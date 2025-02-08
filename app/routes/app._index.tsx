@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import {
@@ -6,20 +5,28 @@ import {
   Layout,
   Text,
   Card,
-  Button,
   BlockStack,
-  Box,
   List,
   Link,
   InlineStack,
+  DataTable,
 } from "@shopify/polaris";
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
+import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
 
-  return null;
+  // TODO: Fetch actual stats from your backend
+  return {
+    stats: {
+      totalTransactions: 0,
+      successfulTransactions: 0,
+      failedTransactions: 0,
+      totalAmount: "0.00",
+    },
+    recentTransactions: [],
+  };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -92,31 +99,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Index() {
-  const fetcher = useFetcher<typeof action>();
-
-  const shopify = useAppBridge();
-  const isLoading =
-    ["loading", "submitting"].includes(fetcher.state) &&
-    fetcher.formMethod === "POST";
-  const productId = fetcher.data?.product?.id.replace(
-    "gid://shopify/Product/",
-    "",
-  );
-
-  useEffect(() => {
-    if (productId) {
-      shopify.toast.show("Product created");
+  const { stats } = useFetcher<typeof loader>().data || {
+    stats: {
+      totalTransactions: 0,
+      successfulTransactions: 0,
+      failedTransactions: 0,
+      totalAmount: "0.00",
     }
-  }, [productId, shopify]);
-  const generateProduct = () => fetcher.submit({}, { method: "POST" });
+  };
 
   return (
     <Page>
-      <TitleBar title="Remix app template">
-        <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button>
-      </TitleBar>
+      <TitleBar title="Welcome !" />
       <BlockStack gap="500">
         <Layout>
           <Layout.Section>
@@ -124,202 +118,134 @@ export default function Index() {
               <BlockStack gap="500">
                 <BlockStack gap="200">
                   <Text as="h2" variant="headingMd">
-                    Congrats on creating a new Shopify app 🎉
+                    Welcome to your lomi. dashboard on Shopify 🌟
                   </Text>
-                  <Text variant="bodyMd" as="p">
-                    This embedded app template uses{" "}
-                    <Link
-                      url="https://shopify.dev/docs/apps/tools/app-bridge"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      App Bridge
-                    </Link>{" "}
-                    interface examples like an{" "}
-                    <Link url="/app/additional" removeUnderline>
-                      additional page in the app nav
-                    </Link>
-                    , as well as an{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      Admin GraphQL
-                    </Link>{" "}
-                    mutation demo, to provide a starting point for app
-                    development.
+                  <Text variant="bodyMd" as="p" tone="subdued">
+                    Monitor your transactions, configure settings, and get support all in one place.
                   </Text>
                 </BlockStack>
-                <BlockStack gap="200">
-                  <Text as="h3" variant="headingMd">
-                    Get started with products
-                  </Text>
-                  <Text as="p" variant="bodyMd">
-                    Generate a product with GraphQL and get the JSON output for
-                    that product. Learn more about the{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      productCreate
-                    </Link>{" "}
-                    mutation in our API references.
-                  </Text>
-                </BlockStack>
-                <InlineStack gap="300">
-                  <Button loading={isLoading} onClick={generateProduct}>
-                    Generate a product
-                  </Button>
-                  {fetcher.data?.product && (
-                    <Button
-                      url={`shopify:admin/products/${productId}`}
-                      target="_blank"
-                      variant="plain"
-                    >
-                      View product
-                    </Button>
-                  )}
+
+                {/* Stats Overview */}
+                <InlineStack gap="300" wrap={false} align="start">
+                  <Card background="bg-surface-secondary">
+                    <BlockStack gap="200">
+                      <Text as="h3" variant="headingMd" tone="subdued">Total Transactions</Text>
+                      <Text as="p" variant="heading3xl">{stats.totalTransactions}</Text>
+                    </BlockStack>
+                  </Card>
+                  <Card background="bg-surface-success">
+                    <BlockStack gap="200">
+                      <Text as="h3" variant="headingMd" tone="success">Successful</Text>
+                      <Text as="p" variant="heading3xl" tone="success">{stats.successfulTransactions}</Text>
+                    </BlockStack>
+                  </Card>
+                  <Card background="bg-surface-critical">
+                    <BlockStack gap="200">
+                      <Text as="h3" variant="headingMd" tone="critical">Failed</Text>
+                      <Text as="p" variant="heading3xl" tone="critical">{stats.failedTransactions}</Text>
+                    </BlockStack>
+                  </Card>
+                  <Card background="bg-surface-secondary">
+                    <BlockStack gap="200">
+                      <Text as="h3" variant="headingMd">Total Amount</Text>
+                      <Text as="p" variant="heading3xl">${stats.totalAmount}</Text>
+                    </BlockStack>
+                  </Card>
                 </InlineStack>
-                {fetcher.data?.product && (
-                  <>
-                    <Text as="h3" variant="headingMd">
-                      {" "}
-                      productCreate mutation
-                    </Text>
-                    <Box
-                      padding="400"
-                      background="bg-surface-active"
-                      borderWidth="025"
-                      borderRadius="200"
-                      borderColor="border"
-                      overflowX="scroll"
-                    >
-                      <pre style={{ margin: 0 }}>
-                        <code>
-                          {JSON.stringify(fetcher.data.product, null, 2)}
-                        </code>
-                      </pre>
-                    </Box>
-                    <Text as="h3" variant="headingMd">
-                      {" "}
-                      productVariantsBulkUpdate mutation
-                    </Text>
-                    <Box
-                      padding="400"
-                      background="bg-surface-active"
-                      borderWidth="025"
-                      borderRadius="200"
-                      borderColor="border"
-                      overflowX="scroll"
-                    >
-                      <pre style={{ margin: 0 }}>
-                        <code>
-                          {JSON.stringify(fetcher.data.variant, null, 2)}
-                        </code>
-                      </pre>
-                    </Box>
-                  </>
-                )}
+
+                {/* Recent Transactions */}
+                <Card>
+                  <BlockStack gap="400">
+                    <InlineStack align="space-between">
+                      <Text as="h3" variant="headingMd">
+                        Recent Transactions
+                      </Text>
+                      <Link url="/app/transactions" removeUnderline>View all</Link>
+                    </InlineStack>
+                    <DataTable
+                      columnContentTypes={[
+                        'text',
+                        'text',
+                        'numeric',
+                        'text',
+                        'text',
+                      ]}
+                      headings={[
+                        'Transaction ID',
+                        'Date',
+                        'Amount',
+                        'Status',
+                        'Customer',
+                      ]}
+                      rows={[
+                        [
+                          'No transactions yet',
+                          '-',
+                          '-',
+                          '-',
+                          '-',
+                        ],
+                      ]}
+                    />
+                  </BlockStack>
+                </Card>
               </BlockStack>
             </Card>
           </Layout.Section>
+
           <Layout.Section variant="oneThird">
             <BlockStack gap="500">
               <Card>
-                <BlockStack gap="200">
+                <BlockStack gap="300">
                   <Text as="h2" variant="headingMd">
-                    App template specs
+                    Actions
                   </Text>
-                  <BlockStack gap="200">
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Framework
-                      </Text>
-                      <Link
-                        url="https://remix.run"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        Remix
-                      </Link>
-                    </InlineStack>
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Database
-                      </Text>
-                      <Link
-                        url="https://www.prisma.io/"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        Prisma
-                      </Link>
-                    </InlineStack>
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Interface
-                      </Text>
-                      <span>
-                        <Link
-                          url="https://polaris.shopify.com"
-                          target="_blank"
-                          removeUnderline
-                        >
-                          Polaris
-                        </Link>
-                        {", "}
-                        <Link
-                          url="https://shopify.dev/docs/apps/tools/app-bridge"
-                          target="_blank"
-                          removeUnderline
-                        >
-                          App Bridge
-                        </Link>
-                      </span>
-                    </InlineStack>
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        API
-                      </Text>
-                      <Link
-                        url="https://shopify.dev/docs/api/admin-graphql"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        GraphQL API
-                      </Link>
-                    </InlineStack>
-                  </BlockStack>
-                </BlockStack>
-              </Card>
-              <Card>
-                <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Next steps
-                  </Text>
-                  <List>
+                  <List type="bullet">
                     <List.Item>
-                      Build an{" "}
-                      <Link
-                        url="https://shopify.dev/docs/apps/getting-started/build-app-example"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        {" "}
-                        example app
-                      </Link>{" "}
-                      to get started
+                      <Link url="/app/settings" removeUnderline>
+                        Configure your API keys
+                      </Link>
                     </List.Item>
                     <List.Item>
-                      Explore Shopify’s API with{" "}
+                      <Link url="/app/support" removeUnderline>
+                        Get support
+                      </Link>
+                    </List.Item>
+                  </List>
+                </BlockStack>
+              </Card>
+
+              <Card>
+                <BlockStack gap="300">
+                  <Text as="h2" variant="headingMd">
+                    Resources
+                  </Text>
+                  <List type="bullet">
+                    <List.Item>
                       <Link
-                        url="https://shopify.dev/docs/apps/tools/graphiql-admin-api"
+                        url="https://docs.lomi.africa"
                         target="_blank"
                         removeUnderline
                       >
-                        GraphiQL
+                        API documentation
+                      </Link>
+                    </List.Item>
+                    <List.Item>
+                      <Link
+                        url="https://lomi.africa/integration-guide"
+                        target="_blank"
+                        removeUnderline
+                      >
+                        lomi. is open source
+                      </Link>
+                    </List.Item>
+                    <List.Item>
+                      <Link
+                        url="https://status.lomi.africa"
+                        target="_blank"
+                        removeUnderline
+                      >
+                        System status
                       </Link>
                     </List.Item>
                   </List>

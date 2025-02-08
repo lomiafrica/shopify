@@ -1,13 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "4ec8f252fab6aec1412e7345162879dd"
-application_url = "https://example.com/"
+application_url = "https://disclose-indian-bermuda-ko.trycloudflare.com"
 embedded = true
 name = "lomi-app"
 handle = "lomi-app"
 
 [build]
 include_config_on_deploy = true
+automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-01"
@@ -25,7 +26,11 @@ api_version = "2025-01"
 scopes = "write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://disclose-indian-bermuda-ko.trycloudflare.com/auth/callback",
+  "https://disclose-indian-bermuda-ko.trycloudflare.com/auth/shopify/callback",
+  "https://disclose-indian-bermuda-ko.trycloudflare.com/api/auth/callback"
+]
 
 [pos]
 embedded = false
