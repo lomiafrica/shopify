@@ -223,7 +223,7 @@ export default function Index() {
                   <List type="bullet">
                     <List.Item>
                       <Link
-                        url="https://docs.lomi.africa"
+                        url="https://developers.lomi.africa/"
                         target="_blank"
                         removeUnderline
                       >
@@ -232,7 +232,7 @@ export default function Index() {
                     </List.Item>
                     <List.Item>
                       <Link
-                        url="https://lomi.africa/integration-guide"
+                        url="https://developers.lomi.africa/open-source"
                         target="_blank"
                         removeUnderline
                       >

@@ -1,39 +1,52 @@
 import type { HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
+import { Outlet, useLoaderData, useRouteError } from "@remix-run/react";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
-import { NavMenu } from "@shopify/app-bridge-react";
+import { Frame, Navigation } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
 };
 
 export default function App() {
   const { apiKey } = useLoaderData<typeof loader>();
 
+  const navigationMarkup = (
+    <Navigation location="/">
+      <Navigation.Section
+        items={[
+          {
+            url: "/app",
+            label: "Dashboard",
+            exactMatch: true,
+          },
+          {
+            url: "/app/transactions",
+            label: "Transactions",
+          },
+          {
+            url: "/app/support",
+            label: "Support",
+          },
+          {
+            url: "/app/settings",
+            label: "Settings",
+          },
+        ]}
+      />
+    </Navigation>
+  );
+
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
-      <NavMenu>
-        <Link to="/app" rel="home" prefetch="intent">
-          Dashboard
-        </Link>
-        <Link to="/app/transactions" prefetch="intent">
-          Transactions
-        </Link>
-        <Link to="/app/settings" prefetch="intent">
-          Settings
-        </Link>
-        <Link to="https://lomi.africa/portal/" target="_blank">
-          lomi. portal
-        </Link>
-      </NavMenu>
-      <Outlet />
+      <Frame navigation={navigationMarkup}>
+        <Outlet />
+      </Frame>
     </AppProvider>
   );
 }

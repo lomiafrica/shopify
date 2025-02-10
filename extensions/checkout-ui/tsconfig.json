@@ -3,7 +3,34 @@
   // About the `react-jsx` tsconfig option, so IDE doesn't complain about missing react import
   // Changing options here won't affect the build of your extension
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "target": "es2021",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": [
+      "@shopify/ui-extensions/checkout",
+      "@shopify/ui-extensions-react/checkout"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["./src"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

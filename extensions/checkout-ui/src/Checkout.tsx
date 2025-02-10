@@ -3,7 +3,6 @@ import {
   Banner,
   BlockStack,
   Button,
-  Image,
   InlineLayout,
   TextBlock,
   useApi,
@@ -17,6 +16,10 @@ import {
   Tag,
   Icon,
   Spinner,
+  PaymentIcon,
+  Progress,
+  Pressable,
+  Image,
 } from "@shopify/ui-extensions-react/checkout";
 import { useState } from "react";
 
@@ -24,6 +27,8 @@ import { useState } from "react";
 interface PaymentState {
   isLoading: boolean;
   error: string | undefined;
+  progress: number;
+  selectedMethod: string | null;
 }
 
 interface LomiPaymentResponse {
@@ -37,6 +42,8 @@ function LomiPayment() {
   const [state, setState] = useState<PaymentState>({
     isLoading: false,
     error: undefined,
+    progress: 0,
+    selectedMethod: null,
   });
 
   const api = useApi();
@@ -46,7 +53,7 @@ function LomiPayment() {
   const canMakeNetworkRequests = useExtensionCapability("network_access");
 
   // Calculate total amount
-  const totalAmount = cartLines.reduce((total, line) => {
+  const totalAmount = cartLines.reduce((total: number, line: { cost: { totalAmount: { amount: number } }, quantity: number }) => {
     return total + (line.cost.totalAmount.amount * line.quantity);
   }, 0);
 
@@ -55,29 +62,36 @@ function LomiPayment() {
 
   if (!canMakeNetworkRequests) {
     return (
-      <Banner status="critical">
-        This extension requires network access capabilities.
+      <Banner status="critical" title="Network Access Required">
+        <TextBlock>This extension requires network access capabilities.</TextBlock>
       </Banner>
     );
   }
 
   if (!settings.api_key || !settings.merchant_id) {
     return (
-      <Banner status="critical">
-        Please configure your lomi. API key and merchant ID in the app settings.
+      <Banner status="critical" title="Configuration Required">
+        <TextBlock>Please configure your lomi. API key and merchant ID in the app settings.</TextBlock>
       </Banner>
     );
   }
 
-  async function handlePaymentInitiation() {
+  async function handlePaymentInitiation(method: string = state.selectedMethod || 'WAVE') {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: undefined }));
+      setState(prev => ({
+        ...prev,
+        isLoading: true,
+        error: undefined,
+        progress: 25,
+        selectedMethod: method,
+      }));
 
-      // Get checkout details
       const checkoutToken = await api.sessionToken.get();
-      const buyerIdentity = api.buyerIdentity;
+      setState(prev => ({ ...prev, progress: 50 }));
 
-      // Initialize payment with Lomi API
+      const buyerIdentity = api.buyerIdentity;
+      setState(prev => ({ ...prev, progress: 75 }));
+
       const response = await fetch("https://api.lomi.africa/v1/payments/initialize", {
         method: "POST",
         headers: {
@@ -90,10 +104,13 @@ function LomiPayment() {
           currency: currencyCode,
           checkout_token: checkoutToken,
           redirect_url: globalThis.location?.href || "",
-          customer_email: buyerIdentity.email,
+          customer_email: buyerIdentity?.email || "",
           shop_name: shop.name,
+          payment_method: method,
         }),
       });
+
+      setState(prev => ({ ...prev, progress: 90 }));
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -101,6 +118,7 @@ function LomiPayment() {
       }
 
       const { payment_url } = await response.json() as LomiPaymentResponse;
+      setState(prev => ({ ...prev, progress: 100 }));
       globalThis.location?.assign(payment_url);
 
     } catch (err) {
@@ -108,25 +126,25 @@ function LomiPayment() {
       setState(prev => ({
         ...prev,
         error: error.message,
+        progress: 0,
       }));
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }
   }
 
+  const paymentMethods = [
+    { id: 'WAVE', name: 'Wave', icon: 'wave' },
+    { id: 'ORANGE', name: 'Orange Money', icon: 'orange-money' },
+    { id: 'MTN', name: 'MTN Money', icon: 'mtn-mobile-money' },
+  ];
+
   return (
     <BlockStack spacing="loose">
       <View border="base" cornerRadius="base" padding="base">
         <BlockStack spacing="tight">
-          {/* Header */}
           <InlineLayout spacing="base" columns={["auto", "fill", "auto"]} blockAlignment="center">
-            <Image
-              source="https://lomi.africa/icon-L.webp"
-              accessibilityRole="decorative"
-              aspectRatio={1}
-              border="base"
-              cornerRadius="base"
-            />
+            <Image source="https://lomi.africa/icon-L.webp" aspectRatio={1} border="base" cornerRadius="base" />
             <BlockStack spacing="extraTight">
               <Text size="large" emphasis="bold">Pay with lomi.</Text>
               <Text appearance="subdued" size="small">Fast and secure payment</Text>
@@ -136,7 +154,30 @@ function LomiPayment() {
 
           <Divider />
 
-          {/* Payment Details */}
+          <BlockStack spacing="base">
+            <Text size="medium" emphasis="bold">Choose payment method</Text>
+            <InlineLayout spacing="base" columns={["fill", "fill", "fill"]} blockAlignment="center">
+              {paymentMethods.map((method) => (
+                <Pressable
+                  key={method.id}
+                  onPress={() => handlePaymentInitiation(method.id)}
+                  disabled={state.isLoading}
+                >
+                  <View
+                    border="base"
+                    padding="base"
+                    cornerRadius="base"
+                  >
+                    <BlockStack spacing="tight" inlineAlignment="center">
+                      <PaymentIcon name={method.icon} accessibilityLabel={`${method.name} payment`} />
+                      <Text size="small">{method.name}</Text>
+                    </BlockStack>
+                  </View>
+                </Pressable>
+              ))}
+            </InlineLayout>
+          </BlockStack>
+
           <BlockStack spacing="base">
             <InlineLayout columns={["fill", "auto"]} spacing="base" blockAlignment="center" padding="base">
               <Text>Amount to pay</Text>
@@ -145,49 +186,58 @@ function LomiPayment() {
               </Text>
             </InlineLayout>
 
-            {/* Features */}
-            <View padding="base" cornerRadius="base">
-              <BlockStack spacing="tight">
-                <InlineLayout spacing="base" blockAlignment="center">
-                  <Icon source="checkmark" appearance="success" />
-                  <Text emphasis="bold">Instant payment confirmation</Text>
-                </InlineLayout>
-                <InlineLayout spacing="base" blockAlignment="center">
-                  <Icon source="lock" appearance="info" />
-                  <Text emphasis="bold">Secure and encrypted transaction</Text>
-                </InlineLayout>
-                <InlineLayout spacing="base" blockAlignment="center">
-                  <Icon source="mobile" appearance="info" />
-                  <Text emphasis="bold">Mobile-friendly experience</Text>
-                </InlineLayout>
-              </BlockStack>
-            </View>
+            {state.isLoading && (
+              <Progress
+                value={state.progress}
+                accessibilityLabel="Payment progress"
+              />
+            )}
           </BlockStack>
 
-          {/* Error Message */}
+          <View padding="base" cornerRadius="base" border="base">
+            <BlockStack spacing="tight">
+              <InlineLayout spacing="base" blockAlignment="center">
+                <Icon source="checkmark" appearance="success" />
+                <Text emphasis="bold">Instant payment confirmation</Text>
+              </InlineLayout>
+              <InlineLayout spacing="base" blockAlignment="center">
+                <Icon source="lock" appearance="info" />
+                <Text emphasis="bold">Secure and encrypted transaction</Text>
+              </InlineLayout>
+              <InlineLayout spacing="base" blockAlignment="center">
+                <Icon source="mobile" appearance="info" />
+                <Text emphasis="bold">Mobile-friendly experience</Text>
+              </InlineLayout>
+            </BlockStack>
+          </View>
+
           {state.error && (
-            <Banner status="critical">
+            <Banner status="critical" title="Payment Error">
               <TextBlock>{state.error}</TextBlock>
             </Banner>
           )}
 
-          {/* Pay Button */}
           <View padding="base">
-            <Button
-              onPress={handlePaymentInitiation}
-              disabled={state.isLoading}
-              kind="primary"
-              appearance="monochrome"
-            >
-              {state.isLoading ? (
-                <InlineLayout spacing="tight" blockAlignment="center">
-                  <Spinner size="small" appearance="accent" />
-                  <Text emphasis="bold">Processing...</Text>
-                </InlineLayout>
-              ) : (
-                <Text emphasis="bold" size="medium">Pay with lomi.</Text>
-              )}
-            </Button>
+            <Pressable onPress={() => handlePaymentInitiation()} disabled={state.isLoading}>
+              <Button
+                kind="primary"
+                appearance="monochrome"
+                disabled={state.isLoading}
+                inlineAlignment="center"
+                onPress={() => handlePaymentInitiation()}
+              >
+                {state.isLoading ? (
+                  <InlineLayout spacing="tight" blockAlignment="center">
+                    <Spinner size="small" appearance="accent" />
+                    <Text emphasis="bold">Processing...</Text>
+                  </InlineLayout>
+                ) : (
+                  <Text emphasis="bold" size="medium">
+                    Pay with {state.selectedMethod ? paymentMethods.find(m => m.id === state.selectedMethod)?.name : 'lomi.'}
+                  </Text>
+                )}
+              </Button>
+            </Pressable>
           </View>
         </BlockStack>
       </View>
