@@ -5,9 +5,8 @@ import { supabaseAdmin } from "../../utils/supabase/server";
 export class SupabaseSessionStorage {
   async storeSession(session: SessionInterface): Promise<boolean> {
     try {
-      const { error } = await supabaseAdmin
-        .from('shopify_sessions')
-        .upsert({
+      const { error } = await supabaseAdmin.from("shopify_sessions").upsert(
+        {
           id: session.id,
           shop: session.shop,
           state: session.state,
@@ -19,19 +18,24 @@ export class SupabaseSessionStorage {
           firstName: session.onlineAccessInfo?.associated_user?.first_name,
           lastName: session.onlineAccessInfo?.associated_user?.last_name,
           email: session.onlineAccessInfo?.associated_user?.email,
-          accountOwner: session.onlineAccessInfo?.associated_user?.account_owner,
+          accountOwner:
+            session.onlineAccessInfo?.associated_user?.account_owner,
           locale: session.onlineAccessInfo?.associated_user?.locale,
           collaborator: session.onlineAccessInfo?.associated_user?.collaborator,
-          emailVerified: session.onlineAccessInfo?.associated_user?.email_verified,
+          emailVerified:
+            session.onlineAccessInfo?.associated_user?.email_verified,
           expires_in: session.onlineAccessInfo?.expires_in,
-          associated_user_scope: session.onlineAccessInfo?.associated_user_scope,
-        }, {
-          onConflict: 'id'
-        });
+          associated_user_scope:
+            session.onlineAccessInfo?.associated_user_scope,
+        },
+        {
+          onConflict: "id",
+        },
+      );
 
       return !error;
     } catch (error) {
-      console.error('Error storing session:', error);
+      console.error("Error storing session:", error);
       return false;
     }
   }
@@ -39,9 +43,9 @@ export class SupabaseSessionStorage {
   async loadSession(id: string): Promise<SessionInterface | undefined> {
     try {
       const { data: session, error } = await supabaseAdmin
-        .from('shopify_sessions')
-        .select('*')
-        .eq('id', id)
+        .from("shopify_sessions")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (error || !session) {
@@ -50,7 +54,7 @@ export class SupabaseSessionStorage {
 
       return this.deserializeSession(session);
     } catch (error) {
-      console.error('Error loading session:', error);
+      console.error("Error loading session:", error);
       return undefined;
     }
   }
@@ -58,13 +62,13 @@ export class SupabaseSessionStorage {
   async deleteSession(id: string): Promise<boolean> {
     try {
       const { error } = await supabaseAdmin
-        .from('shopify_sessions')
+        .from("shopify_sessions")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       return !error;
     } catch (error) {
-      console.error('Error deleting session:', error);
+      console.error("Error deleting session:", error);
       return false;
     }
   }
@@ -72,13 +76,13 @@ export class SupabaseSessionStorage {
   async deleteSessions(ids: string[]): Promise<boolean> {
     try {
       const { error } = await supabaseAdmin
-        .from('shopify_sessions')
+        .from("shopify_sessions")
         .delete()
-        .in('id', ids);
+        .in("id", ids);
 
       return !error;
     } catch (error) {
-      console.error('Error deleting sessions:', error);
+      console.error("Error deleting sessions:", error);
       return false;
     }
   }
@@ -86,17 +90,17 @@ export class SupabaseSessionStorage {
   async findSessionsByShop(shop: string): Promise<SessionInterface[]> {
     try {
       const { data: sessions, error } = await supabaseAdmin
-        .from('shopify_sessions')
-        .select('*')
-        .eq('shop', shop);
+        .from("shopify_sessions")
+        .select("*")
+        .eq("shop", shop);
 
       if (error || !sessions) {
         return [];
       }
 
-      return sessions.map(session => this.deserializeSession(session));
+      return sessions.map((session) => this.deserializeSession(session));
     } catch (error) {
-      console.error('Error finding sessions by shop:', error);
+      console.error("Error finding sessions by shop:", error);
       return [];
     }
   }
@@ -110,20 +114,22 @@ export class SupabaseSessionStorage {
       scope: dbSession.scope,
       expires: dbSession.expires ? new Date(dbSession.expires) : undefined,
       accessToken: dbSession.accessToken,
-      onlineAccessInfo: dbSession.userId ? {
-        associated_user: {
-          id: dbSession.userId,
-          first_name: dbSession.firstName,
-          last_name: dbSession.lastName,
-          email: dbSession.email,
-          account_owner: dbSession.accountOwner,
-          locale: dbSession.locale,
-          collaborator: dbSession.collaborator,
-          email_verified: dbSession.emailVerified,
-        },
-        expires_in: dbSession.expires_in,
-        associated_user_scope: dbSession.associated_user_scope,
-      } : undefined,
+      onlineAccessInfo: dbSession.userId
+        ? {
+            associated_user: {
+              id: dbSession.userId,
+              first_name: dbSession.firstName,
+              last_name: dbSession.lastName,
+              email: dbSession.email,
+              account_owner: dbSession.accountOwner,
+              locale: dbSession.locale,
+              collaborator: dbSession.collaborator,
+              email_verified: dbSession.emailVerified,
+            },
+            expires_in: dbSession.expires_in,
+            associated_user_scope: dbSession.associated_user_scope,
+          }
+        : undefined,
     });
   }
 }

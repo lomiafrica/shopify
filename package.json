@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "remix build",
+    "format": "prettier --write .",
     "dev": "remix dev",
     "start": "remix-serve build/index.js",
     "typecheck": "tsc",

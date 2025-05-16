@@ -105,7 +105,7 @@ export default function Index() {
       successfulTransactions: 0,
       failedTransactions: 0,
       totalAmount: "0.00",
-    }
+    },
   };
 
   return (
@@ -121,7 +121,8 @@ export default function Index() {
                     Welcome to your lomi. dashboard on Shopify 🌟
                   </Text>
                   <Text variant="bodyMd" as="p" tone="subdued">
-                    Monitor your transactions, configure settings, and get support all in one place.
+                    Monitor your transactions, configure settings, and get
+                    support all in one place.
                   </Text>
                 </BlockStack>
 
@@ -129,26 +130,42 @@ export default function Index() {
                 <InlineStack gap="300" wrap={false} align="start">
                   <Card background="bg-surface-secondary">
                     <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd" tone="subdued">Total Transactions</Text>
-                      <Text as="p" variant="heading3xl">{stats.totalTransactions}</Text>
+                      <Text as="h3" variant="headingMd" tone="subdued">
+                        Total Transactions
+                      </Text>
+                      <Text as="p" variant="heading3xl">
+                        {stats.totalTransactions}
+                      </Text>
                     </BlockStack>
                   </Card>
                   <Card background="bg-surface-success">
                     <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd" tone="success">Successful</Text>
-                      <Text as="p" variant="heading3xl" tone="success">{stats.successfulTransactions}</Text>
+                      <Text as="h3" variant="headingMd" tone="success">
+                        Successful
+                      </Text>
+                      <Text as="p" variant="heading3xl" tone="success">
+                        {stats.successfulTransactions}
+                      </Text>
                     </BlockStack>
                   </Card>
                   <Card background="bg-surface-critical">
                     <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd" tone="critical">Failed</Text>
-                      <Text as="p" variant="heading3xl" tone="critical">{stats.failedTransactions}</Text>
+                      <Text as="h3" variant="headingMd" tone="critical">
+                        Failed
+                      </Text>
+                      <Text as="p" variant="heading3xl" tone="critical">
+                        {stats.failedTransactions}
+                      </Text>
                     </BlockStack>
                   </Card>
                   <Card background="bg-surface-secondary">
                     <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd">Total Amount</Text>
-                      <Text as="p" variant="heading3xl">${stats.totalAmount}</Text>
+                      <Text as="h3" variant="headingMd">
+                        Total Amount
+                      </Text>
+                      <Text as="p" variant="heading3xl">
+                        ${stats.totalAmount}
+                      </Text>
                     </BlockStack>
                   </Card>
                 </InlineStack>
@@ -160,32 +177,26 @@ export default function Index() {
                       <Text as="h3" variant="headingMd">
                         Recent Transactions
                       </Text>
-                      <Link url="/app/transactions" removeUnderline>View all</Link>
+                      <Link url="/app/transactions" removeUnderline>
+                        View all
+                      </Link>
                     </InlineStack>
                     <DataTable
                       columnContentTypes={[
-                        'text',
-                        'text',
-                        'numeric',
-                        'text',
-                        'text',
+                        "text",
+                        "text",
+                        "numeric",
+                        "text",
+                        "text",
                       ]}
                       headings={[
-                        'Transaction ID',
-                        'Date',
-                        'Amount',
-                        'Status',
-                        'Customer',
+                        "Transaction ID",
+                        "Date",
+                        "Amount",
+                        "Status",
+                        "Customer",
                       ]}
-                      rows={[
-                        [
-                          'No transactions yet',
-                          '-',
-                          '-',
-                          '-',
-                          '-',
-                        ],
-                      ]}
+                      rows={[["No transactions yet", "-", "-", "-", "-"]]}
                     />
                   </BlockStack>
                 </Card>

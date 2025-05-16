@@ -172,7 +172,8 @@ export default function SettingsPage() {
                     >
                       documentation
                     </Button>{" "}
-                    to learn how to get your API keys and set up custom integrations.
+                    to learn how to get your API keys and set up custom
+                    integrations.
                   </Text>
                 </Box>
               </Box>

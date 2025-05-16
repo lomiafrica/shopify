@@ -8,9 +8,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   try {
     const { data: settings, error } = await supabase
-      .from('shopify_shop_settings')
-      .select('*')
-      .eq('shop', session.shop)
+      .from("shopify_shop_settings")
+      .select("*")
+      .eq("shop", session.shop)
       .single();
 
     if (error) throw error;
@@ -41,25 +41,28 @@ export async function action({ request }: ActionFunctionArgs) {
 
     // Save settings to Supabase
     const { error: upsertError } = await supabase
-      .from('shopify_shop_settings')
+      .from("shopify_shop_settings")
       .upsert(settings, {
-        onConflict: 'shop',
+        onConflict: "shop",
       });
 
     if (upsertError) throw upsertError;
 
     // Register the checkout extension
-    const response = await fetch("https://api.lomi.africa/v1/shopify/register-extension", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${data.api_key}`,
+    const response = await fetch(
+      "https://api.lomi.africa/v1/shopify/register-extension",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.api_key}`,
+        },
+        body: JSON.stringify({
+          shop: session.shop,
+          merchant_id: data.merchant_id,
+        }),
       },
-      body: JSON.stringify({
-        shop: session.shop,
-        merchant_id: data.merchant_id,
-      }),
-    });
+    );
 
     if (!response.ok) {
       throw new Error("Failed to register extension");
@@ -68,8 +71,12 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ success: true });
   } catch (error) {
     console.error("Error saving settings:", error);
-    return json({
-      error: error instanceof Error ? error.message : "Failed to save settings"
-    }, { status: 500 });
+    return json(
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to save settings",
+      },
+      { status: 500 },
+    );
   }
 }

@@ -40,7 +40,8 @@ export default function SupportPage() {
               <Box padding="400">
                 <BlockStack gap="400">
                   <Text as="p" variant="bodyMd">
-                    Get help with your integration or ask questions about our services.
+                    Get help with your integration or ask questions about our
+                    services.
                   </Text>
                   <List type="bullet">
                     <List.Item>
@@ -79,7 +80,8 @@ export default function SupportPage() {
               <Box padding="400">
                 <BlockStack gap="400">
                   <Text as="p" variant="bodyMd">
-                    Our support team is available 24/7 to help you with any issues.
+                    Our support team is available 24/7 to help you with any
+                    issues.
                   </Text>
                   <Button
                     url="mailto:support@lomi.africa"
@@ -88,10 +90,7 @@ export default function SupportPage() {
                   >
                     Email Support
                   </Button>
-                  <Button
-                    url="https://wa.me/2250700000000"
-                    external
-                  >
+                  <Button url="https://wa.me/2250700000000" external>
                     WhatsApp Support
                   </Button>
                 </BlockStack>
