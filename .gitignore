@@ -1,19 +1,19 @@
-# Build files
+# Build
 node_modules
 /build
 /app/build
 /public/build/
 /public/_dev
 /app/public/build
-database.sqlite
 /library
 /extensions/*/dist
 .cursor
-# Environment files
+
+# Environment
 .env
 .env.*
 
-# Cache files
+# Cache
 /.cache
 
 # Ignore shopify files created during app dev
