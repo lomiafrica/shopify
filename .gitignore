@@ -1,23 +1,20 @@
+# Build files
 node_modules
-
-/.cache
 /build
 /app/build
 /public/build/
 /public/_dev
 /app/public/build
-/prisma/dev.sqlite
-/prisma/dev.sqlite-journal
 database.sqlite
 /library
+/extensions/*/dist
+.cursor
+# Environment files
 .env
 .env.*
 
-
-
-
-
-/extensions/*/dist
+# Cache files
+/.cache
 
 # Ignore shopify files created during app dev
 .shopify/*

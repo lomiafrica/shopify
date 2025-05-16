@@ -1,5 +1,5 @@
 {
-  "name": "lomi-app",
+  "name": "lomi-shopify",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@prisma/client": "^6.8.2",
     "@remix-run/fs-routes": "^2.16.6",
     "@remix-run/node": "^2.5.0",
     "@remix-run/react": "^2.5.0",
@@ -34,12 +33,14 @@
   "devDependencies": {
     "@remix-run/dev": "^2.5.0",
     "@remix-run/eslint-config": "^2.5.0",
+    "@shopify/api-codegen-preset": "^1.1.7",
     "@types/eslint": "^8.44.7",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^9.0.0",
+    "graphql-config": "^5.1.5",
     "prettier": "^3.1.0",
     "typescript": "^5.1.6",
     "vitest": "^1.0.0"
