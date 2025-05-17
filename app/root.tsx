@@ -5,13 +5,12 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node"; // or cloudflare/deno
+import type { LinksFunction } from "@remix-run/node";
 
-import tailwindStyles from "./tailwind.css?url"; // Import the CSS file
+import tailwindStyles from "./index.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: tailwindStyles },
-  // You can keep existing links or add others here if needed
   {
     rel: "stylesheet",
     href: "https://cdn.shopify.com/static/fonts/inter/v4/styles.css",

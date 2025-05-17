@@ -5,7 +5,7 @@
   "scripts": {
     "build": "remix build",
     "format": "prettier --write .",
-    "dev": "remix dev",
+    "dev": "vite dev",
     "start": "remix-serve build/index.js",
     "typecheck": "tsc",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
@@ -41,6 +41,7 @@
     "@remix-run/dev": "^2.5.0",
     "@remix-run/eslint-config": "^2.5.0",
     "@shopify/api-codegen-preset": "^1.1.7",
+    "@tailwindcss/postcss": "^4.1.7",
     "@types/eslint": "^8.44.7",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.20",

@@ -2,18 +2,27 @@ import { shopifyApp } from "@shopify/shopify-app-remix/server";
 import { DeliveryMethod, ApiVersion } from "@shopify/shopify-api";
 import { SupabaseSessionStorage } from "./utils/session-storage";
 
-if (!process.env.SHOPIFY_API_KEY) {
-  throw new Error("Missing SHOPIFY_API_KEY environment variable");
+if (!process.env.SHOPIFY_CLIENT_ID) {
+  throw new Error("Missing SHOPIFY_CLIENT_ID environment variable");
 }
 
-if (!process.env.SHOPIFY_API_SECRET) {
-  throw new Error("Missing SHOPIFY_API_SECRET environment variable");
+if (!process.env.SHOPIFY_CLIENT_SECRET) {
+  throw new Error("Missing SHOPIFY_CLIENT_SECRET environment variable");
+}
+
+if (!process.env.SHOPIFY_APP_URL) {
+  throw new Error("Missing SHOPIFY_APP_URL environment variable");
+}
+
+if (!process.env.SHOPIFY_SCOPES) {
+  throw new Error("Missing SHOPIFY_SCOPES environment variable");
 }
 
 const shopify = shopifyApp({
-  apiKey: process.env.SHOPIFY_API_KEY || "",
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
-  appUrl: process.env.SHOPIFY_APP_URL || "",
+  apiKey: process.env.SHOPIFY_CLIENT_ID,
+  apiSecretKey: process.env.SHOPIFY_CLIENT_SECRET,
+  appUrl: process.env.SHOPIFY_APP_URL,
+  scopes: (process.env.SHOPIFY_SCOPES || "").split(',').map(scope => scope.trim()).filter(scope => scope),
   authPathPrefix: "/auth",
   sessionStorage: new SupabaseSessionStorage(),
   apiVersion: ApiVersion.January23,

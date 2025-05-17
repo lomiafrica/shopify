@@ -1,3 +1,4 @@
+import pkg from "@shopify/app-bridge-react";
 import {
   Box,
   Card,
@@ -8,7 +9,8 @@ import {
   Text,
   BlockStack,
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
+
+const { TitleBar } = pkg;
 
 export default function AdditionalPage() {
   return (

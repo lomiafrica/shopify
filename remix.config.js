@@ -7,8 +7,11 @@ export default {
     "@shopify/shopify-app-remix",
     /^@shopify\/polaris/,
   ],
-  watchPaths: ["./public"],
+  watchPaths: ["app/index.css"],
+  tailwind: true,
+  postcss: true,
   future: {
+    unstable_vite: true,
     v3_fetcherPersist: true,
     v3_lazyRouteDiscovery: true,
     v3_relativeSplatPath: true,

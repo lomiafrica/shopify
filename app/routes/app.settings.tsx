@@ -1,3 +1,4 @@
+import pkg from "@shopify/app-bridge-react";
 import {
   Page,
   Layout,
@@ -10,9 +11,10 @@ import {
   Box,
   Banner,
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "@remix-run/react";
+
+const { TitleBar } = pkg;
 
 export default function SettingsPage() {
   const navigate = useNavigate();

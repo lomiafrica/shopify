@@ -1,5 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
+import pkg from "@shopify/app-bridge-react";
 import {
   Page,
   Layout,
@@ -11,8 +12,9 @@ import {
   InlineStack,
   DataTable,
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
+
+const { TitleBar } = pkg;
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
