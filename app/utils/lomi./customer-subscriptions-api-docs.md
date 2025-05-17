@@ -26,13 +26,13 @@ Lists all subscriptions for a merchant with optional filtering by customer ID or
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| merchant_id | string (UUID) | Yes | ID of the merchant |
-| customer_id | string (UUID) | No | Filter subscriptions by customer ID |
-| status | string | No | Filter by subscription status (pending, active, paused, cancelled, expired, past_due, trial) |
-| limit | number | No | Number of results per page (default: 20) |
-| offset | number | No | Number of results to skip (default: 0) |
+| Parameter   | Type          | Required | Description                                                                                  |
+| ----------- | ------------- | -------- | -------------------------------------------------------------------------------------------- |
+| merchant_id | string (UUID) | Yes      | ID of the merchant                                                                           |
+| customer_id | string (UUID) | No       | Filter subscriptions by customer ID                                                          |
+| status      | string        | No       | Filter by subscription status (pending, active, paused, cancelled, expired, past_due, trial) |
+| limit       | number        | No       | Number of results per page (default: 20)                                                     |
+| offset      | number        | No       | Number of results to skip (default: 0)                                                       |
 
 **Example Response:**
 
@@ -59,7 +59,7 @@ Lists all subscriptions for a merchant with optional filtering by customer ID or
       "metadata": { "source": "checkout_session" },
       "created_at": "2025-01-01T00:00:00.000Z",
       "updated_at": "2025-01-01T00:00:00.000Z"
-    },
+    }
     // Additional subscriptions...
   ],
   "meta": {
@@ -72,12 +72,12 @@ Lists all subscriptions for a merchant with optional filtering by customer ID or
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 400 | Invalid or missing merchant_id | The merchant ID is invalid or missing |
-| 401 | API key required | Authentication failed or API key is missing |
-| 401 | Invalid API key | The provided API key is invalid |
-| 500 | Internal server error | An unexpected error occurred |
+| Status Code | Error                          | Description                                 |
+| ----------- | ------------------------------ | ------------------------------------------- |
+| 400         | Invalid or missing merchant_id | The merchant ID is invalid or missing       |
+| 401         | API key required               | Authentication failed or API key is missing |
+| 401         | Invalid API key                | The provided API key is invalid             |
+| 500         | Internal server error          | An unexpected error occurred                |
 
 ### Get Subscription Details
 
@@ -87,15 +87,15 @@ Retrieves details of a specific subscription.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| subscription_id | string (UUID) | Yes | ID of the subscription to retrieve |
+| Parameter       | Type          | Required | Description                        |
+| --------------- | ------------- | -------- | ---------------------------------- |
+| subscription_id | string (UUID) | Yes      | ID of the subscription to retrieve |
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| merchant_id | string (UUID) | Yes | ID of the merchant |
+| Parameter   | Type          | Required | Description        |
+| ----------- | ------------- | -------- | ------------------ |
+| merchant_id | string (UUID) | Yes      | ID of the merchant |
 
 **Example Response:**
 
@@ -128,13 +128,13 @@ Retrieves details of a specific subscription.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 400 | Invalid subscription_id | The subscription ID format is invalid |
-| 400 | Invalid or missing merchant_id | The merchant ID is invalid or missing |
-| 401 | API key required | Authentication failed or API key is missing |
-| 404 | Subscription not found | No subscription found with the provided ID |
-| 500 | Internal server error | An unexpected error occurred |
+| Status Code | Error                          | Description                                 |
+| ----------- | ------------------------------ | ------------------------------------------- |
+| 400         | Invalid subscription_id        | The subscription ID format is invalid       |
+| 400         | Invalid or missing merchant_id | The merchant ID is invalid or missing       |
+| 401         | API key required               | Authentication failed or API key is missing |
+| 404         | Subscription not found         | No subscription found with the provided ID  |
+| 500         | Internal server error          | An unexpected error occurred                |
 
 ### Update Subscription
 
@@ -144,25 +144,25 @@ Updates a subscription's status, dates, or metadata.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| subscription_id | string (UUID) | Yes | ID of the subscription to update |
+| Parameter       | Type          | Required | Description                      |
+| --------------- | ------------- | -------- | -------------------------------- |
+| subscription_id | string (UUID) | Yes      | ID of the subscription to update |
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| merchant_id | string (UUID) | Yes | ID of the merchant |
+| Parameter   | Type          | Required | Description        |
+| ----------- | ------------- | -------- | ------------------ |
+| merchant_id | string (UUID) | Yes      | ID of the merchant |
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| status | string | No | New subscription status (active, paused, cancelled, expired, past_due, trial) |
-| start_date | string (ISO8601) | No | New start date for the subscription |
-| end_date | string (ISO8601) | No | New end date for the subscription |
-| next_billing_date | string (ISO8601) | No | New next billing date for the subscription |
-| metadata | object | No | Additional metadata for the subscription (will be merged with existing metadata) |
+| Parameter         | Type             | Required | Description                                                                      |
+| ----------------- | ---------------- | -------- | -------------------------------------------------------------------------------- |
+| status            | string           | No       | New subscription status (active, paused, cancelled, expired, past_due, trial)    |
+| start_date        | string (ISO8601) | No       | New start date for the subscription                                              |
+| end_date          | string (ISO8601) | No       | New end date for the subscription                                                |
+| next_billing_date | string (ISO8601) | No       | New next billing date for the subscription                                       |
+| metadata          | object           | No       | Additional metadata for the subscription (will be merged with existing metadata) |
 
 **Note:** At least one parameter must be provided for update.
 
@@ -212,15 +212,15 @@ Updates a subscription's status, dates, or metadata.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 400 | Invalid subscription_id | The subscription ID format is invalid |
-| 400 | Invalid or missing merchant_id | The merchant ID is invalid or missing |
-| 400 | At least one field must be provided for update | Request body is empty |
-| 400 | Invalid request data | The request body contains invalid data |
-| 401 | API key required | Authentication failed or API key is missing |
-| 404 | Subscription not found or update failed | No subscription found with the provided ID |
-| 500 | Internal server error | An unexpected error occurred |
+| Status Code | Error                                          | Description                                 |
+| ----------- | ---------------------------------------------- | ------------------------------------------- |
+| 400         | Invalid subscription_id                        | The subscription ID format is invalid       |
+| 400         | Invalid or missing merchant_id                 | The merchant ID is invalid or missing       |
+| 400         | At least one field must be provided for update | Request body is empty                       |
+| 400         | Invalid request data                           | The request body contains invalid data      |
+| 401         | API key required                               | Authentication failed or API key is missing |
+| 404         | Subscription not found or update failed        | No subscription found with the provided ID  |
+| 500         | Internal server error                          | An unexpected error occurred                |
 
 ### Cancel Subscription
 
@@ -230,15 +230,15 @@ Cancels a subscription, setting its status to 'cancelled'.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| subscription_id | string (UUID) | Yes | ID of the subscription to cancel |
+| Parameter       | Type          | Required | Description                      |
+| --------------- | ------------- | -------- | -------------------------------- |
+| subscription_id | string (UUID) | Yes      | ID of the subscription to cancel |
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| merchant_id | string (UUID) | Yes | ID of the merchant |
+| Parameter   | Type          | Required | Description        |
+| ----------- | ------------- | -------- | ------------------ |
+| merchant_id | string (UUID) | Yes      | ID of the merchant |
 
 **Example Response:**
 
@@ -270,14 +270,14 @@ Cancels a subscription, setting its status to 'cancelled'.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 400 | Invalid subscription_id | The subscription ID format is invalid |
-| 400 | Invalid or missing merchant_id | The merchant ID is invalid or missing |
-| 401 | API key required | Authentication failed or API key is missing |
-| 404 | Subscription not found or cancellation failed | No subscription found with the provided ID |
-| 409 | Cannot cancel subscription with status "..." | Only active, paused, pending or trial subscriptions can be cancelled |
-| 500 | Internal server error | An unexpected error occurred |
+| Status Code | Error                                         | Description                                                          |
+| ----------- | --------------------------------------------- | -------------------------------------------------------------------- |
+| 400         | Invalid subscription_id                       | The subscription ID format is invalid                                |
+| 400         | Invalid or missing merchant_id                | The merchant ID is invalid or missing                                |
+| 401         | API key required                              | Authentication failed or API key is missing                          |
+| 404         | Subscription not found or cancellation failed | No subscription found with the provided ID                           |
+| 409         | Cannot cancel subscription with status "..."  | Only active, paused, pending or trial subscriptions can be cancelled |
+| 500         | Internal server error                         | An unexpected error occurred                                         |
 
 ## Error Handling
 
@@ -297,28 +297,28 @@ Error responses follow a consistent format:
 
 ## Subscription Statuses
 
-| Status | Description |
-|--------|-------------|
-| pending | Subscription has been created but is not yet active |
-| active | Subscription is active and billing normally |
-| paused | Subscription is temporarily paused (no billing) |
-| cancelled | Subscription has been cancelled by the merchant or customer |
-| expired | Subscription has reached its end date |
-| past_due | Payment for the subscription has failed but is being retried |
-| trial | Subscription is in a trial period before regular billing begins |
+| Status    | Description                                                     |
+| --------- | --------------------------------------------------------------- |
+| pending   | Subscription has been created but is not yet active             |
+| active    | Subscription is active and billing normally                     |
+| paused    | Subscription is temporarily paused (no billing)                 |
+| cancelled | Subscription has been cancelled by the merchant or customer     |
+| expired   | Subscription has reached its end date                           |
+| past_due  | Payment for the subscription has failed but is being retried    |
+| trial     | Subscription is in a trial period before regular billing begins |
 
 ## Webhook Events
 
 Subscription-related events are sent to your configured webhook endpoints:
 
-* `SUBSCRIPTION_CREATED` - When a new subscription is created
-* `SUBSCRIPTION_RENEWED` - When a subscription is successfully renewed (new billing cycle)
-* `SUBSCRIPTION_CANCELED` - When a subscription is cancelled
+- `SUBSCRIPTION_CREATED` - When a new subscription is created
+- `SUBSCRIPTION_RENEWED` - When a subscription is successfully renewed (new billing cycle)
+- `SUBSCRIPTION_CANCELED` - When a subscription is cancelled
 
 Configure webhooks in your merchant dashboard to receive these notifications.
 
 ## Notes
 
-* Subscriptions are primarily created as a result of successful transactions for subscription plans, not directly through the API
-* A subscription's status will automatically change to "expired" when the end_date is reached
-* Billing is handled automatically according to the plan's billing_frequency and the subscription's next_billing_date 
+- Subscriptions are primarily created as a result of successful transactions for subscription plans, not directly through the API
+- A subscription's status will automatically change to "expired" when the end_date is reached
+- Billing is handled automatically according to the plan's billing_frequency and the subscription's next_billing_date

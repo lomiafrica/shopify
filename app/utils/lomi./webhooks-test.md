@@ -5,6 +5,7 @@ This document contains curl commands to test all the endpoints defined in `webho
 ## Setup
 
 Replace the following values in your requests if needed:
+
 - `API_KEY`: Your API key (e.g., `lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee`)
 - `API_BASE_URL`: Your API base URL (default: `https://api.lomi.africa/v1`)
 - `WEBHOOK_ID`: The ID of a webhook created during testing (replace after creation)
@@ -40,6 +41,7 @@ curl -X POST "https://api.lomi.africa/v1/webhooks" \
     "description": "Test webhook for payments"
   }'
 ```
+
 **Note:** Record the `id` (WEBHOOK_ID) and `secret` from the response for subsequent tests.
 
 ### Test error: Create with duplicate URL
@@ -85,6 +87,7 @@ curl -X POST "https://api.lomi.africa/v1/webhooks" \
 curl -X GET "https://api.lomi.africa/v1/webhooks" \
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
+
 **Note:** Verify that the webhook `secret` is **not** included in the response.
 
 ## 3. Get a Webhook by ID
@@ -94,6 +97,7 @@ curl -X GET "https://api.lomi.africa/v1/webhooks" \
 curl -X GET "https://api.lomi.africa/v1/webhooks/WEBHOOK_ID" \
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
+
 **Note:** Verify that the webhook `secret` is **not** included in the response.
 
 ### Test error: Get webhook with invalid ID format

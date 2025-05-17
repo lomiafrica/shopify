@@ -5,6 +5,7 @@ This document contains curl commands to test all the endpoints defined in the Ch
 ## Setup
 
 Replace the following values in your requests if needed:
+
 - `API_KEY`: Your API key (lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee)
 - `API_BASE_URL`: Your API base URL (default: https://api.lomi.africa/v1)
 
@@ -147,4 +148,4 @@ curl -X GET "https://api.lomi.africa/v1/checkout-sessions"
 4. Run the command to test the endpoint.
 5. Review the response for success or error information.
 
-**Note**: For proper testing, first create a checkout session, then use the returned ID to test the get and list endpoints. The examples above test both success paths and error handling for each endpoint. 
+**Note**: For proper testing, first create a checkout session, then use the returned ID to test the get and list endpoints. The examples above test both success paths and error handling for each endpoint.

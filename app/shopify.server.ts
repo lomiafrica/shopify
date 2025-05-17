@@ -22,7 +22,10 @@ const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_CLIENT_ID,
   apiSecretKey: process.env.SHOPIFY_CLIENT_SECRET,
   appUrl: process.env.SHOPIFY_APP_URL,
-  scopes: (process.env.SHOPIFY_SCOPES || "").split(',').map(scope => scope.trim()).filter(scope => scope),
+  scopes: (process.env.SHOPIFY_SCOPES || "")
+    .split(",")
+    .map((scope) => scope.trim())
+    .filter((scope) => scope),
   authPathPrefix: "/auth",
   sessionStorage: new SupabaseSessionStorage(),
   apiVersion: ApiVersion.January23,

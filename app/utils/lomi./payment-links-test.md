@@ -5,6 +5,7 @@ This document contains curl commands to test all the endpoints defined in `payme
 ## Setup
 
 Replace the following values in your requests if needed:
+
 - `API_KEY`: Your API key (e.g., `lomi_sk_test_...` or `lomi_sk_live_...`)
 - `API_BASE_URL`: Your API base URL (default: `https://api.lomi.africa/v1`)
 - `MERCHANT_ID`: Your Merchant ID (UUID)

@@ -5,7 +5,8 @@ This document contains curl commands to test the `GET /refunds/{id}` endpoint de
 ## Setup
 
 Replace the following values in your requests if needed:
-- `YOUR_API_KEY`: Your Lomi API key (e.g., lomi_sk_...)
+
+- `YOUR_API_KEY`: Your Lomi API key (e.g., lomi*sk*...)
 - `YOUR_VALID_REFUND_ID`: The UUID of a refund that exists and belongs to the merchant associated with YOUR_API_KEY.
 - `API_BASE_URL`: Your API base URL (default: https://api.lomi.africa/v1)
 
@@ -22,6 +23,7 @@ curl -X GET "https://api.lomi.africa/v1/refunds/YOUR_VALID_REFUND_ID" \
 ```
 
 **Expected Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -53,6 +55,7 @@ curl -X GET "https://api.lomi.africa/v1/refunds/00000000-0000-0000-0000-00000000
 ```
 
 **Expected Response (404 Not Found):**
+
 ```json
 {
   "error": {
@@ -75,6 +78,7 @@ curl -X GET "https://api.lomi.africa/v1/refunds/invalid-refund-id-format" \
 ```
 
 **Expected Response (400 Bad Request):**
+
 ```json
 {
   "error": {
@@ -82,12 +86,10 @@ curl -X GET "https://api.lomi.africa/v1/refunds/invalid-refund-id-format" \
     "code": "INVALID_REQUEST",
     "message": "Invalid Refund ID in URL",
     "details": {
-        "_errors": [],
-        "id": {
-            "_errors": [
-                "Invalid uuid"
-            ]
-        }
+      "_errors": [],
+      "id": {
+        "_errors": ["Invalid uuid"]
+      }
     },
     "timestamp": "..."
   }
@@ -104,6 +106,7 @@ curl -X GET "https://api.lomi.africa/v1/refunds/YOUR_VALID_REFUND_ID" \
 ```
 
 **Expected Response (401 Unauthorized - or specific error from auth middleware):**
+
 ```json
 {
   "error": {
@@ -115,7 +118,8 @@ curl -X GET "https://api.lomi.africa/v1/refunds/YOUR_VALID_REFUND_ID" \
   }
 }
 ```
-*(Note: The exact 401 error message/code might vary based on the auth middleware implementation)*
+
+_(Note: The exact 401 error message/code might vary based on the auth middleware implementation)_
 
 ### Test with Missing API Key Header
 
@@ -126,6 +130,7 @@ curl -X GET "https://api.lomi.africa/v1/refunds/YOUR_VALID_REFUND_ID"
 ```
 
 **Expected Response (401 Unauthorized):**
+
 ```json
 {
   "error": {
@@ -137,7 +142,8 @@ curl -X GET "https://api.lomi.africa/v1/refunds/YOUR_VALID_REFUND_ID"
   }
 }
 ```
-*(Note: The exact 401 error message/code might vary based on the auth middleware implementation)*
+
+_(Note: The exact 401 error message/code might vary based on the auth middleware implementation)_
 
 ## Usage Instructions
 

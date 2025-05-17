@@ -59,20 +59,20 @@ Retrieves a list of all available payment providers with their connection status
 
 **Response Properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| code | string | Unique identifier for the payment provider |
-| name | string | Display name of the payment provider |
-| description | string | Brief description of the payment provider |
-| payment_methods | array | List of payment method types supported by this provider |
-| is_connected | boolean | Whether this provider is connected to your merchant account |
+| Property        | Type    | Description                                                 |
+| --------------- | ------- | ----------------------------------------------------------- |
+| code            | string  | Unique identifier for the payment provider                  |
+| name            | string  | Display name of the payment provider                        |
+| description     | string  | Brief description of the payment provider                   |
+| payment_methods | array   | List of payment method types supported by this provider     |
+| is_connected    | boolean | Whether this provider is connected to your merchant account |
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 401 | Authentication required | Missing or invalid API key |
-| 500 | Failed to retrieve payment providers | Internal server error with details |
+| Status Code | Error                                | Description                        |
+| ----------- | ------------------------------------ | ---------------------------------- |
+| 401         | Authentication required              | Missing or invalid API key         |
+| 500         | Failed to retrieve payment providers | Internal server error with details |
 
 ## Error Handling
 
@@ -98,4 +98,4 @@ Error responses follow a consistent format:
 - The list of available providers may change over time as new integrations are added
 - Provider availability may also depend on merchant configuration and supported regions
 - Use the provider code (e.g., "ORANGE", "WAVE") when specifying allowed providers in checkout sessions
-- Only connected providers (`is_connected: true`) can be used for processing payments 
+- Only connected providers (`is_connected: true`) can be used for processing payments

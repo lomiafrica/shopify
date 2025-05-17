@@ -26,18 +26,18 @@ Creates a new customer profile.
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Customer's full name |
-| email | string | No | Customer's email address |
-| phone_number | string | No | Customer's phone number |
-| whatsapp_number | string | No | Customer's WhatsApp number |
-| country | string | No | Customer's country |
-| city | string | No | Customer's city |
-| address | string | No | Customer's address |
-| postal_code | string | No | Customer's postal code |
-| is_business | boolean | No | Whether the customer is a business (default: false) |
-| metadata | object | No | Additional metadata for the customer |
+| Parameter       | Type    | Required | Description                                         |
+| --------------- | ------- | -------- | --------------------------------------------------- |
+| name            | string  | Yes      | Customer's full name                                |
+| email           | string  | No       | Customer's email address                            |
+| phone_number    | string  | No       | Customer's phone number                             |
+| whatsapp_number | string  | No       | Customer's WhatsApp number                          |
+| country         | string  | No       | Customer's country                                  |
+| city            | string  | No       | Customer's city                                     |
+| address         | string  | No       | Customer's address                                  |
+| postal_code     | string  | No       | Customer's postal code                              |
+| is_business     | boolean | No       | Whether the customer is a business (default: false) |
+| metadata        | object  | No       | Additional metadata for the customer                |
 
 **Example Request:**
 
@@ -78,11 +78,11 @@ Creates a new customer profile.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 400 | Invalid request body | Request validation failed with details about the invalid fields |
-| 401 | Merchant ID or Organization ID not found | Authentication failed or API key is invalid |
-| 500 | Failed to create customer | Internal server error with details |
+| Status Code | Error                                    | Description                                                     |
+| ----------- | ---------------------------------------- | --------------------------------------------------------------- |
+| 400         | Invalid request body                     | Request validation failed with details about the invalid fields |
+| 401         | Merchant ID or Organization ID not found | Authentication failed or API key is invalid                     |
+| 500         | Failed to create customer                | Internal server error with details                              |
 
 ### Get a Customer
 
@@ -92,9 +92,9 @@ Retrieves details of a specific customer.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | ID of the customer to retrieve |
+| Parameter | Type   | Required | Description                    |
+| --------- | ------ | -------- | ------------------------------ |
+| id        | string | Yes      | ID of the customer to retrieve |
 
 **Example Response:**
 
@@ -122,11 +122,11 @@ Retrieves details of a specific customer.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 401 | Merchant ID not found | Authentication failed or API key is invalid |
-| 404 | Customer not found | No customer found with the provided ID |
-| 500 | Failed to retrieve customer | Internal server error with details |
+| Status Code | Error                       | Description                                 |
+| ----------- | --------------------------- | ------------------------------------------- |
+| 401         | Merchant ID not found       | Authentication failed or API key is invalid |
+| 404         | Customer not found          | No customer found with the provided ID      |
+| 500         | Failed to retrieve customer | Internal server error with details          |
 
 ### Update a Customer
 
@@ -136,24 +136,24 @@ Updates details of a specific customer.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | ID of the customer to update |
+| Parameter | Type   | Required | Description                  |
+| --------- | ------ | -------- | ---------------------------- |
+| id        | string | Yes      | ID of the customer to update |
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | No | Customer's full name |
-| email | string | No | Customer's email address |
-| phone_number | string | No | Customer's phone number |
-| whatsapp_number | string | No | Customer's WhatsApp number |
-| country | string | No | Customer's country |
-| city | string | No | Customer's city |
-| address | string | No | Customer's address |
-| postal_code | string | No | Customer's postal code |
-| is_business | boolean | No | Whether the customer is a business |
-| metadata | object | No | Additional metadata for the customer |
+| Parameter       | Type    | Required | Description                          |
+| --------------- | ------- | -------- | ------------------------------------ |
+| name            | string  | No       | Customer's full name                 |
+| email           | string  | No       | Customer's email address             |
+| phone_number    | string  | No       | Customer's phone number              |
+| whatsapp_number | string  | No       | Customer's WhatsApp number           |
+| country         | string  | No       | Customer's country                   |
+| city            | string  | No       | Customer's city                      |
+| address         | string  | No       | Customer's address                   |
+| postal_code     | string  | No       | Customer's postal code               |
+| is_business     | boolean | No       | Whether the customer is a business   |
+| metadata        | object  | No       | Additional metadata for the customer |
 
 **Example Request:**
 
@@ -190,12 +190,12 @@ Updates details of a specific customer.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 400 | Invalid request body | Request validation failed with details about the invalid fields |
-| 401 | Merchant ID not found | Authentication failed or API key is invalid |
-| 404 | Customer not found | No customer found with the provided ID |
-| 500 | Failed to update customer | Internal server error with details |
+| Status Code | Error                     | Description                                                     |
+| ----------- | ------------------------- | --------------------------------------------------------------- |
+| 400         | Invalid request body      | Request validation failed with details about the invalid fields |
+| 401         | Merchant ID not found     | Authentication failed or API key is invalid                     |
+| 404         | Customer not found        | No customer found with the provided ID                          |
+| 500         | Failed to update customer | Internal server error with details                              |
 
 ### List Customers
 
@@ -205,12 +205,12 @@ Lists all customers for a merchant with optional filtering.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| limit | number | No | Number of customers to return (default: 20) |
-| page | number | No | Page number for pagination (default: 1) |
-| email | string | No | Filter by customer email |
-| phone_number | string | No | Filter by customer phone number |
+| Parameter    | Type   | Required | Description                                 |
+| ------------ | ------ | -------- | ------------------------------------------- |
+| limit        | number | No       | Number of customers to return (default: 20) |
+| page         | number | No       | Page number for pagination (default: 1)     |
+| email        | string | No       | Filter by customer email                    |
+| phone_number | string | No       | Filter by customer phone number             |
 
 > **Note:** By default, this endpoint only returns customers who have at least one completed or refunded transaction. Newly created customers without transactions will not appear in results.
 
@@ -235,7 +235,7 @@ Lists all customers for a merchant with optional filtering.
       "metadata": null,
       "created_at": "2025-04-04T14:21:49.955Z",
       "updated_at": "2025-04-04T15:30:22.123Z"
-    },
+    }
     // Additional customers...
   ],
   "meta": {
@@ -247,10 +247,10 @@ Lists all customers for a merchant with optional filtering.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 401 | Merchant ID not found | Authentication failed or API key is invalid |
-| 500 | Failed to list customers | Internal server error with details |
+| Status Code | Error                    | Description                                 |
+| ----------- | ------------------------ | ------------------------------------------- |
+| 401         | Merchant ID not found    | Authentication failed or API key is invalid |
+| 500         | Failed to list customers | Internal server error with details          |
 
 ### Delete a Customer
 
@@ -260,9 +260,9 @@ Deletes a specific customer.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | ID of the customer to delete |
+| Parameter | Type   | Required | Description                  |
+| --------- | ------ | -------- | ---------------------------- |
+| id        | string | Yes      | ID of the customer to delete |
 
 **Example Response:**
 
@@ -277,11 +277,11 @@ Deletes a specific customer.
 
 **Possible Error Responses:**
 
-| Status Code | Error | Description |
-|-------------|-------|-------------|
-| 401 | Merchant ID not found | Authentication failed or API key is invalid |
-| 404 | Customer not found | No customer found with the provided ID |
-| 500 | Failed to delete customer | Internal server error with details |
+| Status Code | Error                     | Description                                 |
+| ----------- | ------------------------- | ------------------------------------------- |
+| 401         | Merchant ID not found     | Authentication failed or API key is invalid |
+| 404         | Customer not found        | No customer found with the provided ID      |
+| 500         | Failed to delete customer | Internal server error with details          |
 
 ## Error Handling
 
@@ -305,4 +305,4 @@ Error responses follow a consistent format:
 
 ## Webhooks
 
-Changes to customer resources can trigger webhook events if configured. Configure webhooks in your merchant dashboard. 
+Changes to customer resources can trigger webhook events if configured. Configure webhooks in your merchant dashboard.

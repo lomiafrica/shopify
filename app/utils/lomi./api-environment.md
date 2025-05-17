@@ -79,9 +79,9 @@ Live environment responses include an environment indicator but no test flag:
 Rate limits differ between environments:
 
 | Environment | Requests per minute | Requests per day |
-|-------------|--------------------:|----------------:|
-| Test        | 120                 | 20,000          |
-| Live        | 60                  | 10,000          |
+| ----------- | ------------------: | ---------------: |
+| Test        |                 120 |           20,000 |
+| Live        |                  60 |           10,000 |
 
 ## Webhooks
 
@@ -101,4 +101,4 @@ Webhooks work identically in both environments, but with different data:
 
 ## Switching Environments
 
-To switch environments, simply use the appropriate API key and base URL in your requests. You don't need to change any API endpoints or parameters. 
+To switch environments, simply use the appropriate API key and base URL in your requests. You don't need to change any API endpoints or parameters.

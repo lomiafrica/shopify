@@ -1,16 +1,14 @@
 # Subscription Plans API Documentation
 
-The Subscription Plans API allows you to create, retrieve, update, and delete subscription plans *for a specific merchant*. These plans define the pricing and billing cycle for recurring payments.
+The Subscription Plans API allows you to create, retrieve, update, and delete subscription plans _for a specific merchant_. These plans define the pricing and billing cycle for recurring payments.
 
 ## Base URL
 
 https://api.lomi.africa/v1
 
-
 ## Authentication
 
 All API requests require authentication using an API key. Provide your API key in the request header:
-
 
 ## Endpoints
 
@@ -22,8 +20,8 @@ Creates a new subscription plan for the specified merchant.
 
 **Path Parameters:**
 
-| Parameter     | Type   | Required | Description                             |
-|---------------|--------|----------|-----------------------------------------|
+| Parameter     | Type   | Required | Description                            |
+| ------------- | ------ | -------- | -------------------------------------- |
 | `merchant_id` | string | Yes      | The unique identifier of the merchant. |
 
 **Request Body:**
@@ -85,13 +83,13 @@ Requires a JSON object matching the `CreateSubscriptionPlan` schema (excluding `
 
 **Possible Error Responses:**
 
-| Status Code | Error Code          | Description                                    |
-|-------------|---------------------|------------------------------------------------|
-| 400         | VALIDATION_FAILED   | Request body validation failed.                |
-| 401         | UNAUTHORIZED        | Authentication failed or API key invalid.      |
-| 404         | MERCHANT_NOT_FOUND  | The specified `merchant_id` was not found.     |
-| 500         | DATABASE_ERROR      | Error creating the plan in the database.       |
-| 500         | INTERNAL_ERROR      | Internal server error.                         |
+| Status Code | Error Code         | Description                                |
+| ----------- | ------------------ | ------------------------------------------ |
+| 400         | VALIDATION_FAILED  | Request body validation failed.            |
+| 401         | UNAUTHORIZED       | Authentication failed or API key invalid.  |
+| 404         | MERCHANT_NOT_FOUND | The specified `merchant_id` was not found. |
+| 500         | DATABASE_ERROR     | Error creating the plan in the database.   |
+| 500         | INTERNAL_ERROR     | Internal server error.                     |
 
 ---
 
@@ -103,16 +101,16 @@ Retrieves a list of subscription plans belonging to the specified merchant.
 
 **Path Parameters:**
 
-| Parameter     | Type   | Required | Description                             |
-|---------------|--------|----------|-----------------------------------------|
+| Parameter     | Type   | Required | Description                            |
+| ------------- | ------ | -------- | -------------------------------------- |
 | `merchant_id` | string | Yes      | The unique identifier of the merchant. |
 
 **Query Parameters:**
 
-| Parameter | Type    | Required | Default | Description                                      |
-|-----------|---------|----------|---------|--------------------------------------------------|
-| `limit`   | integer | No       | 20      | Maximum number of plans to return.              |
-| `offset`  | integer | No       | 0       | Number of plans to skip for pagination.          |
+| Parameter | Type    | Required | Default | Description                             |
+| --------- | ------- | -------- | ------- | --------------------------------------- |
+| `limit`   | integer | No       | 20      | Maximum number of plans to return.      |
+| `offset`  | integer | No       | 0       | Number of plans to skip for pagination. |
 
 **Example Response (200 OK):**
 
@@ -141,12 +139,12 @@ Retrieves a list of subscription plans belonging to the specified merchant.
 
 **Possible Error Responses:**
 
-| Status Code | Error Code          | Description                                    |
-|-------------|---------------------|------------------------------------------------|
-| 401         | UNAUTHORIZED        | Authentication failed or API key invalid.      |
-| 404         | MERCHANT_NOT_FOUND  | The specified `merchant_id` was not found.     |
-| 500         | DATABASE_ERROR      | Error retrieving plans from the database.      |
-| 500         | INTERNAL_ERROR      | Internal server error.                         |
+| Status Code | Error Code         | Description                                |
+| ----------- | ------------------ | ------------------------------------------ |
+| 401         | UNAUTHORIZED       | Authentication failed or API key invalid.  |
+| 404         | MERCHANT_NOT_FOUND | The specified `merchant_id` was not found. |
+| 500         | DATABASE_ERROR     | Error retrieving plans from the database.  |
+| 500         | INTERNAL_ERROR     | Internal server error.                     |
 
 ---
 
@@ -158,10 +156,10 @@ Retrieves details for a specific subscription plan belonging to the specified me
 
 **Path Parameters:**
 
-| Parameter     | Type   | Required | Description                             |
-|---------------|--------|----------|-----------------------------------------|
+| Parameter     | Type   | Required | Description                            |
+| ------------- | ------ | -------- | -------------------------------------- |
 | `merchant_id` | string | Yes      | The unique identifier of the merchant. |
-| `plan_id`     | string | Yes      | The unique identifier of the plan.      |
+| `plan_id`     | string | Yes      | The unique identifier of the plan.     |
 
 **Example Response (200 OK):**
 
@@ -186,12 +184,12 @@ Retrieves details for a specific subscription plan belonging to the specified me
 
 **Possible Error Responses:**
 
-| Status Code | Error Code          | Description                                       |
+| Status Code | Error Code | Description |
 |-------------|---------------------|---------------------------------------------------|\
-| 401         | UNAUTHORIZED        | Authentication failed or API key invalid.         |
-| 404         | NOT_FOUND           | Plan not found for the given merchant and plan ID.|\
-| 500         | DATABASE_ERROR      | Error retrieving the plan from the database.      |
-| 500         | INTERNAL_ERROR      | Internal server error.                            |
+| 401 | UNAUTHORIZED | Authentication failed or API key invalid. |
+| 404 | NOT_FOUND | Plan not found for the given merchant and plan ID.|\
+| 500 | DATABASE_ERROR | Error retrieving the plan from the database. |
+| 500 | INTERNAL_ERROR | Internal server error. |
 
 ---
 
@@ -203,10 +201,10 @@ Updates specific fields (`is_active` and/or `metadata`) of a subscription plan. 
 
 **Path Parameters:**
 
-| Parameter     | Type   | Required | Description                             |
-|---------------|--------|----------|-----------------------------------------|
+| Parameter     | Type   | Required | Description                            |
+| ------------- | ------ | -------- | -------------------------------------- |
 | `merchant_id` | string | Yes      | The unique identifier of the merchant. |
-| `plan_id`     | string | Yes      | The unique identifier of the plan.      |
+| `plan_id`     | string | Yes      | The unique identifier of the plan.     |
 
 **Request Body:**
 
@@ -257,13 +255,13 @@ Requires a JSON object containing at least one of the following optional fields:
 
 **Possible Error Responses:**
 
-| Status Code | Error Code          | Description                                                    |
+| Status Code | Error Code | Description |
 |-------------|---------------------|----------------------------------------------------------------|\
-| 400         | VALIDATION_FAILED   | Request body invalid or empty (must provide `is_active` or `metadata`). |\
-| 401         | UNAUTHORIZED        | Authentication failed or API key invalid.                      |\
-| 404         | NOT_FOUND           | Plan not found for the merchant, or update check failed.       |\
-| 500         | DATABASE_ERROR      | Error updating the plan in the database.                       |\
-| 500         | INTERNAL_ERROR      | Internal server error.                                         |
+| 400 | VALIDATION_FAILED | Request body invalid or empty (must provide `is_active` or `metadata`). |\
+| 401 | UNAUTHORIZED | Authentication failed or API key invalid. |\
+| 404 | NOT_FOUND | Plan not found for the merchant, or update check failed. |\
+| 500 | DATABASE_ERROR | Error updating the plan in the database. |\
+| 500 | INTERNAL_ERROR | Internal server error. |
 
 ---
 
@@ -275,24 +273,24 @@ Deletes a subscription plan. This operation will fail if the plan is currently a
 
 **Path Parameters:**
 
-| Parameter     | Type   | Required | Description                             |
-|---------------|--------|----------|-----------------------------------------|
+| Parameter     | Type   | Required | Description                            |
+| ------------- | ------ | -------- | -------------------------------------- |
 | `merchant_id` | string | Yes      | The unique identifier of the merchant. |
-| `plan_id`     | string | Yes      | The unique identifier of the plan.      |
+| `plan_id`     | string | Yes      | The unique identifier of the plan.     |
 
 **Example Response (204 No Content):**
 
-*(No response body)*
+_(No response body)_
 
 **Possible Error Responses:**
 
-| Status Code | Error Code          | Description                                       |
+| Status Code | Error Code | Description |
 |-------------|---------------------|---------------------------------------------------|\
-| 401         | UNAUTHORIZED        | Authentication failed or API key invalid.         |
-| 404         | NOT_FOUND           | Plan not found for the given merchant and plan ID.|\
-| 409         | CONFLICT            | Cannot delete plan because it is in use.          |\
-| 500         | DATABASE_ERROR      | Error deleting the plan from the database.        |\
-| 500         | INTERNAL_ERROR      | Internal server error.                            |
+| 401 | UNAUTHORIZED | Authentication failed or API key invalid. |
+| 404 | NOT_FOUND | Plan not found for the given merchant and plan ID.|\
+| 409 | CONFLICT | Cannot delete plan because it is in use. |\
+| 500 | DATABASE_ERROR | Error deleting the plan from the database. |\
+| 500 | INTERNAL_ERROR | Internal server error. |
 
 ## Error Handling
 
@@ -300,10 +298,10 @@ Refer to the [Merchants API Documentation](./merchants-api-docs.md#error-handlin
 
 Specific error codes related to subscriptions include:
 
-| Error Code | Description                                      |
-|------------|--------------------------------------------------|
+| Error Code | Description                                        |
+| ---------- | -------------------------------------------------- |
 | NOT_FOUND  | Plan not found for the specified merchant/plan ID. |
-| CONFLICT   | Plan cannot be deleted because it's in use.      |
+| CONFLICT   | Plan cannot be deleted because it's in use.        |
 
 ## Data Structures
 
@@ -328,7 +326,8 @@ Specific error codes related to subscriptions include:
   "updated_at": "timestampz"
 }
 ```
-```
+
+````
 
 **2. File: `api-docs/subscriptions-test.md`**
 
@@ -348,7 +347,7 @@ This document provides `curl` commands to test the Subscription Plans API endpoi
 API_KEY="YOUR_API_KEY"
 MERCHANT_ID="YOUR_MERCHANT_ID"
 API_BASE_URL="https://api.lomi.africa/v1"
-```
+````
 
 ## 1. Create Subscription Plan
 
@@ -371,12 +370,13 @@ curl -X POST "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions" \
 ```
 
 **Expected Success Response (201 Created):**
+
 ```json
 {
   "success": true,
   "data": {
     "plan_id": "<generated_plan_uuid>", // Note this ID for later tests
-    "merchant_id": "YOUR_MERCHANT_ID",
+    "merchant_id": "YOUR_MERCHANT_ID"
     // ... other plan fields ...
   }
 }
@@ -396,11 +396,14 @@ curl -X POST "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions" \
 ```
 
 **Expected Error Response (400 Bad Request):**
+
 ```json
 {
   "success": false,
   "message": "Validation failed",
-  "details": { /* Zod error details */ }
+  "details": {
+    /* Zod error details */
+  }
 }
 ```
 
@@ -423,18 +426,19 @@ curl -X GET "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions?limit=5&offs
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": [
     {
       "plan_id": "<plan_uuid_1>",
-      "merchant_id": "YOUR_MERCHANT_ID",
+      "merchant_id": "YOUR_MERCHANT_ID"
       // ... other fields ...
     },
     {
       "plan_id": "<plan_uuid_2>",
-      "merchant_id": "YOUR_MERCHANT_ID",
+      "merchant_id": "YOUR_MERCHANT_ID"
       // ... other fields ...
     }
     // ... potentially more plans ...
@@ -450,11 +454,14 @@ curl -X GET "${API_BASE_URL}/merchants/invalid-merchant-uuid/subscriptions" \
 ```
 
 **Expected Error Response (400 Bad Request - likely due to UUID validation):**
+
 ```json
 {
   "success": false,
   "message": "Validation failed",
-  "details": { /* Zod error details */ }
+  "details": {
+    /* Zod error details */
+  }
 }
 ```
 
@@ -472,12 +479,13 @@ curl -X GET "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_TO
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": {
     "plan_id": "<PLAN_ID_TO_GET>",
-    "merchant_id": "YOUR_MERCHANT_ID",
+    "merchant_id": "YOUR_MERCHANT_ID"
     // ... all other plan fields ...
   }
 }
@@ -491,6 +499,7 @@ curl -X GET "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/00000000-000
 ```
 
 **Expected Error Response (404 Not Found):**
+
 ```json
 {
   "success": false,
@@ -529,12 +538,13 @@ curl -X PATCH "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": {
     "plan_id": "<PLAN_ID_TO_UPDATE>",
-    "merchant_id": "YOUR_MERCHANT_ID",
+    "merchant_id": "YOUR_MERCHANT_ID"
     // ... other fields with updated values for is_active/metadata and updated_at ...
   }
 }
@@ -550,11 +560,14 @@ curl -X PATCH "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_
 ```
 
 **Expected Error Response (400 Bad Request):**
+
 ```json
 {
   "success": false,
   "message": "Validation failed",
-  "details": { /* Zod error details indicating at least one field required */ }
+  "details": {
+    /* Zod error details indicating at least one field required */
+  }
 }
 ```
 
@@ -562,7 +575,7 @@ curl -X PATCH "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_
 
 **Description:** Deletes a specific subscription plan.
 
-**Setup:** Replace `<PLAN_ID_TO_DELETE>` with a valid `plan_id` that is *not* currently used by any subscriptions.
+**Setup:** Replace `<PLAN_ID_TO_DELETE>` with a valid `plan_id` that is _not_ currently used by any subscriptions.
 
 ```bash
 PLAN_ID_TO_DELETE="<PLAN_ID_TO_DELETE>"
@@ -572,7 +585,7 @@ curl -X DELETE "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID
 ```
 
 **Expected Success Response (204 No Content):**
-*(No response body)*
+_(No response body)_
 
 **Test Deleting Non-Existent Plan:**
 
@@ -582,25 +595,27 @@ curl -X DELETE "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/00000000-
 ```
 
 **Expected Error Response (404 Not Found):**
+
 ```json
 {
-    "success": false,
-    "message": "Subscription plan not found for this merchant."
+  "success": false,
+  "message": "Subscription plan not found for this merchant."
 }
 ```
 
 **Test Deleting Plan in Use (Requires setup):**
-*(You would need to create a subscription associated with the plan first)*
+_(You would need to create a subscription associated with the plan first)_
 
 **Expected Error Response (409 Conflict):**
+
 ```json
 {
-    "success": false,
-    "message": "Cannot delete subscription plan: It is currently in use by subscriptions.",
-    "details": {
-        "code": "23503",
-        "hint": "Delete associated subscriptions first."
-    }
+  "success": false,
+  "message": "Cannot delete subscription plan: It is currently in use by subscriptions.",
+  "details": {
+    "code": "23503",
+    "hint": "Delete associated subscriptions first."
+  }
 }
 ```
 

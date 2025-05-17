@@ -36,12 +36,13 @@ curl -X POST "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions" \
 ```
 
 **Expected Success Response (201 Created):**
+
 ```json
 {
   "success": true,
   "data": {
     "plan_id": "<generated_plan_uuid>", // Note this ID for later tests
-    "merchant_id": "YOUR_MERCHANT_ID",
+    "merchant_id": "YOUR_MERCHANT_ID"
     // ... other plan fields ...
   }
 }
@@ -61,11 +62,14 @@ curl -X POST "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions" \
 ```
 
 **Expected Error Response (400 Bad Request):**
+
 ```json
 {
   "success": false,
   "message": "Validation failed",
-  "details": { /* Zod error details */ }
+  "details": {
+    /* Zod error details */
+  }
 }
 ```
 
@@ -88,18 +92,19 @@ curl -X GET "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions?limit=5&offs
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": [
     {
       "plan_id": "<plan_uuid_1>",
-      "merchant_id": "YOUR_MERCHANT_ID",
+      "merchant_id": "YOUR_MERCHANT_ID"
       // ... other fields ...
     },
     {
       "plan_id": "<plan_uuid_2>",
-      "merchant_id": "YOUR_MERCHANT_ID",
+      "merchant_id": "YOUR_MERCHANT_ID"
       // ... other fields ...
     }
     // ... potentially more plans ...
@@ -115,11 +120,14 @@ curl -X GET "${API_BASE_URL}/merchants/invalid-merchant-uuid/subscriptions" \
 ```
 
 **Expected Error Response (400 Bad Request - likely due to UUID validation):**
+
 ```json
 {
   "success": false,
   "message": "Validation failed",
-  "details": { /* Zod error details */ }
+  "details": {
+    /* Zod error details */
+  }
 }
 ```
 
@@ -137,12 +145,13 @@ curl -X GET "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_TO
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": {
     "plan_id": "<PLAN_ID_TO_GET>",
-    "merchant_id": "YOUR_MERCHANT_ID",
+    "merchant_id": "YOUR_MERCHANT_ID"
     // ... all other plan fields ...
   }
 }
@@ -156,6 +165,7 @@ curl -X GET "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/00000000-000
 ```
 
 **Expected Error Response (404 Not Found):**
+
 ```json
 {
   "success": false,
@@ -194,12 +204,13 @@ curl -X PATCH "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": {
     "plan_id": "<PLAN_ID_TO_UPDATE>",
-    "merchant_id": "YOUR_MERCHANT_ID",
+    "merchant_id": "YOUR_MERCHANT_ID"
     // ... other fields with updated values for is_active/metadata and updated_at ...
   }
 }
@@ -215,11 +226,14 @@ curl -X PATCH "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_
 ```
 
 **Expected Error Response (400 Bad Request):**
+
 ```json
 {
   "success": false,
   "message": "Validation failed",
-  "details": { /* Zod error details indicating at least one field required */ }
+  "details": {
+    /* Zod error details indicating at least one field required */
+  }
 }
 ```
 
@@ -227,7 +241,7 @@ curl -X PATCH "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID_
 
 **Description:** Deletes a specific subscription plan.
 
-**Setup:** Replace `<PLAN_ID_TO_DELETE>` with a valid `plan_id` that is *not* currently used by any subscriptions.
+**Setup:** Replace `<PLAN_ID_TO_DELETE>` with a valid `plan_id` that is _not_ currently used by any subscriptions.
 
 ```bash
 PLAN_ID_TO_DELETE="<PLAN_ID_TO_DELETE>"
@@ -237,7 +251,7 @@ curl -X DELETE "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/${PLAN_ID
 ```
 
 **Expected Success Response (204 No Content):**
-*(No response body)*
+_(No response body)_
 
 **Test Deleting Non-Existent Plan:**
 
@@ -247,25 +261,27 @@ curl -X DELETE "${API_BASE_URL}/merchants/${MERCHANT_ID}/subscriptions/00000000-
 ```
 
 **Expected Error Response (404 Not Found):**
+
 ```json
 {
-    "success": false,
-    "message": "Subscription plan not found for this merchant."
+  "success": false,
+  "message": "Subscription plan not found for this merchant."
 }
 ```
 
 **Test Deleting Plan in Use (Requires setup):**
-*(You would need to create a subscription associated with the plan first)*
+_(You would need to create a subscription associated with the plan first)_
 
 **Expected Error Response (409 Conflict):**
+
 ```json
 {
-    "success": false,
-    "message": "Cannot delete subscription plan: It is currently in use by subscriptions.",
-    "details": {
-        "code": "23503",
-        "hint": "Delete associated subscriptions first."
-    }
+  "success": false,
+  "message": "Cannot delete subscription plan: It is currently in use by subscriptions.",
+  "details": {
+    "code": "23503",
+    "hint": "Delete associated subscriptions first."
+  }
 }
 ```
 

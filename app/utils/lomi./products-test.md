@@ -29,7 +29,7 @@ curl -X POST "https://api.lomi.africa/v1/products" \
   }'
 ```
 
-*Expected Response: 201 Created with product data.*
+_Expected Response: 201 Created with product data._
 
 ### Create a product (Validation Error)
 
@@ -43,7 +43,7 @@ curl -X POST "https://api.lomi.africa/v1/products" \
   }'
 ```
 
-*Expected Response: 400 Bad Request with `INVALID_REQUEST` error code.*
+_Expected Response: 400 Bad Request with `INVALID_REQUEST` error code._
 
 ## 2. List Products
 
@@ -54,7 +54,7 @@ curl -X GET "https://api.lomi.africa/v1/products" \
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 200 OK with a list of products and metadata.*
+_Expected Response: 200 OK with a list of products and metadata._
 
 ### List products (With pagination and filter)
 
@@ -63,7 +63,7 @@ curl -X GET "https://api.lomi.africa/v1/products?limit=5&offset=5&is_active=true
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 200 OK with up to 5 active products, skipping the first 5, and metadata.*
+_Expected Response: 200 OK with up to 5 active products, skipping the first 5, and metadata._
 
 ### List products (Invalid pagination)
 
@@ -72,7 +72,7 @@ curl -X GET "https://api.lomi.africa/v1/products?limit=-1" \
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 400 Bad Request with `INVALID_REQUEST` error code.*
+_Expected Response: 400 Bad Request with `INVALID_REQUEST` error code._
 
 ## 3. Get Product Details
 
@@ -83,7 +83,7 @@ curl -X GET "https://api.lomi.africa/v1/products/57406346-3c49-4270-9645-7809ac6
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 200 OK with the product details.*
+_Expected Response: 200 OK with the product details._
 
 ### Get details for a non-existent product
 
@@ -92,7 +92,7 @@ curl -X GET "https://api.lomi.africa/v1/products/INVALID_PRODUCT_ID" \
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 404 Not Found with `PRODUCT_NOT_FOUND` error code.*
+_Expected Response: 404 Not Found with `PRODUCT_NOT_FOUND` error code._
 
 ## 4. Update Product
 
@@ -107,7 +107,7 @@ curl -X PATCH "https://api.lomi.africa/v1/products/7195da16-70a7-428f-bba5-2500e
   }'
 ```
 
-*Expected Response: 200 OK with the updated product details.*
+_Expected Response: 200 OK with the updated product details._
 
 ### Update a product (Missing required is_active field)
 
@@ -118,7 +118,7 @@ curl -X PATCH "https://api.lomi.africa/v1/products/7195da16-70a7-428f-bba5-2500e
   -d '{}'
 ```
 
-*Expected Response: 400 Bad Request with `INVALID_REQUEST` error code.*
+_Expected Response: 400 Bad Request with `INVALID_REQUEST` error code._
 
 ### Update a product (Attempting to modify immutable fields)
 
@@ -133,7 +133,7 @@ curl -X PATCH "https://api.lomi.africa/v1/products/57406346-3c49-4270-9645-7809a
   }'
 ```
 
-*Expected Response: 400 Bad Request with `INVALID_REQUEST` error code. Only is_active can be modified.*
+_Expected Response: 400 Bad Request with `INVALID_REQUEST` error code. Only is_active can be modified._
 
 ### Update a non-existent product
 
@@ -146,7 +146,7 @@ curl -X PATCH "https://api.lomi.africa/v1/products/INVALID_PRODUCT_ID" \
   }'
 ```
 
-*Expected Response: 404 Not Found with `PRODUCT_NOT_FOUND` error code.*
+_Expected Response: 404 Not Found with `PRODUCT_NOT_FOUND` error code._
 
 ## 5. Delete Product
 
@@ -159,7 +159,7 @@ curl -X DELETE "https://api.lomi.africa/v1/products/1375cf47-c8a2-46d8-82cf-cab3
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 204 No Content.*
+_Expected Response: 204 No Content._
 
 ### Delete a non-existent product
 
@@ -168,7 +168,7 @@ curl -X DELETE "https://api.lomi.africa/v1/products/INVALID_PRODUCT_ID" \
   -H "X-API-Key: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee"
 ```
 
-*Expected Response: 404 Not Found with `PRODUCT_NOT_FOUND` error code.*
+_Expected Response: 404 Not Found with `PRODUCT_NOT_FOUND` error code._
 
 ## General Error Tests
 
@@ -179,7 +179,7 @@ curl -X GET "https://api.lomi.africa/v1/products" \
   -H "X-API-Key: invalid_api_key"
 ```
 
-*Expected Response: 401 Unauthorized with `UNAUTHORIZED` error code (or similar, depending on auth middleware).*
+_Expected Response: 401 Unauthorized with `UNAUTHORIZED` error code (or similar, depending on auth middleware)._
 
 ### Test with missing API key
 
@@ -187,11 +187,11 @@ curl -X GET "https://api.lomi.africa/v1/products" \
 curl -X GET "https://api.lomi.africa/v1/products"
 ```
 
-*Expected Response: 401 Unauthorized with `UNAUTHORIZED` error code (or similar, depending on auth middleware).*
+_Expected Response: 401 Unauthorized with `UNAUTHORIZED` error code (or similar, depending on auth middleware)._
 
 ## Usage Instructions
 
 1.  Replace placeholders (`YOUR_API_KEY`, `VALID_PRODUCT_ID`, etc.) with actual values.
 2.  Open a terminal window.
 3.  Copy and paste the desired curl command.
-4.  Run the command and verify the HTTP status code and response body (especially the error code for failures). 
+4.  Run the command and verify the HTTP status code and response body (especially the error code for failures).

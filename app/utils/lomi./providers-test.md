@@ -5,6 +5,7 @@ This document contains curl commands to test all the endpoints defined in the Pr
 ## Setup
 
 Replace the following values in your requests if needed:
+
 - `API_KEY`: Your API key (lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee)
 - `API_BASE_URL`: Your API base URL (default: https://api.lomi.africa/v1)
 
@@ -101,27 +102,29 @@ The providers list can be used to dynamically build payment method selection int
 
 ```javascript
 // Example using fetch API
-fetch('https://api.lomi.africa/v1/providers', {
+fetch("https://api.lomi.africa/v1/providers", {
   headers: {
-    'X-API-Key': 'your_api_key'
-  }
+    "X-API-Key": "your_api_key",
+  },
 })
-.then(response => response.json())
-.then(data => {
-  // Filter only connected providers
-  const connectedProviders = data.data.filter(provider => provider.is_connected);
-  
-  // Use provider data to build UI
-  const selectElement = document.getElementById('payment-method-select');
-  
-  connectedProviders.forEach(provider => {
-    const option = document.createElement('option');
-    option.value = provider.code;
-    option.textContent = provider.name;
-    selectElement.appendChild(option);
-  });
-})
-.catch(error => console.error('Error fetching providers:', error));
+  .then((response) => response.json())
+  .then((data) => {
+    // Filter only connected providers
+    const connectedProviders = data.data.filter(
+      (provider) => provider.is_connected,
+    );
+
+    // Use provider data to build UI
+    const selectElement = document.getElementById("payment-method-select");
+
+    connectedProviders.forEach((provider) => {
+      const option = document.createElement("option");
+      option.value = provider.code;
+      option.textContent = provider.name;
+      selectElement.appendChild(option);
+    });
+  })
+  .catch((error) => console.error("Error fetching providers:", error));
 ```
 
-**Note**: Only providers that are connected to your merchant account (`is_connected: true`) should be offered as payment options to your customers. 
+**Note**: Only providers that are connected to your merchant account (`is_connected: true`) should be offered as payment options to your customers.

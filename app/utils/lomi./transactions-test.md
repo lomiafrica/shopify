@@ -117,4 +117,4 @@ curl -X GET "https://api.lomi.africa/v1/transactions"
 2. Copy and paste the desired curl command.
 3. For the "Get Transaction by ID" command, replace `YOUR_TRANSACTION_ID` with an actual transaction ID from your account.
 4. Run the command to test the endpoint.
-5. Review the response for success or error information. 
+5. Review the response for success or error information.

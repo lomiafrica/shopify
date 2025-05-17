@@ -26,14 +26,14 @@ Retrieves a list of transactions for the authenticated merchant, with optional f
 
 **Query Parameters:**
 
-| Parameter   | Type              | Required | Description                                                                 |
-|-------------|-------------------|----------|-----------------------------------------------------------------------------|
-| status      | string (enum[])   | No       | Filter by transaction status (comma-separated: pending,completed,failed,refunded,expired) |
-| provider    | string (enum)     | No       | Filter by payment provider code (e.g., ORANGE, WAVE)                        |
-| from_date   | string (ISO 8601) | No       | Filter transactions created on or after this date (YYYY-MM-DDTHH:mm:ssZ)      |
-| to_date     | string (ISO 8601) | No       | Filter transactions created on or before this date (YYYY-MM-DDTHH:mm:ssZ)       |
-| limit       | number            | No       | Maximum number of transactions to return (default: 20, max: 100)            |
-| page        | number            | No       | Page number for pagination (default: 1)                                     |
+| Parameter | Type              | Required | Description                                                                               |
+| --------- | ----------------- | -------- | ----------------------------------------------------------------------------------------- |
+| status    | string (enum[])   | No       | Filter by transaction status (comma-separated: pending,completed,failed,refunded,expired) |
+| provider  | string (enum)     | No       | Filter by payment provider code (e.g., ORANGE, WAVE)                                      |
+| from_date | string (ISO 8601) | No       | Filter transactions created on or after this date (YYYY-MM-DDTHH:mm:ssZ)                  |
+| to_date   | string (ISO 8601) | No       | Filter transactions created on or before this date (YYYY-MM-DDTHH:mm:ssZ)                 |
+| limit     | number            | No       | Maximum number of transactions to return (default: 20, max: 100)                          |
+| page      | number            | No       | Page number for pagination (default: 1)                                                   |
 
 **Example Response:**
 
@@ -76,12 +76,12 @@ Retrieves a list of transactions for the authenticated merchant, with optional f
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                 |
-|-------------|-------------------|-------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid pagination or filter parameters                     |
-| 401         | UNAUTHORIZED      | Authentication failed: Merchant ID not found in request.    |
-| 500         | DATABASE_ERROR    | Database operation failed while listing transactions        |
-| 500         | INTERNAL_ERROR    | An unexpected internal server error occurred                |
+| Status Code | Error Code      | Description                                              |
+| ----------- | --------------- | -------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid pagination or filter parameters                  |
+| 401         | UNAUTHORIZED    | Authentication failed: Merchant ID not found in request. |
+| 500         | DATABASE_ERROR  | Database operation failed while listing transactions     |
+| 500         | INTERNAL_ERROR  | An unexpected internal server error occurred             |
 
 ---
 
@@ -93,9 +93,9 @@ Retrieves details of a specific transaction belonging to the authenticated merch
 
 **Path Parameters:**
 
-| Parameter       | Type         | Required | Description                     |
-|-----------------|--------------|----------|---------------------------------|
-| transaction_id  | string (UUID)| Yes      | ID of the transaction to retrieve |
+| Parameter      | Type          | Required | Description                       |
+| -------------- | ------------- | -------- | --------------------------------- |
+| transaction_id | string (UUID) | Yes      | ID of the transaction to retrieve |
 
 **Example Response:**
 
@@ -130,13 +130,13 @@ Retrieves details of a specific transaction belonging to the authenticated merch
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                  |
-|-------------|-------------------|--------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid Transaction ID in URL format (must be UUID)          |
-| 401         | UNAUTHORIZED      | Authentication failed: Merchant ID not found in request.     |
-| 404         | NOT_FOUND         | Transaction not found or does not belong to this merchant    |
-| 500         | DATABASE_ERROR    | Database operation failed while fetching the transaction     |
-| 500         | INTERNAL_ERROR    | An unexpected internal server error occurred                 |
+| Status Code | Error Code      | Description                                               |
+| ----------- | --------------- | --------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid Transaction ID in URL format (must be UUID)       |
+| 401         | UNAUTHORIZED    | Authentication failed: Merchant ID not found in request.  |
+| 404         | NOT_FOUND       | Transaction not found or does not belong to this merchant |
+| 500         | DATABASE_ERROR  | Database operation failed while fetching the transaction  |
+| 500         | INTERNAL_ERROR  | An unexpected internal server error occurred              |
 
 ## Error Handling
 
@@ -157,4 +157,4 @@ Error responses follow a consistent format:
 ## Rate Limits
 
 - Live API keys: 60 requests per minute, 10,000 requests per day
-- Test API keys: 120 requests per minute, 20,000 requests per day 
+- Test API keys: 120 requests per minute, 20,000 requests per day

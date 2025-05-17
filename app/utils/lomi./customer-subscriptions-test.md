@@ -41,6 +41,7 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions?merchant_id=${MERCHANT_ID}&s
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -51,9 +52,9 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions?merchant_id=${MERCHANT_ID}&s
       "organization_id": "<organization_uuid>",
       "plan_id": "<plan_uuid>",
       "customer_id": "<customer_uuid>",
-      "status": "active",
+      "status": "active"
       // ... other subscription fields ...
-    },
+    }
     // ... additional subscriptions ...
   ],
   "meta": {
@@ -72,13 +73,16 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions?merchant_id=invalid-uuid" \
 ```
 
 **Expected Error Response (400 Bad Request):**
+
 ```json
 {
   "error": {
     "status": 400,
     "code": "INVALID_REQUEST",
     "message": "Invalid or missing merchant_id",
-    "details": { /* Validation error details */ }
+    "details": {
+      /* Validation error details */
+    }
   }
 }
 ```
@@ -96,6 +100,7 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions/${SUBSCRIPTION_ID}?merchant_
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -108,7 +113,7 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions/${SUBSCRIPTION_ID}?merchant_
     "status": "active",
     "start_date": "2025-01-01T00:00:00.000Z",
     "end_date": null,
-    "next_billing_date": "2025-02-01T00:00:00.000Z",
+    "next_billing_date": "2025-02-01T00:00:00.000Z"
     // ... other fields ...
   }
 }
@@ -122,6 +127,7 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions/00000000-0000-0000-0000-0000
 ```
 
 **Expected Error Response (404 Not Found):**
+
 ```json
 {
   "error": {
@@ -161,6 +167,7 @@ curl -X PATCH "${API_BASE_URL}/customer-subscriptions/${SUBSCRIPTION_ID}?merchan
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -188,6 +195,7 @@ curl -X PATCH "${API_BASE_URL}/customer-subscriptions/${SUBSCRIPTION_ID}?merchan
 ```
 
 **Expected Error Response (400 Bad Request):**
+
 ```json
 {
   "error": {
@@ -212,6 +220,7 @@ curl -X DELETE "${API_BASE_URL}/customer-subscriptions/${SUBSCRIPTION_ID}?mercha
 ```
 
 **Expected Success Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -234,6 +243,7 @@ curl -X DELETE "${API_BASE_URL}/customer-subscriptions/00000000-0000-0000-0000-0
 ```
 
 **Expected Error Response (404 Not Found):**
+
 ```json
 {
   "error": {
@@ -254,6 +264,7 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions?merchant_id=${MERCHANT_ID}" 
 ```
 
 **Expected Error Response (401 Unauthorized):**
+
 ```json
 {
   "error": {
@@ -271,6 +282,7 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions?merchant_id=${MERCHANT_ID}"
 ```
 
 **Expected Error Response (401 Unauthorized):**
+
 ```json
 {
   "error": {
@@ -279,4 +291,4 @@ curl -X GET "${API_BASE_URL}/customer-subscriptions?merchant_id=${MERCHANT_ID}"
     "message": "API key required"
   }
 }
-``` 
+```

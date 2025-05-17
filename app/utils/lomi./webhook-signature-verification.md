@@ -20,83 +20,82 @@ To verify that a webhook was sent by Lomi, you should:
 ### Node.js
 
 ```javascript
-const crypto = require('crypto');
-const express = require('express');
+const crypto = require("crypto");
+const express = require("express");
 const app = express();
 
 // Use JSON middleware
-app.use(express.json({
-  verify: (req, res, buf) => {
-    // Store the raw request body for signature verification
-    req.rawBody = buf;
-  }
-}));
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      // Store the raw request body for signature verification
+      req.rawBody = buf;
+    },
+  }),
+);
 
-app.post('/webhooks', (req, res) => {
+app.post("/webhooks", (req, res) => {
   // Get the signature from the header
-  const signature = req.headers['x-lomi-signature'];
-  
+  const signature = req.headers["x-lomi-signature"];
+
   // Your webhook secret (store securely, preferably in environment variables)
-  const webhookSecret = 'whsec_your_webhook_secret';
-  
+  const webhookSecret = "whsec_your_webhook_secret";
+
   // Verify the signature
   const isValid = verifySignature(req.rawBody, signature, webhookSecret);
-  
+
   if (!isValid) {
-    console.error('Invalid webhook signature');
-    return res.status(400).send('Invalid signature');
+    console.error("Invalid webhook signature");
+    return res.status(400).send("Invalid signature");
   }
-  
+
   // Process the webhook event
   const event = req.body;
   console.log(`Received webhook: ${event.event_type}`);
-  
+
   // Handle the event based on its type
   switch (event.event_type) {
-    case 'PAYMENT_SUCCEEDED':
+    case "PAYMENT_SUCCEEDED":
       // Handle payment success
       break;
-    case 'SUBSCRIPTION_CREATED':
+    case "SUBSCRIPTION_CREATED":
       // Handle subscription creation
       break;
     // Handle other event types
     default:
       console.log(`Unhandled event type: ${event.event_type}`);
   }
-  
+
   // Acknowledge receipt of the webhook
-  res.status(200).send({ status: 'success' });
+  res.status(200).send({ status: "success" });
 });
 
 function verifySignature(payload, signature, secret) {
   if (!payload || !signature || !secret) {
     return false;
   }
-  
+
   try {
     // Create HMAC hasher with your secret
-    const hmac = crypto.createHmac('sha256', secret);
-    
+    const hmac = crypto.createHmac("sha256", secret);
+
     // Update with payload (must be a Buffer or string)
     const payloadString = payload.toString();
     hmac.update(payloadString);
-    
+
     // Get digest as hex
-    const digest = hmac.digest('hex');
-    
+    const digest = hmac.digest("hex");
+
     // Compare the calculated signature with the provided one
-    return crypto.timingSafeEqual(
-      Buffer.from(digest),
-      Buffer.from(signature)
-    );
+    return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
   } catch (error) {
-    console.error('Error verifying signature:', error);
+    console.error("Error verifying signature:", error);
     return false;
   }
 }
 
 app.listen(3000, () => {
-  console.log('Webhook receiver listening on port 3000');
+  console.log("Webhook receiver listening on port 3000");
 });
 ```
 
@@ -128,10 +127,10 @@ function verifySignature($payload, $signature, $secret) {
     if (empty($payload) || empty($signature) || empty($secret)) {
         return false;
     }
-    
+
     // Calculate the expected signature
     $calculatedSignature = hash_hmac('sha256', $payload, $secret);
-    
+
     // Compare signatures using a constant-time comparison function
     return hash_equals($calculatedSignature, $signature);
 }
@@ -151,32 +150,32 @@ app = Flask(__name__)
 def webhook_receiver():
     # Get the signature from the header
     signature = request.headers.get('X-Lomi-Signature')
-    
+
     # Your webhook secret (store securely)
     webhook_secret = 'whsec_your_webhook_secret'
-    
+
     # Verify the signature
     payload = request.data
     if not verify_signature(payload, signature, webhook_secret):
         return jsonify({'error': 'Invalid signature'}), 400
-    
+
     # Process the webhook event
     event = request.json
     print(f"Received webhook: {event.get('event_type')}")
-    
+
     return jsonify({'status': 'success'})
 
 def verify_signature(payload, signature, secret):
     if not payload or not signature or not secret:
         return False
-    
+
     # Calculate expected signature
     expected_signature = hmac.new(
         key=secret.encode('utf-8'),
         msg=payload,
         digestmod=hashlib.sha256
     ).hexdigest()
-    
+
     # Compare signatures (use hmac.compare_digest for constant-time comparison)
     return hmac.compare_digest(expected_signature, signature)
 
@@ -213,4 +212,4 @@ Lomi automatically retries failed webhook deliveries with an exponential backoff
 - Fourth retry after 180 minutes
 - Fifth retry after 360 minutes
 
-After 5 failed attempts, the webhook will no longer be retried automatically. 
+After 5 failed attempts, the webhook will no longer be retried automatically.

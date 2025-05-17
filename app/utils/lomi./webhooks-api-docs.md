@@ -16,25 +16,25 @@ All API requests require authentication using an API key. Provide your API key i
 
 When creating or updating a webhook, you specify which events should trigger notifications. Available events are defined by the `WebhookEvent` enum:
 
-| Event Enum                      | Description                                    | Data Payload Type |
-|---------------------------------|------------------------------------------------|-------------------|
-| `PAYMENT_SUCCEEDED`             | A one-time payment is successfully completed.  | Transaction       |
-| `PAYMENT_FAILED`                | A one-time payment attempt failed.             | Transaction       |
-| `CHECKOUT_COMPLETED`            | A checkout session was successfully completed. | CheckoutSession   |
-| `SUBSCRIPTION_CREATED`          | A new subscription is created.                 | Subscription      |
-| `SUBSCRIPTION_RENEWED`          | A subscription successfully renews.            | Subscription      |
-| `SUBSCRIPTION_PAYMENT_FAILED`   | A scheduled subscription payment failed.       | Subscription      |
-| `SUBSCRIPTION_CANCELED`         | A subscription is canceled.                    | Subscription      |
-| `REFUND_COMPLETED`              | A refund is successfully processed.            | Refund            |
-| `PROVIDER_STATUS_CHANGED`       | The status of a connected provider changes.    | ProviderSetting   |
-| `test.webhook`                  | A test event generated via the API.            | TestPayload       |
+| Event Enum                    | Description                                    | Data Payload Type |
+| ----------------------------- | ---------------------------------------------- | ----------------- |
+| `PAYMENT_SUCCEEDED`           | A one-time payment is successfully completed.  | Transaction       |
+| `PAYMENT_FAILED`              | A one-time payment attempt failed.             | Transaction       |
+| `CHECKOUT_COMPLETED`          | A checkout session was successfully completed. | CheckoutSession   |
+| `SUBSCRIPTION_CREATED`        | A new subscription is created.                 | Subscription      |
+| `SUBSCRIPTION_RENEWED`        | A subscription successfully renews.            | Subscription      |
+| `SUBSCRIPTION_PAYMENT_FAILED` | A scheduled subscription payment failed.       | Subscription      |
+| `SUBSCRIPTION_CANCELED`       | A subscription is canceled.                    | Subscription      |
+| `REFUND_COMPLETED`            | A refund is successfully processed.            | Refund            |
+| `PROVIDER_STATUS_CHANGED`     | The status of a connected provider changes.    | ProviderSetting   |
+| `test.webhook`                | A test event generated via the API.            | TestPayload       |
 
 ## Webhook Security
 
 Lomi signs webhook events it sends to your endpoint, allowing you to verify that the events were sent by Lomi and not a third party.
 
-*   **Signature Header:** Each webhook request includes an `X-Lomi-Signature` header.
-*   **Verification:** Use the webhook's `secret` (provided only upon creation) along with the raw request body to verify the signature. Detailed instructions will be available in the developer documentation.
+- **Signature Header:** Each webhook request includes an `X-Lomi-Signature` header.
+- **Verification:** Use the webhook's `secret` (provided only upon creation) along with the raw request body to verify the signature. Detailed instructions will be available in the developer documentation.
 
 ## Endpoints
 
@@ -66,12 +66,12 @@ Retrieves a list of all webhooks configured for the authenticated merchant's org
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                           |
-|-------------|-------------------|-------------------------------------------------------|
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key. |
-| 404         | NOT_FOUND         | Merchant account not found for this organization.     |
-| 500         | DATABASE_ERROR    | Database operation failed while fetching webhooks.    |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred while listing webhooks.  |
+| Status Code | Error Code     | Description                                              |
+| ----------- | -------------- | -------------------------------------------------------- |
+| 401         | UNAUTHORIZED   | Organization ID not found in request or invalid API key. |
+| 404         | NOT_FOUND      | Merchant account not found for this organization.        |
+| 500         | DATABASE_ERROR | Database operation failed while fetching webhooks.       |
+| 500         | INTERNAL_ERROR | An unexpected error occurred while listing webhooks.     |
 
 ---
 
@@ -91,23 +91,23 @@ Creates a new webhook endpoint for the authenticated merchant's organization. Th
 }
 ```
 
-*   `url` (string, required): The HTTPS URL where Lomi should send webhook events. Must be unique per merchant.
-*   `authorized_events` (array of `WebhookEvent` enums, required): List of event enums this webhook should receive. Must contain at least one valid event.
-*   `description` (string, optional): A description for the webhook (stored in metadata).
+- `url` (string, required): The HTTPS URL where Lomi should send webhook events. Must be unique per merchant.
+- `authorized_events` (array of `WebhookEvent` enums, required): List of event enums this webhook should receive. Must contain at least one valid event.
+- `description` (string, optional): A description for the webhook (stored in metadata).
 
 **Example Response (201 Created):**
 
 ```json
 {
   "data": {
-      "id": "wh_new1b2c3d4e5f6",
-      "organization_id": "org_f6e5d4c3b2a1",
-      "url": "https://example.com/new-webhook-receiver",
-      "events": ["PAYMENT_SUCCEEDED", "PAYMENT_FAILED"],
-      "active": true, // Webhooks are active by default
-      "created_at": "2025-04-06T14:00:00.000Z",
-      "updated_at": "2025-04-06T14:00:00.000Z",
-      "description": "Webhook for payment events"
+    "id": "wh_new1b2c3d4e5f6",
+    "organization_id": "org_f6e5d4c3b2a1",
+    "url": "https://example.com/new-webhook-receiver",
+    "events": ["PAYMENT_SUCCEEDED", "PAYMENT_FAILED"],
+    "active": true, // Webhooks are active by default
+    "created_at": "2025-04-06T14:00:00.000Z",
+    "updated_at": "2025-04-06T14:00:00.000Z",
+    "description": "Webhook for payment events"
   },
   "secret": "whsec_abc123def456..." // Store this secret securely! It won't be shown again.
 }
@@ -115,14 +115,14 @@ Creates a new webhook endpoint for the authenticated merchant's organization. Th
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                      |
-|-------------|-------------------|------------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid request body (missing/invalid fields, invalid URL/events). |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key.         |
-| 404         | NOT_FOUND         | Merchant account not found for this organization.                |
-| 409         | CONFLICT          | A webhook with this URL already exists for your organization.    |
-| 500         | DATABASE_ERROR    | Database operation failed while creating the webhook.            |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred (e.g., fetching after creation).    |
+| Status Code | Error Code      | Description                                                        |
+| ----------- | --------------- | ------------------------------------------------------------------ |
+| 400         | INVALID_REQUEST | Invalid request body (missing/invalid fields, invalid URL/events). |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key.           |
+| 404         | NOT_FOUND       | Merchant account not found for this organization.                  |
+| 409         | CONFLICT        | A webhook with this URL already exists for your organization.      |
+| 500         | DATABASE_ERROR  | Database operation failed while creating the webhook.              |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred (e.g., fetching after creation).      |
 
 ---
 
@@ -134,23 +134,23 @@ Retrieves details for a specific webhook belonging to the authenticated merchant
 
 **Path Parameters:**
 
-| Parameter | Type         | Required | Description               |
-|-----------|--------------|----------|---------------------------|
-| id        | string (UUID)| Yes      | ID of the webhook (starts with `wh_`) |
+| Parameter | Type          | Required | Description                           |
+| --------- | ------------- | -------- | ------------------------------------- |
+| id        | string (UUID) | Yes      | ID of the webhook (starts with `wh_`) |
 
 **Example Response (200 OK):**
 
 ```json
 {
   "data": {
-      "id": "wh_a1b2c3d4e5f6",
-      "organization_id": "org_f6e5d4c3b2a1",
-      "url": "https://example.com/webhook-receiver",
-      "events": ["PAYMENT_SUCCEEDED", "SUBSCRIPTION_RENEWED"],
-      "active": true,
-      "created_at": "2025-04-06T12:00:00.000Z",
-      "updated_at": "2025-04-06T12:15:00.000Z",
-      "description": "Updated description"
+    "id": "wh_a1b2c3d4e5f6",
+    "organization_id": "org_f6e5d4c3b2a1",
+    "url": "https://example.com/webhook-receiver",
+    "events": ["PAYMENT_SUCCEEDED", "SUBSCRIPTION_RENEWED"],
+    "active": true,
+    "created_at": "2025-04-06T12:00:00.000Z",
+    "updated_at": "2025-04-06T12:15:00.000Z",
+    "description": "Updated description"
   }
   // Secret is NOT included
 }
@@ -158,13 +158,13 @@ Retrieves details for a specific webhook belonging to the authenticated merchant
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                            |
-|-------------|-------------------|--------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid Webhook ID format.                             |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key. |
-| 404         | NOT_FOUND         | Webhook not found or doesn't belong to the merchant. |
-| 500         | DATABASE_ERROR    | Database operation failed while fetching the webhook.  |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred.                          |
+| Status Code | Error Code      | Description                                              |
+| ----------- | --------------- | -------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid Webhook ID format.                               |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key. |
+| 404         | NOT_FOUND       | Webhook not found or doesn't belong to the merchant.     |
+| 500         | DATABASE_ERROR  | Database operation failed while fetching the webhook.    |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred.                            |
 
 ---
 
@@ -176,9 +176,9 @@ Updates details for a specific webhook belonging to the authenticated merchant's
 
 **Path Parameters:**
 
-| Parameter | Type         | Required | Description               |
-|-----------|--------------|----------|---------------------------|
-| id        | string (UUID)| Yes      | ID of the webhook (starts with `wh_`) |
+| Parameter | Type          | Required | Description                           |
+| --------- | ------------- | -------- | ------------------------------------- |
+| id        | string (UUID) | Yes      | ID of the webhook (starts with `wh_`) |
 
 **Request Body (include only fields to update):**
 
@@ -191,24 +191,24 @@ Updates details for a specific webhook belonging to the authenticated merchant's
 }
 ```
 
-*   `url` (string, optional): The new HTTPS URL. Must be unique per merchant if changed.
-*   `authorized_events` (array of `WebhookEvent` enums, optional): The new list of event enums. Must contain at least one valid event if provided.
-*   `is_active` (boolean, optional): Set to `false` to disable the webhook, `true` to enable.
-*   `description` (string, optional): A new description for the webhook.
+- `url` (string, optional): The new HTTPS URL. Must be unique per merchant if changed.
+- `authorized_events` (array of `WebhookEvent` enums, optional): The new list of event enums. Must contain at least one valid event if provided.
+- `is_active` (boolean, optional): Set to `false` to disable the webhook, `true` to enable.
+- `description` (string, optional): A new description for the webhook.
 
 **Example Response (200 OK):**
 
 ```json
 {
   "data": {
-      "id": "wh_a1b2c3d4e5f6",
-      "organization_id": "org_f6e5d4c3b2a1",
-      "url": "https://example.com/updated-webhook-receiver",
-      "events": ["PAYMENT_SUCCEEDED"],
-      "active": false,
-      "created_at": "2025-04-06T12:00:00.000Z",
-      "updated_at": "2025-04-06T14:30:00.000Z",
-      "description": "Updated description"
+    "id": "wh_a1b2c3d4e5f6",
+    "organization_id": "org_f6e5d4c3b2a1",
+    "url": "https://example.com/updated-webhook-receiver",
+    "events": ["PAYMENT_SUCCEEDED"],
+    "active": false,
+    "created_at": "2025-04-06T12:00:00.000Z",
+    "updated_at": "2025-04-06T14:30:00.000Z",
+    "description": "Updated description"
   }
   // Secret is NOT included
 }
@@ -216,15 +216,15 @@ Updates details for a specific webhook belonging to the authenticated merchant's
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                          |
-|-------------|-------------------|----------------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid request body or Webhook ID format.                           |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key.             |
-| 403         | FORBIDDEN         | Permission denied (e.g., trying to update another merchant's webhook). |
-| 404         | NOT_FOUND         | Webhook not found or doesn't belong to the merchant.                 |
-| 409         | CONFLICT          | Attempting to change URL to one that already exists for the merchant.|
-| 500         | DATABASE_ERROR    | Database operation failed while updating the webhook.                |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred.                                        |
+| Status Code | Error Code      | Description                                                            |
+| ----------- | --------------- | ---------------------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid request body or Webhook ID format.                             |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key.               |
+| 403         | FORBIDDEN       | Permission denied (e.g., trying to update another merchant's webhook). |
+| 404         | NOT_FOUND       | Webhook not found or doesn't belong to the merchant.                   |
+| 409         | CONFLICT        | Attempting to change URL to one that already exists for the merchant.  |
+| 500         | DATABASE_ERROR  | Database operation failed while updating the webhook.                  |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred.                                          |
 
 ---
 
@@ -236,24 +236,24 @@ Deletes a specific webhook belonging to the authenticated merchant's organizatio
 
 **Path Parameters:**
 
-| Parameter | Type         | Required | Description               |
-|-----------|--------------|----------|---------------------------|
-| id        | string (UUID)| Yes      | ID of the webhook (starts with `wh_`) |
+| Parameter | Type          | Required | Description                           |
+| --------- | ------------- | -------- | ------------------------------------- |
+| id        | string (UUID) | Yes      | ID of the webhook (starts with `wh_`) |
 
 **Example Response (204 No Content):**
 
-*(No response body)*
+_(No response body)_
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                            |
-|-------------|-------------------|--------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid Webhook ID format.                             |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key. |
-| 403         | FORBIDDEN         | Permission denied.                                     |
-| 404         | NOT_FOUND         | Webhook not found or doesn't belong to the merchant. |
-| 500         | DATABASE_ERROR    | Database operation failed while deleting the webhook.  |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred.                          |
+| Status Code | Error Code      | Description                                              |
+| ----------- | --------------- | -------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid Webhook ID format.                               |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key. |
+| 403         | FORBIDDEN       | Permission denied.                                       |
+| 404         | NOT_FOUND       | Webhook not found or doesn't belong to the merchant.     |
+| 500         | DATABASE_ERROR  | Database operation failed while deleting the webhook.    |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred.                            |
 
 ---
 
@@ -265,9 +265,9 @@ Triggers an internal simulation of sending a test event (`test.webhook`) payload
 
 **Path Parameters:**
 
-| Parameter | Type         | Required | Description               |
-|-----------|--------------|----------|---------------------------|
-| id        | string (UUID)| Yes      | ID of the webhook (starts with `wh_`) |
+| Parameter | Type          | Required | Description                           |
+| --------- | ------------- | -------- | ------------------------------------- |
+| id        | string (UUID) | Yes      | ID of the webhook (starts with `wh_`) |
 
 **Example Response (200 OK):**
 
@@ -284,14 +284,14 @@ Triggers an internal simulation of sending a test event (`test.webhook`) payload
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                    |
-|-------------|-------------------|----------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid Webhook ID format.                                     |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key.       |
-| 403         | FORBIDDEN         | Permission denied.                                             |
-| 404         | NOT_FOUND         | Webhook not found or doesn't belong to the merchant.           |
-| 500         | DATABASE_ERROR    | Database operation failed while testing the webhook.           |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred.                                  |
+| Status Code | Error Code      | Description                                              |
+| ----------- | --------------- | -------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid Webhook ID format.                               |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key. |
+| 403         | FORBIDDEN       | Permission denied.                                       |
+| 404         | NOT_FOUND       | Webhook not found or doesn't belong to the merchant.     |
+| 500         | DATABASE_ERROR  | Database operation failed while testing the webhook.     |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred.                            |
 
 ---
 
@@ -303,18 +303,18 @@ Retrieves delivery attempt logs for a specific webhook. Logs are created when Lo
 
 **Path Parameters:**
 
-| Parameter | Type         | Required | Description               |
-|-----------|--------------|----------|---------------------------|
-| id        | string (UUID)| Yes      | ID of the webhook (starts with `wh_`) |
+| Parameter | Type          | Required | Description                           |
+| --------- | ------------- | -------- | ------------------------------------- |
+| id        | string (UUID) | Yes      | ID of the webhook (starts with `wh_`) |
 
 **Query Parameters:**
 
-| Parameter   | Type    | Required | Description                                                |
-|-------------|---------|----------|------------------------------------------------------------|
-| limit       | number  | No       | Max number of logs to return (default: 25, max: 100).      |
-| offset      | number  | No       | Number of logs to skip for pagination (default: 0).        |
-| success     | boolean | No       | If `true`, only return successful delivery attempts (status 2xx). |
-| failed      | boolean | No       | If `true`, only return failed delivery attempts (status non-2xx). |
+| Parameter | Type    | Required | Description                                                       |
+| --------- | ------- | -------- | ----------------------------------------------------------------- |
+| limit     | number  | No       | Max number of logs to return (default: 25, max: 100).             |
+| offset    | number  | No       | Number of logs to skip for pagination (default: 0).               |
+| success   | boolean | No       | If `true`, only return successful delivery attempts (status 2xx). |
+| failed    | boolean | No       | If `true`, only return failed delivery attempts (status non-2xx). |
 
 **Example Response (200 OK):**
 
@@ -354,18 +354,19 @@ Retrieves delivery attempt logs for a specific webhook. Logs are created when Lo
   }
 }
 ```
-*Note: `response_body` and `payload` are generally omitted for brevity/security in the list view but might be available on a dedicated log retrieval endpoint (if implemented).*
+
+_Note: `response_body` and `payload` are generally omitted for brevity/security in the list view but might be available on a dedicated log retrieval endpoint (if implemented)._
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                              |
-|-------------|-------------------|--------------------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid Webhook ID or pagination/filter parameters.                      |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key.                 |
-| 403         | FORBIDDEN         | Permission denied.                                                       |
-| 404         | NOT_FOUND         | Webhook not found or doesn't belong to the merchant.                   |
-| 500         | DATABASE_ERROR    | Database operation failed while retrieving logs.                         |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred.                                            |
+| Status Code | Error Code      | Description                                              |
+| ----------- | --------------- | -------------------------------------------------------- |
+| 400         | INVALID_REQUEST | Invalid Webhook ID or pagination/filter parameters.      |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key. |
+| 403         | FORBIDDEN       | Permission denied.                                       |
+| 404         | NOT_FOUND       | Webhook not found or doesn't belong to the merchant.     |
+| 500         | DATABASE_ERROR  | Database operation failed while retrieving logs.         |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred.                            |
 
 ---
 
@@ -377,10 +378,10 @@ Manually triggers a retry attempt for a specific **failed** webhook delivery log
 
 **Path Parameters:**
 
-| Parameter | Type         | Required | Description                        |
-|-----------|--------------|----------|------------------------------------|
-| id        | string (UUID)| Yes      | ID of the webhook (starts with `wh_`) |
-| logId     | string (UUID)| Yes      | ID of the failed delivery log (starts with `log_`) |
+| Parameter | Type          | Required | Description                                        |
+| --------- | ------------- | -------- | -------------------------------------------------- |
+| id        | string (UUID) | Yes      | ID of the webhook (starts with `wh_`)              |
+| logId     | string (UUID) | Yes      | ID of the failed delivery log (starts with `log_`) |
 
 **Example Response (200 OK):**
 
@@ -397,13 +398,13 @@ Manually triggers a retry attempt for a specific **failed** webhook delivery log
 
 **Possible Error Responses:**
 
-| Status Code | Error Code        | Description                                                                      |
-|-------------|-------------------|----------------------------------------------------------------------------------|
-| 400         | INVALID_REQUEST   | Invalid Webhook ID or Log ID format.                                             |
-| 401         | UNAUTHORIZED      | Organization ID not found in request or invalid API key.                         |
-| 403         | FORBIDDEN         | Permission denied.                                                               |
-| 404         | NOT_FOUND         | Webhook or Log not found, log was already successful, or max retries exceeded/permission denied. |
-| 500         | DATABASE_ERROR    | Database operation failed while attempting retry.                                |
-| 500         | INTERNAL_ERROR    | An unexpected error occurred.                                                    |
+| Status Code | Error Code      | Description                                                                                      |
+| ----------- | --------------- | ------------------------------------------------------------------------------------------------ |
+| 400         | INVALID_REQUEST | Invalid Webhook ID or Log ID format.                                                             |
+| 401         | UNAUTHORIZED    | Organization ID not found in request or invalid API key.                                         |
+| 403         | FORBIDDEN       | Permission denied.                                                                               |
+| 404         | NOT_FOUND       | Webhook or Log not found, log was already successful, or max retries exceeded/permission denied. |
+| 500         | DATABASE_ERROR  | Database operation failed while attempting retry.                                                |
+| 500         | INTERNAL_ERROR  | An unexpected error occurred.                                                                    |
 
 ---

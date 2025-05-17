@@ -5,6 +5,7 @@ This document contains curl commands to test all the endpoints defined in the Cu
 ## Setup
 
 Using the same API key as in the checkout-sessions tests:
+
 - `API_KEY`: lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee
 - `API_BASE_URL`: https://api.lomi.africa/v1
 
@@ -181,10 +182,11 @@ curl -X GET "https://api.lomi.africa/v1/customers"
 5. Review the response for success or error information.
 
 **Note**: The test flow should typically be:
+
 1. Create a customer
 2. Get the customer details
 3. List customers (with filters)
 4. Update the customer
 5. Delete the customer
 
-This allows you to test the full customer lifecycle. 
+This allows you to test the full customer lifecycle.

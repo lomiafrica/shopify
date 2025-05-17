@@ -67,12 +67,14 @@ async function lomiApiRequest<T_Data>({
 
     if (!response.ok) {
       const errorDetails = responseBody?.error || responseBody;
-      const errorMessage = errorDetails?.message || `Lomi API request failed with status ${response.status}`;
+      const errorMessage =
+        errorDetails?.message ||
+        `Lomi API request failed with status ${response.status}`;
       console.error("Lomi API Error:", errorDetails || responseBody);
       throw new LomiApiError(
         errorMessage,
         response.status,
-        errorDetails?.details || errorDetails
+        errorDetails?.details || errorDetails,
       );
     }
 
@@ -80,21 +82,26 @@ async function lomiApiRequest<T_Data>({
       return undefined as T_Data;
     }
 
-    if (responseBody && typeof responseBody === 'object' && 'data' in responseBody) {
-        return responseBody.data as T_Data;
+    if (
+      responseBody &&
+      typeof responseBody === "object" &&
+      "data" in responseBody
+    ) {
+      return responseBody.data as T_Data;
     }
 
     return responseBody as T_Data;
-
   } catch (error) {
     console.error("Error during Lomi API request execution:", error);
     if (error instanceof LomiApiError) {
       throw error;
     }
     throw new LomiApiError(
-        error instanceof Error ? error.message : "An unexpected error occurred during the Lomi API request",
-        (error as any).status || 500,
-        error
+      error instanceof Error
+        ? error.message
+        : "An unexpected error occurred during the Lomi API request",
+      (error as any).status || 500,
+      error,
     );
   }
 }
@@ -159,10 +166,13 @@ interface CheckoutSession {
  */
 export async function createLomiCheckoutSession(
   apiKey: string,
-  data: CreateCheckoutSessionRequest
+  data: CreateCheckoutSessionRequest,
 ): Promise<CheckoutSession> {
   if (!apiKey) {
-    throw new LomiApiError("Lomi API key is required to create a checkout session.", 400);
+    throw new LomiApiError(
+      "Lomi API key is required to create a checkout session.",
+      400,
+    );
   }
   const path = "/checkout-sessions";
   return lomiApiRequest<CheckoutSession>({

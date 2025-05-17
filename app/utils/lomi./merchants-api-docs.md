@@ -26,9 +26,9 @@ Retrieves detailed information about a specific merchant.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | The unique identifier of the merchant |
+| Parameter | Type   | Required | Description                           |
+| --------- | ------ | -------- | ------------------------------------- |
+| id        | string | Yes      | The unique identifier of the merchant |
 
 **Example Response:**
 
@@ -56,12 +56,12 @@ Retrieves detailed information about a specific merchant.
 
 **Possible Error Responses:**
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 401 | UNAUTHORIZED | Authentication failed or API key is invalid |
-| 404 | MERCHANT_NOT_FOUND | No merchant found with the provided ID |
-| 500 | DATABASE_ERROR | Error retrieving merchant details from database |
-| 500 | INTERNAL_ERROR | Internal server error |
+| Status Code | Error Code         | Description                                     |
+| ----------- | ------------------ | ----------------------------------------------- |
+| 401         | UNAUTHORIZED       | Authentication failed or API key is invalid     |
+| 404         | MERCHANT_NOT_FOUND | No merchant found with the provided ID          |
+| 500         | DATABASE_ERROR     | Error retrieving merchant details from database |
+| 500         | INTERNAL_ERROR     | Internal server error                           |
 
 ### Get Merchant Monthly Recurring Revenue (MRR)
 
@@ -71,9 +71,9 @@ Retrieves the current monthly recurring revenue for a merchant.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | The unique identifier of the merchant |
+| Parameter | Type   | Required | Description                           |
+| --------- | ------ | -------- | ------------------------------------- |
+| id        | string | Yes      | The unique identifier of the merchant |
 
 **Example Response:**
 
@@ -90,13 +90,13 @@ Retrieves the current monthly recurring revenue for a merchant.
 
 **Possible Error Responses:**
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 401 | UNAUTHORIZED | Authentication failed or API key is invalid |
-| 404 | MERCHANT_NOT_FOUND | No merchant found with the provided ID |
-| 404 | NOT_FOUND | No MRR data found for the merchant |
-| 500 | DATABASE_ERROR | Error retrieving merchant MRR from database |
-| 500 | INTERNAL_ERROR | Internal server error |
+| Status Code | Error Code         | Description                                 |
+| ----------- | ------------------ | ------------------------------------------- |
+| 401         | UNAUTHORIZED       | Authentication failed or API key is invalid |
+| 404         | MERCHANT_NOT_FOUND | No merchant found with the provided ID      |
+| 404         | NOT_FOUND          | No MRR data found for the merchant          |
+| 500         | DATABASE_ERROR     | Error retrieving merchant MRR from database |
+| 500         | INTERNAL_ERROR     | Internal server error                       |
 
 ### Get Merchant Annual Recurring Revenue (ARR)
 
@@ -106,9 +106,9 @@ Retrieves the current annual recurring revenue for a merchant.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | The unique identifier of the merchant |
+| Parameter | Type   | Required | Description                           |
+| --------- | ------ | -------- | ------------------------------------- |
+| id        | string | Yes      | The unique identifier of the merchant |
 
 **Example Response:**
 
@@ -125,13 +125,13 @@ Retrieves the current annual recurring revenue for a merchant.
 
 **Possible Error Responses:**
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 401 | UNAUTHORIZED | Authentication failed or API key is invalid |
-| 404 | MERCHANT_NOT_FOUND | No merchant found with the provided ID |
-| 404 | NOT_FOUND | No ARR data found for the merchant |
-| 500 | DATABASE_ERROR | Error retrieving merchant ARR from database |
-| 500 | INTERNAL_ERROR | Internal server error |
+| Status Code | Error Code         | Description                                 |
+| ----------- | ------------------ | ------------------------------------------- |
+| 401         | UNAUTHORIZED       | Authentication failed or API key is invalid |
+| 404         | MERCHANT_NOT_FOUND | No merchant found with the provided ID      |
+| 404         | NOT_FOUND          | No ARR data found for the merchant          |
+| 500         | DATABASE_ERROR     | Error retrieving merchant ARR from database |
+| 500         | INTERNAL_ERROR     | Internal server error                       |
 
 ### Get Merchant Account Balance
 
@@ -141,15 +141,15 @@ Retrieves the current account balance for a merchant's specific currency.
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | The unique identifier of the merchant |
+| Parameter | Type   | Required | Description                           |
+| --------- | ------ | -------- | ------------------------------------- |
+| id        | string | Yes      | The unique identifier of the merchant |
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| currency_code | string | Yes | Currency code for the balance (XOF, USD, EUR, etc.) |
+| Parameter     | Type   | Required | Description                                         |
+| ------------- | ------ | -------- | --------------------------------------------------- |
+| currency_code | string | Yes      | Currency code for the balance (XOF, USD, EUR, etc.) |
 
 **Example Response:**
 
@@ -166,12 +166,12 @@ Retrieves the current account balance for a merchant's specific currency.
 
 **Possible Error Responses:**
 
-| Status Code | Error Code | Description |
-|-------------|------------|-------------|
-| 400 | MISSING_PARAMETER | The currency_code query parameter is missing |
-| 401 | UNAUTHORIZED | Authentication failed or API key is invalid |
-| 500 | DATABASE_ERROR | Error retrieving merchant balance from database |
-| 500 | INTERNAL_ERROR | Internal server error |
+| Status Code | Error Code        | Description                                     |
+| ----------- | ----------------- | ----------------------------------------------- |
+| 400         | MISSING_PARAMETER | The currency_code query parameter is missing    |
+| 401         | UNAUTHORIZED      | Authentication failed or API key is invalid     |
+| 500         | DATABASE_ERROR    | Error retrieving merchant balance from database |
+| 500         | INTERNAL_ERROR    | Internal server error                           |
 
 ## Error Handling
 
@@ -193,15 +193,15 @@ Error responses follow a consistent format:
 
 The API uses the following standardized error codes:
 
-| Error Code | Description |
-|------------|-------------|
-| INVALID_REQUEST | The request is malformed or invalid |
-| UNAUTHORIZED | Authentication is required or has failed |
-| NOT_FOUND | The requested resource was not found |
-| MERCHANT_NOT_FOUND | The specified merchant was not found |
-| DATABASE_ERROR | An error occurred when interacting with the database |
-| INTERNAL_ERROR | An internal server error occurred |
-| MISSING_PARAMETER | A required parameter is missing from the request |
+| Error Code         | Description                                          |
+| ------------------ | ---------------------------------------------------- |
+| INVALID_REQUEST    | The request is malformed or invalid                  |
+| UNAUTHORIZED       | Authentication is required or has failed             |
+| NOT_FOUND          | The requested resource was not found                 |
+| MERCHANT_NOT_FOUND | The specified merchant was not found                 |
+| DATABASE_ERROR     | An error occurred when interacting with the database |
+| INTERNAL_ERROR     | An internal server error occurred                    |
+| MISSING_PARAMETER  | A required parameter is missing from the request     |
 
 ## Rate Limits
 
@@ -215,4 +215,4 @@ The API uses the following standardized error codes:
 ## Implementation Notes
 
 - All financial data is returned in the smallest currency unit (e.g., cents for USD, centimes for XOF)
-- Dates and times are returned in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ) 
+- Dates and times are returned in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)

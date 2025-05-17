@@ -5,6 +5,7 @@ This document contains curl commands to test all the endpoints defined in the Me
 ## Setup
 
 Replace the following values in your requests if needed:
+
 - `API_KEY`: Your API key (lomi_sk_5a1826c9da8e9692e6c91055cb92726ca0b9d28112f37d2f423f8690cadc9eee)
 - `API_BASE_URL`: Your API base URL (default: https://api.lomi.africa/v1)
 - `MERCHANT_ID`: The merchant ID to use for testing
@@ -26,6 +27,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/invalid-merchant-id" \
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -54,6 +56,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/invalid-merchant-id/mrr" \
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -82,6 +85,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/invalid-merchant-id/arr" \
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -110,6 +114,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/904d003c-3736-41d4-90a5-9de74d
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -129,6 +134,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/invalid-merchant-id/balance?cu
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -150,6 +156,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/904d003c-3736-41d4-90a5-9de74d
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -168,6 +175,7 @@ curl -X GET "https://api.lomi.africa/v1/merchants/904d003c-3736-41d4-90a5-9de74d
 ```
 
 Expected response:
+
 ```json
 {
   "error": {
@@ -182,7 +190,9 @@ Expected response:
 ## Response Structure
 
 ### Success Responses
+
 All successful responses follow this structure:
+
 ```json
 {
   "data": {
@@ -192,13 +202,15 @@ All successful responses follow this structure:
 ```
 
 ### Error Responses
+
 All error responses now include enhanced information:
+
 ```json
 {
   "error": {
-    "status": 404,                      // HTTP status code
-    "code": "MERCHANT_NOT_FOUND",       // Error code for client-side handling
-    "message": "Merchant not found",    // Human-readable message
+    "status": 404, // HTTP status code
+    "code": "MERCHANT_NOT_FOUND", // Error code for client-side handling
+    "message": "Merchant not found", // Human-readable message
     "details": "Additional error details (if available)",
     "timestamp": "2023-04-01T12:30:45Z" // When the error occurred
   }
@@ -212,4 +224,4 @@ All error responses now include enhanced information:
 3. Run the command to test the endpoint.
 4. Review the response for success or error information.
 
-**Note**: These examples test both success paths and error handling for each endpoint. You may need to replace the example merchant ID with a valid ID from your system. 
+**Note**: These examples test both success paths and error handling for each endpoint. You may need to replace the example merchant ID with a valid ID from your system.
