@@ -22,9 +22,11 @@ export default function App() {
   return (
     <div className={styles.index}>
       <div className={styles.content}>
-        <h1 className={styles.heading}>A short heading about [your app]</h1>
+        <h1 className={styles.heading}>
+          <img src="/lomi_d.webp" alt="lomi." className={styles.logoImage} />
+        </h1>
         <p className={styles.text}>
-          A tagline about [your app] that describes your value proposition.
+          Helping West African entrepreneurs sell online
         </p>
         {showForm && (
           <Form className={styles.form} method="post" action="/auth/login">
@@ -40,16 +42,19 @@ export default function App() {
         )}
         <ul className={styles.list}>
           <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
+            <strong>Seamless integration</strong>Effortlessly connect
+            lomi. to your Shopify store in minutes. Start accepting payments
+            quickly with our user-friendly setup, no complex coding required.
           </li>
           <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
+            <strong>Reach more customers</strong>Enable your customers to pay
+            using popular local payment methods. Expand your market across West
+            Africa by offering familiar and trusted payment options.
           </li>
           <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
+            <strong>Secure and reliable</strong>Process transactions
+            with confidence. lomi. ensures top-tier security for every one of your payment and
+            provides reliable, instant payouts to your bank account.
           </li>
         </ul>
       </div>
