@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { supabaseAdmin } from "@/utils/supabase/server";
+import { supabaseAdmin } from "@/app/utils/supabase/server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { payload, session, topic, shop } = await authenticate.webhook(request);
