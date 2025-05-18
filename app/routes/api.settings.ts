@@ -1,4 +1,4 @@
-import { json } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { supabase } from "@/app/utils/supabase/client";
@@ -14,10 +14,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
       .single();
 
     if (error) throw error;
-    return json(settings || {});
+    return data(settings || {});
   } catch (error) {
     console.error("Error loading settings:", error);
-    return json({});
+    return data({});
   }
 }
 
@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { session } = await authenticate.admin(request);
 
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return data({ error: "Method not allowed" }, { status: 405 });
   }
 
   try {
@@ -68,10 +68,10 @@ export async function action({ request }: ActionFunctionArgs) {
       throw new Error("Failed to register extension");
     }
 
-    return json({ success: true });
+    return data({ success: true });
   } catch (error) {
     console.error("Error saving settings:", error);
-    return json(
+    return data(
       {
         error:
           error instanceof Error ? error.message : "Failed to save settings",

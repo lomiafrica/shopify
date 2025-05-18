@@ -1,3 +1,4 @@
+import "./polyfills/crypto";
 import { shopifyApp } from "@shopify/shopify-app-remix/server";
 import { DeliveryMethod, ApiVersion } from "@shopify/shopify-api";
 import { SupabaseSessionStorage } from "./utils/session-storage";

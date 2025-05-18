@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import { authenticate } from "~/shopify.server"; // Assuming this is your Shopify admin authentication utility
 import { supabaseAdmin } from "../utils/supabase/server"; // Corrected relative path
 
@@ -16,7 +16,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { admin, session } = await authenticate.admin(request);
 
   if (!admin || !session) {
-    return json<ActionData>(
+    return data<ActionData>(
       { success: false, message: "Unauthorized" },
       { status: 401 },
     );
@@ -29,7 +29,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const keyFromForm = formData.get("lomiApiKey");
     if (typeof keyFromForm !== "string" || !keyFromForm.trim()) {
-      return json<ActionData>(
+      return data<ActionData>(
         { success: false, message: "Lomi API Key is required." },
         { status: 400 },
       );
@@ -37,7 +37,7 @@ export async function action({ request }: ActionFunctionArgs) {
     lomiApiKey = keyFromForm.trim();
   } catch (error) {
     console.error("Error parsing form data:", error);
-    return json<ActionData>(
+    return data<ActionData>(
       { success: false, message: "Invalid request data." },
       { status: 400 },
     );
@@ -45,7 +45,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (!supabaseAdmin) {
     console.error("Supabase admin client not initialized for API route.");
-    return json<ActionData>(
+    return data<ActionData>(
       { success: false, message: "Server configuration error." },
       { status: 500 },
     );
@@ -65,7 +65,7 @@ export async function action({ request }: ActionFunctionArgs) {
         `RPC 'validate_and_store_lomi_key_for_shop' error for shop ${shopDomain}:`,
         rpcError,
       );
-      return json<ActionData>(
+      return data<ActionData>(
         {
           success: false,
           message: rpcError.message || "Error validating and storing API key.",
@@ -83,7 +83,7 @@ export async function action({ request }: ActionFunctionArgs) {
         `Invalid RPC response structure for shop ${shopDomain}:`,
         result,
       );
-      return json<ActionData>(
+      return data<ActionData>(
         {
           success: false,
           message: "Invalid response from validation service.",
@@ -92,7 +92,7 @@ export async function action({ request }: ActionFunctionArgs) {
       );
     }
 
-    return json<ActionData>(result, { status: result.success ? 200 : 400 });
+    return data<ActionData>(result, { status: result.success ? 200 : 400 });
   } catch (error) {
     console.error(
       `Unexpected error in /api/validate-lomi-key for shop ${shopDomain}:`,
@@ -102,7 +102,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    return json<ActionData>(
+    return data<ActionData>(
       { success: false, message: errorMessage, errorDetails: error },
       { status: 500 },
     );

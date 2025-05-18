@@ -1,0 +1,20 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/remix",
+      "config": {
+        "installCommand": "bun install --frozen-lockfile",
+        "buildCommand": "bun run build"
+      }
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "ALLOW-FROM https://admin.shopify.com" }
+      ]
+    }
+  ]
+}
