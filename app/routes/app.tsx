@@ -5,6 +5,7 @@ import { AppProvider } from "@shopify/shopify-app-remix/react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import { Frame, Navigation } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
+import { Analytics } from "@vercel/analytics/remix"
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
@@ -47,6 +48,7 @@ export default function App() {
       <Frame navigation={navigationMarkup}>
         <Outlet />
       </Frame>
+      <Analytics />
     </AppProvider>
   );
 }
