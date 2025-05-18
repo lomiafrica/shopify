@@ -1,7 +1,6 @@
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
-  serverModuleFormat: "cjs",
   serverDependenciesToBundle: [
     "@shopify/shopify-api",
     "@shopify/shopify-app-remix",
