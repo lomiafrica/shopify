@@ -1,7 +1,6 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { installGlobals } from "@remix-run/node";
 import { defineConfig, type UserConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import { vercelPreset } from "@vercel/remix/vite";
 
 installGlobals({ nativeFetch: true });
@@ -35,31 +34,35 @@ if (host === "localhost") {
   };
 }
 
-export default defineConfig({
-  server: {
-    port: Number(process.env.PORT || 3000),
-    hmr: hmrConfig,
-    fs: {
-      // See https://vitejs.dev/config/server-options.html#server-fs-allow for more information
-      allow: ["app", "node_modules"],
-    },
-  },
-  plugins: [
-    remix({
-      presets: [vercelPreset()],
-      ignoredRouteFiles: ["**/.*"],
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
-        v3_lazyRouteDiscovery: true,
-        v3_singleFetch: false,
-        v3_routeConfig: true,
+export default defineConfig(async () => {
+  const tsconfigPaths = (await import("vite-tsconfig-paths")).default;
+
+  return {
+    server: {
+      port: Number(process.env.PORT || 3000),
+      hmr: hmrConfig,
+      fs: {
+        // See https://vitejs.dev/config/server-options.html#server-fs-allow for more information
+        allow: ["app", "node_modules"],
       },
-    }),
-    tsconfigPaths({ projects: ["./tsconfig.json"] }),
-  ],
-  build: {
-    assetsInlineLimit: 0,
-  },
-}) satisfies UserConfig;
+    },
+    plugins: [
+      remix({
+        presets: [vercelPreset()],
+        future: {
+          v3_fetcherPersist: true,
+          v3_relativeSplatPath: true,
+          v3_throwAbortReason: true,
+          v3_lazyRouteDiscovery: true,
+          v3_singleFetch: true,
+          v3_routeConfig: true,
+        },
+        serverModuleFormat: 'esm',
+      }),
+      tsconfigPaths({ root: '.' }),
+    ],
+    build: {
+      assetsInlineLimit: 0,
+    },
+  } satisfies UserConfig;
+});
