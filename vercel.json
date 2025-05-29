@@ -2,11 +2,6 @@
   "framework": "remix",
   "installCommand": "bun install --frozen-lockfile",
   "buildCommand": "bun run build",
-  "functions": {
-    "app/routes/**": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
