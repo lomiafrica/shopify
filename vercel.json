@@ -2,6 +2,8 @@
   "framework": "remix",
   "installCommand": "bun install --frozen-lockfile",
   "buildCommand": "bun run build",
+  "nodeVersion": "20",
+  "outputDirectory": "build",
   "headers": [
     {
       "source": "/(.*)",
