@@ -1,8 +1,11 @@
--- Create Shopify schema
-CREATE SCHEMA IF NOT EXISTS shopify;
+-- Migration to move Shopify schema to public with shopify_ prefixes
+-- This fixes RPC function 404 issues with Supabase PostgREST API
 
--- Create Shopify tables in the new schema
-CREATE TABLE shopify.stores (
+-- First, drop the entire shopify schema
+DROP SCHEMA IF EXISTS shopify CASCADE;
+
+-- Create Shopify tables in public schema with shopify_ prefix
+CREATE TABLE shopify_stores (
     store_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES public.organizations(organization_id),
     shop_domain VARCHAR NOT NULL,
@@ -16,23 +19,40 @@ CREATE TABLE shopify.stores (
     UNIQUE(organization_id, shop_domain)
 );
 
--- Add the new table for Lomi API Keys
-CREATE TABLE shopify.api_keys (
+-- Shopify API Keys table
+CREATE TABLE shopify_api_keys (
     api_key_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    store_id UUID NOT NULL REFERENCES shopify.stores(store_id) ON DELETE CASCADE,
+    store_id UUID NOT NULL REFERENCES shopify_stores(store_id) ON DELETE CASCADE,
     lomi_api_key TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(store_id) -- Each store should have only one Lomi API key configuration
 );
 
-COMMENT ON TABLE shopify.api_keys IS 'Stores Lomi API keys for Shopify stores, linked to the shopify.stores table.';
+COMMENT ON TABLE shopify_api_keys IS 'Stores Lomi API keys for Shopify stores, linked to the shopify_stores table.';
 
-CREATE INDEX idx_shopify_api_keys_store_id ON shopify.api_keys(store_id);
+CREATE INDEX idx_shopify_api_keys_store_id ON shopify_api_keys(store_id);
 
-CREATE TABLE shopify.webhooks (
+-- Shop settings table for api.settings.ts
+CREATE TABLE shopify_shop_settings (
+    settings_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    shop VARCHAR NOT NULL UNIQUE,
+    api_key VARCHAR,
+    api_secret VARCHAR,
+    merchant_id VARCHAR,
+    webhook_url VARCHAR,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE shopify_shop_settings IS 'Stores shop-specific settings for Shopify stores used by api.settings.ts';
+
+CREATE INDEX idx_shopify_shop_settings_shop ON shopify_shop_settings(shop);
+
+-- Webhooks table
+CREATE TABLE shopify_webhooks (
     webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    store_id UUID NOT NULL REFERENCES shopify.stores(store_id),
+    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
     topic VARCHAR NOT NULL,
     address VARCHAR NOT NULL,
     shopify_webhook_id VARCHAR NOT NULL,
@@ -41,7 +61,8 @@ CREATE TABLE shopify.webhooks (
     UNIQUE(store_id, topic)
 );
 
-CREATE TABLE shopify.sessions (
+-- Sessions table
+CREATE TABLE shopify_sessions (
     id TEXT PRIMARY KEY,
     shop TEXT NOT NULL,
     state TEXT NOT NULL,
@@ -63,33 +84,38 @@ CREATE TABLE shopify.sessions (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-COMMENT ON TABLE shopify.sessions IS 'Stores Shopify session data for authentication';
+COMMENT ON TABLE shopify_sessions IS 'Stores Shopify session data for authentication';
 
--- Add RLS policies
-ALTER TABLE shopify.stores ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shopify.webhooks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shopify.sessions ENABLE ROW LEVEL SECURITY;
+-- Enable RLS on all tables
+ALTER TABLE shopify_stores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shopify_api_keys ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shopify_shop_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shopify_webhooks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shopify_sessions ENABLE ROW LEVEL SECURITY;
 
--- Add RLS for the new api_keys table
-ALTER TABLE shopify.api_keys ENABLE ROW LEVEL SECURITY;
-
+-- RLS Policies
 CREATE POLICY "Organizations can manage Lomi API keys for their own stores"
-    ON shopify.api_keys
+    ON shopify_api_keys
     FOR ALL
     TO authenticated
     USING (store_id IN (
         SELECT s.store_id
-        FROM shopify.stores s
+        FROM shopify_stores s
         WHERE s.organization_id IN (
             SELECT mol.organization_id
-            FROM public.merchant_organization_links mol -- Assuming merchant_organization_links is in public schema
+            FROM public.merchant_organization_links mol
             WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
         )
     ));
 
--- Add RLS policies for stores
+CREATE POLICY "Service role can manage shop settings"
+    ON shopify_shop_settings
+    FOR ALL
+    TO service_role
+    USING (true);
+
 CREATE POLICY "Organizations can manage their own stores"
-    ON shopify.stores
+    ON shopify_stores
     FOR ALL
     TO authenticated
     USING (organization_id IN (
@@ -98,14 +124,13 @@ CREATE POLICY "Organizations can manage their own stores"
         WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
     ));
 
--- Add RLS policies for webhooks
 CREATE POLICY "Organizations can manage their store webhooks"
-    ON shopify.webhooks
+    ON shopify_webhooks
     FOR ALL
     TO authenticated
     USING (store_id IN (
         SELECT s.store_id
-        FROM shopify.stores s
+        FROM shopify_stores s
         WHERE s.organization_id IN (
             SELECT mol.organization_id
             FROM public.merchant_organization_links mol
@@ -113,14 +138,13 @@ CREATE POLICY "Organizations can manage their store webhooks"
         )
     ));
 
--- Add RLS policies for sessions
 CREATE POLICY "Organizations can manage their store sessions"
-    ON shopify.sessions
+    ON shopify_sessions
     FOR ALL
     TO authenticated
     USING (shop IN (
         SELECT s.shop_domain
-        FROM shopify.stores s
+        FROM shopify_stores s
         WHERE s.organization_id IN (
             SELECT mol.organization_id
             FROM merchant_organization_links mol
@@ -128,8 +152,16 @@ CREATE POLICY "Organizations can manage their store sessions"
         )
     ));
 
--- Create RPC functions in the shopify schema
-CREATE OR REPLACE FUNCTION shopify.install_store(
+-- Service role policy for shopify sessions
+CREATE POLICY "Service role can manage shopify sessions"
+    ON shopify_sessions
+    FOR ALL
+    TO service_role
+    USING (true);
+
+-- RPC Functions (now in public schema)
+
+CREATE OR REPLACE FUNCTION install_shopify_store(
     p_organization_id UUID,
     p_shop_domain VARCHAR,
     p_access_token VARCHAR,
@@ -138,7 +170,7 @@ CREATE OR REPLACE FUNCTION shopify.install_store(
 DECLARE
     v_store_id UUID;
 BEGIN
-    INSERT INTO shopify.stores (
+    INSERT INTO shopify_stores (
         organization_id,
         shop_domain,
         access_token,
@@ -153,9 +185,9 @@ BEGIN
 
     RETURN v_store_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
-CREATE OR REPLACE FUNCTION shopify.manage_session(
+CREATE OR REPLACE FUNCTION manage_shopify_session(
     p_id TEXT,
     p_shop TEXT,
     p_state TEXT,
@@ -175,7 +207,7 @@ CREATE OR REPLACE FUNCTION shopify.manage_session(
     p_associated_user_scope TEXT
 ) RETURNS TEXT AS $$
 BEGIN
-    INSERT INTO shopify.sessions (
+    INSERT INTO shopify_sessions (
         id,
         shop,
         state,
@@ -234,30 +266,80 @@ BEGIN
 
     RETURN p_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
-CREATE OR REPLACE FUNCTION shopify.delete_session(p_id TEXT) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION delete_shopify_session(p_id TEXT) RETURNS BOOLEAN AS $$
 BEGIN
-    DELETE FROM shopify.sessions WHERE id = p_id;
+    DELETE FROM shopify_sessions WHERE id = p_id;
     RETURN FOUND;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
-CREATE OR REPLACE FUNCTION shopify.delete_sessions(p_ids TEXT[]) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION delete_shopify_sessions(p_ids TEXT[]) RETURNS BOOLEAN AS $$
 BEGIN
-    DELETE FROM shopify.sessions WHERE id = ANY(p_ids);
+    DELETE FROM shopify_sessions WHERE id = ANY(p_ids);
     RETURN FOUND;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
-CREATE OR REPLACE FUNCTION shopify.find_sessions_by_shop(p_shop TEXT) RETURNS SETOF shopify.sessions AS $$
+CREATE OR REPLACE FUNCTION delete_shopify_sessions_by_shop(p_shop TEXT) RETURNS BOOLEAN AS $$
+BEGIN
+    DELETE FROM shopify_sessions WHERE shop = p_shop;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+CREATE OR REPLACE FUNCTION update_shopify_session_scope(p_session_id TEXT, p_scope TEXT) RETURNS BOOLEAN AS $$
+BEGIN
+    UPDATE shopify_sessions SET scope = p_scope, updated_at = NOW() WHERE id = p_session_id;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Shop settings RPC functions
+CREATE OR REPLACE FUNCTION get_shopify_shop_settings(p_shop TEXT) RETURNS SETOF shopify_shop_settings AS $$
 BEGIN
     RETURN QUERY
-    SELECT * FROM shopify.sessions WHERE shop = p_shop;
+    SELECT * FROM shopify_shop_settings WHERE shop = p_shop;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
-CREATE OR REPLACE FUNCTION shopify.register_webhook(
+CREATE OR REPLACE FUNCTION upsert_shopify_shop_settings(
+    p_shop TEXT,
+    p_api_key VARCHAR,
+    p_api_secret VARCHAR,
+    p_merchant_id VARCHAR,
+    p_webhook_url VARCHAR
+) RETURNS SETOF shopify_shop_settings AS $$
+BEGIN
+    RETURN QUERY
+    INSERT INTO shopify_shop_settings (shop, api_key, api_secret, merchant_id, webhook_url, updated_at)
+    VALUES (p_shop, p_api_key, p_api_secret, p_merchant_id, p_webhook_url, NOW())
+    ON CONFLICT (shop) DO UPDATE
+    SET api_key = EXCLUDED.api_key,
+        api_secret = EXCLUDED.api_secret,
+        merchant_id = EXCLUDED.merchant_id,
+        webhook_url = EXCLUDED.webhook_url,
+        updated_at = NOW()
+    RETURNING *;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+CREATE OR REPLACE FUNCTION find_shopify_sessions_by_shop(p_shop TEXT) RETURNS SETOF shopify_sessions AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM shopify_sessions WHERE shop = p_shop;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+CREATE OR REPLACE FUNCTION find_shopify_session_by_id(p_id TEXT) RETURNS SETOF shopify_sessions AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM shopify_sessions WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+CREATE OR REPLACE FUNCTION register_shopify_webhook(
     p_store_id UUID,
     p_topic VARCHAR,
     p_address VARCHAR,
@@ -266,7 +348,7 @@ CREATE OR REPLACE FUNCTION shopify.register_webhook(
 DECLARE
     v_webhook_id UUID;
 BEGIN
-    INSERT INTO shopify.webhooks (
+    INSERT INTO shopify_webhooks (
         store_id,
         topic,
         address,
@@ -281,17 +363,10 @@ BEGIN
 
     RETURN v_webhook_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Grant necessary permissions
-GRANT USAGE ON SCHEMA shopify TO service_role;
-GRANT ALL ON ALL TABLES IN SCHEMA shopify TO service_role;
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA shopify TO service_role;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA shopify TO service_role;
-
--- New RPC Functions for Lomi API Key Management
-
-CREATE OR REPLACE FUNCTION shopify.get_lomi_api_key(
+-- Lomi API Key Management Functions
+CREATE OR REPLACE FUNCTION get_shopify_lomi_api_key(
     p_store_id UUID
 ) RETURNS TEXT AS $$
 DECLARE
@@ -299,38 +374,38 @@ DECLARE
 BEGIN
     SELECT lomi_api_key
     INTO v_api_key
-    FROM shopify.api_keys
+    FROM shopify_api_keys
     WHERE store_id = p_store_id;
 
     RETURN v_api_key;
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public, pg_temp;
 
-COMMENT ON FUNCTION shopify.get_lomi_api_key(UUID) IS 'Retrieves the Lomi API key for a given store_id from shopify.api_keys.';
+COMMENT ON FUNCTION get_shopify_lomi_api_key(UUID) IS 'Retrieves the Lomi API key for a given store_id from shopify_api_keys.';
 
-CREATE OR REPLACE FUNCTION shopify.upsert_lomi_api_key(
+CREATE OR REPLACE FUNCTION upsert_shopify_lomi_api_key(
     p_store_id UUID,
     p_lomi_api_key TEXT
-) RETURNS SETOF shopify.api_keys AS $$
+) RETURNS SETOF shopify_api_keys AS $$
 BEGIN
     RETURN QUERY
-    INSERT INTO shopify.api_keys (store_id, lomi_api_key, updated_at)
+    INSERT INTO shopify_api_keys (store_id, lomi_api_key, updated_at)
     VALUES (p_store_id, p_lomi_api_key, NOW())
     ON CONFLICT (store_id) DO UPDATE
     SET lomi_api_key = EXCLUDED.lomi_api_key,
         updated_at = NOW()
     RETURNING *;
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public, pg_temp;
 
-COMMENT ON FUNCTION shopify.upsert_lomi_api_key(UUID, TEXT) IS 'Upserts a Lomi API key into shopify.api_keys for a given store_id. Assumes the key has been validated elsewhere.';
+COMMENT ON FUNCTION upsert_shopify_lomi_api_key(UUID, TEXT) IS 'Upserts a Lomi API key into shopify_api_keys for a given store_id. Assumes the key has been validated elsewhere.';
 
-CREATE OR REPLACE FUNCTION shopify.validate_and_store_lomi_key_for_shop(
+CREATE OR REPLACE FUNCTION validate_and_store_shopify_lomi_key_for_shop(
     p_shop_domain TEXT,
     p_lomi_api_key_to_validate TEXT
 ) RETURNS JSONB AS $$
 DECLARE
-    v_store_record shopify.stores%ROWTYPE;
+    v_store_record shopify_stores%ROWTYPE;
     v_validation_result RECORD;
     v_calling_user_id UUID := auth.uid(); -- The user making the request via Shopify app
     v_expected_merchant_id UUID; -- Merchant ID linked to the auth.uid(), to be checked against the key's merchant_id
@@ -340,31 +415,23 @@ DECLARE
     v_key_message TEXT;
 BEGIN
     -- Get the merchant_id associated with the currently authenticated Supabase user
-    -- This assumes you have a way to link auth.uid() to a merchant_id in your public.users or a similar table.
-    -- Adjust this query as per your actual schema for linking auth.uid() to a merchant_id.
     SELECT merchant_id INTO v_expected_merchant_id FROM public.users WHERE id = v_calling_user_id;
     IF NOT FOUND THEN
         RETURN jsonb_build_object('success', false, 'message', 'Authenticated user not linked to a merchant.');
     END IF;
 
     -- Fetch store details based on shop_domain
-    SELECT * INTO v_store_record FROM shopify.stores WHERE shop_domain = p_shop_domain;
+    SELECT * INTO v_store_record FROM shopify_stores WHERE shop_domain = p_shop_domain;
     IF NOT FOUND THEN
         RETURN jsonb_build_object('success', false, 'message', 'Shop not found for domain: ' || p_shop_domain);
     END IF;
 
-    -- Ensure the authenticated user (via its organization) has access to this store
-    -- This relies on RLS on shopify.stores. An additional explicit check can be added if needed.
-    -- For example, check if v_store_record.organization_id is in the list of orgs for v_expected_merchant_id.
-
     -- Call the central API key verification function
-    -- Assuming public.verify_api_key returns at least: is_valid (boolean), merchant_id (uuid), organization_id (uuid), message (text)
     SELECT result.is_valid, result.merchant_id, result.organization_id, result.message
     INTO v_key_is_valid, v_key_merchant_id, v_key_organization_id, v_key_message
     FROM public.verify_api_key(p_api_key := p_lomi_api_key_to_validate, p_endpoint := 'shopify_app_lomi_key_setup') as result;
 
     IF v_key_is_valid IS NULL THEN
-        -- This case handles if verify_api_key itself errors or returns an unexpected structure
         RETURN jsonb_build_object('success', false, 'message', 'API key validation service returned an unexpected result.');
     END IF;
 
@@ -383,7 +450,7 @@ BEGIN
     END IF;
 
     -- If all checks pass, upsert the API key
-    PERFORM shopify.upsert_lomi_api_key(v_store_record.store_id, p_lomi_api_key_to_validate);
+    PERFORM upsert_shopify_lomi_api_key(v_store_record.store_id, p_lomi_api_key_to_validate);
 
     RETURN jsonb_build_object(
         'success', true,
@@ -397,6 +464,26 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN jsonb_build_object('success', false, 'message', 'An unexpected error occurred: ' || SQLERRM);
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
-COMMENT ON FUNCTION shopify.validate_and_store_lomi_key_for_shop(TEXT, TEXT) IS 'Validates a Lomi API key using public.verify_api_key, checks its association with the shop domains organization and authenticated merchant, and stores it in shopify.api_keys if valid.';
+-- Grant necessary permissions to service_role
+GRANT ALL ON shopify_stores TO service_role;
+GRANT ALL ON shopify_api_keys TO service_role;
+GRANT ALL ON shopify_shop_settings TO service_role;
+GRANT ALL ON shopify_webhooks TO service_role;
+GRANT ALL ON shopify_sessions TO service_role;
+
+GRANT EXECUTE ON FUNCTION install_shopify_store(UUID, VARCHAR, VARCHAR, VARCHAR[]) TO service_role;
+GRANT EXECUTE ON FUNCTION manage_shopify_session(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TIMESTAMPTZ, TEXT, BIGINT, TEXT, TEXT, TEXT, BOOLEAN, TEXT, BOOLEAN, BOOLEAN, INTEGER, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION delete_shopify_session(TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION delete_shopify_sessions(TEXT[]) TO service_role;
+GRANT EXECUTE ON FUNCTION delete_shopify_sessions_by_shop(TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION update_shopify_session_scope(TEXT, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION get_shopify_shop_settings(TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION upsert_shopify_shop_settings(TEXT, VARCHAR, VARCHAR, VARCHAR, VARCHAR) TO service_role;
+GRANT EXECUTE ON FUNCTION find_shopify_sessions_by_shop(TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION find_shopify_session_by_id(TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION register_shopify_webhook(UUID, VARCHAR, VARCHAR, VARCHAR) TO service_role;
+GRANT EXECUTE ON FUNCTION get_shopify_lomi_api_key(UUID) TO service_role;
+GRANT EXECUTE ON FUNCTION upsert_shopify_lomi_api_key(UUID, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION validate_and_store_shopify_lomi_key_for_shop(TEXT, TEXT) TO service_role;

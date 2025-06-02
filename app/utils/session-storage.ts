@@ -4,103 +4,137 @@ import { supabaseAdmin } from "@/app/utils/supabase/server";
 
 export class SupabaseSessionStorage {
   async storeSession(session: SessionInterface): Promise<boolean> {
+    console.log("[SupabaseSessionStorage] Attempting to store session:", JSON.stringify(session, null, 2));
     try {
-      const { error } = await supabaseAdmin.from("shopify_sessions").upsert(
-        {
-          id: session.id,
-          shop: session.shop,
-          state: session.state,
-          isOnline: session.isOnline,
-          scope: session.scope,
-          expires: session.expires?.toISOString(),
-          accessToken: session.accessToken,
-          userId: session.onlineAccessInfo?.associated_user?.id,
-          firstName: session.onlineAccessInfo?.associated_user?.first_name,
-          lastName: session.onlineAccessInfo?.associated_user?.last_name,
-          email: session.onlineAccessInfo?.associated_user?.email,
-          accountOwner:
-            session.onlineAccessInfo?.associated_user?.account_owner,
-          locale: session.onlineAccessInfo?.associated_user?.locale,
-          collaborator: session.onlineAccessInfo?.associated_user?.collaborator,
-          emailVerified:
-            session.onlineAccessInfo?.associated_user?.email_verified,
-          expires_in: session.onlineAccessInfo?.expires_in,
-          associated_user_scope:
-            session.onlineAccessInfo?.associated_user_scope,
-        },
-        {
-          onConflict: "id",
-        },
-      );
+      const { error } = await supabaseAdmin.rpc("manage_shopify_session", {
+        p_id: session.id,
+        p_shop: session.shop,
+        p_state: session.state,
+        p_is_online: session.isOnline,
+        p_scope: session.scope,
+        p_expires: session.expires?.toISOString() || null,
+        p_access_token: session.accessToken,
+        p_user_id: session.onlineAccessInfo?.associated_user?.id || null,
+        p_first_name: session.onlineAccessInfo?.associated_user?.first_name || null,
+        p_last_name: session.onlineAccessInfo?.associated_user?.last_name || null,
+        p_email: session.onlineAccessInfo?.associated_user?.email || null,
+        p_account_owner: session.onlineAccessInfo?.associated_user?.account_owner || false,
+        p_locale: session.onlineAccessInfo?.associated_user?.locale || null,
+        p_collaborator: session.onlineAccessInfo?.associated_user?.collaborator || false,
+        p_email_verified: session.onlineAccessInfo?.associated_user?.email_verified || false,
+        p_expires_in: session.onlineAccessInfo?.expires_in || null,
+        p_associated_user_scope: session.onlineAccessInfo?.associated_user_scope || null,
+      });
 
-      return !error;
+      if (error) {
+        console.error("[SupabaseSessionStorage] Error storing session via RPC:", JSON.stringify(error, null, 2));
+        return false;
+      }
+      console.log("[SupabaseSessionStorage] Session stored successfully via RPC for id:", session.id);
+      return true;
     } catch (error) {
-      console.error("Error storing session:", error);
+      console.error("[SupabaseSessionStorage] Exception during storeSession:", error);
       return false;
     }
   }
 
   async loadSession(id: string): Promise<SessionInterface | undefined> {
-    try {
-      const { data: session, error } = await supabaseAdmin
-        .from("shopify_sessions")
-        .select("*")
-        .eq("id", id)
-        .single();
+    console.log("[SupabaseSessionStorage] Attempting to load session for id:", id);
+    console.log("[SupabaseSessionStorage] Using supabaseAdmin client - checking connection...");
 
-      if (error || !session) {
+    try {
+      // Use the find_shopify_session_by_id RPC function
+      console.log("[SupabaseSessionStorage] About to call find_shopify_session_by_id with params:", { p_id: id });
+
+      const { data: dbSessions, error } = await supabaseAdmin.rpc("find_shopify_session_by_id", {
+        p_id: id,
+      });
+
+      console.log("[SupabaseSessionStorage] RPC response - data:", JSON.stringify(dbSessions, null, 2));
+      console.log("[SupabaseSessionStorage] RPC response - error:", JSON.stringify(error, null, 2));
+
+      if (error) {
+        console.error("[SupabaseSessionStorage] Error loading session via RPC:", JSON.stringify(error, null, 2));
         return undefined;
       }
 
-      return this.deserializeSession(session);
+      if (!dbSessions || dbSessions.length === 0) {
+        console.log("[SupabaseSessionStorage] No session found for id:", id);
+        return undefined;
+      }
+
+      // The RPC returns an array, but we expect only one session
+      const dbSession = dbSessions[0];
+
+      console.log("[SupabaseSessionStorage] Session data loaded via RPC:", JSON.stringify(dbSession, null, 2));
+      const deserializedSession = this.deserializeSession(dbSession);
+      console.log("[SupabaseSessionStorage] Session deserialized successfully for id:", id);
+      return deserializedSession;
     } catch (error) {
-      console.error("Error loading session:", error);
+      console.error("[SupabaseSessionStorage] Exception during loadSession:", error);
       return undefined;
     }
   }
 
   async deleteSession(id: string): Promise<boolean> {
+    console.log("[SupabaseSessionStorage] Attempting to delete session for id:", id);
     try {
-      const { error } = await supabaseAdmin
-        .from("shopify_sessions")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabaseAdmin.rpc("delete_shopify_session", {
+        p_id: id,
+      });
 
-      return !error;
+      if (error) {
+        console.error("[SupabaseSessionStorage] Error deleting session via RPC:", JSON.stringify(error, null, 2));
+        return false;
+      }
+      console.log("[SupabaseSessionStorage] Session deleted successfully via RPC for id:", id);
+      return true;
     } catch (error) {
-      console.error("Error deleting session:", error);
+      console.error("[SupabaseSessionStorage] Exception during deleteSession:", error);
       return false;
     }
   }
 
   async deleteSessions(ids: string[]): Promise<boolean> {
+    console.log("[SupabaseSessionStorage] Attempting to delete sessions for ids:", ids);
     try {
-      const { error } = await supabaseAdmin
-        .from("shopify_sessions")
-        .delete()
-        .in("id", ids);
+      const { error } = await supabaseAdmin.rpc("delete_shopify_sessions", {
+        p_ids: ids,
+      });
 
-      return !error;
+      if (error) {
+        console.error("[SupabaseSessionStorage] Error deleting sessions via RPC:", JSON.stringify(error, null, 2));
+        return false;
+      }
+      console.log("[SupabaseSessionStorage] Sessions deleted successfully via RPC for ids:", ids);
+      return true;
     } catch (error) {
-      console.error("Error deleting sessions:", error);
+      console.error("[SupabaseSessionStorage] Exception during deleteSessions:", error);
       return false;
     }
   }
 
   async findSessionsByShop(shop: string): Promise<SessionInterface[]> {
+    console.log("[SupabaseSessionStorage] Attempting to find sessions by shop:", shop);
     try {
-      const { data: sessions, error } = await supabaseAdmin
-        .from("shopify_sessions")
-        .select("*")
-        .eq("shop", shop);
+      const { data: dbSessions, error } = await supabaseAdmin.rpc("find_shopify_sessions_by_shop", {
+        p_shop: shop,
+      });
 
-      if (error || !sessions) {
+      if (error) {
+        console.error("[SupabaseSessionStorage] Error finding sessions by shop via RPC:", JSON.stringify(error, null, 2));
         return [];
       }
 
-      return sessions.map((session) => this.deserializeSession(session));
+      if (!dbSessions || dbSessions.length === 0) {
+        console.log("[SupabaseSessionStorage] No sessions found for shop:", shop);
+        return [];
+      }
+
+      console.log(`[SupabaseSessionStorage] Found ${dbSessions.length} session(s) for shop ${shop} via RPC.`);
+      return dbSessions.map((session: any) => this.deserializeSession(session));
     } catch (error) {
-      console.error("Error finding sessions by shop:", error);
+      console.error("[SupabaseSessionStorage] Exception during findSessionsByShop:", error);
       return [];
     }
   }
@@ -110,21 +144,21 @@ export class SupabaseSessionStorage {
       id: dbSession.id,
       shop: dbSession.shop,
       state: dbSession.state,
-      isOnline: dbSession.isOnline,
+      isOnline: dbSession.isOnline || dbSession.isonline,
       scope: dbSession.scope,
       expires: dbSession.expires ? new Date(dbSession.expires) : undefined,
-      accessToken: dbSession.accessToken,
-      onlineAccessInfo: dbSession.userId
+      accessToken: dbSession.accessToken || dbSession.accesstoken,
+      onlineAccessInfo: dbSession.userId || dbSession.userid
         ? {
             associated_user: {
-              id: dbSession.userId,
-              first_name: dbSession.firstName,
-              last_name: dbSession.lastName,
+              id: dbSession.userId || dbSession.userid,
+              first_name: dbSession.firstName || dbSession.firstname,
+              last_name: dbSession.lastName || dbSession.lastname,
               email: dbSession.email,
-              account_owner: dbSession.accountOwner,
+              account_owner: dbSession.accountOwner || dbSession.accountowner,
               locale: dbSession.locale,
               collaborator: dbSession.collaborator,
-              email_verified: dbSession.emailVerified,
+              email_verified: dbSession.emailVerified || dbSession.emailverified,
             },
             expires_in: dbSession.expires_in,
             associated_user_scope: dbSession.associated_user_scope,

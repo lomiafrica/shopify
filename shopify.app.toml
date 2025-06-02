@@ -23,14 +23,15 @@ api_version = "2025-01"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "write_products,read_orders,write_orders,read_payment_sessions,write_payment_sessions,read_payment_gateways,write_payment_gateways,read_checkouts,write_checkouts"
 
 [auth]
 redirect_urls = [
   "https://shopify.lomi.africa/auth/callback",
   "https://shopify.lomi.africa/auth/shopify/callback",
-  "https://shopify.lomi.africa/api/auth/callback"
+  "https://shopify.lomi.africa/api/auth/callback",
+  "https://shopify.lomi.africa/auth/exit-iframe"
 ]
 
 [pos]
-embedded = false
+embedded = true

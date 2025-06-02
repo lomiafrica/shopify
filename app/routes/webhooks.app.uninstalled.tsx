@@ -11,10 +11,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // If this webhook already ran, the session might have been deleted previously by ShopifyAppRemix's default handling or a prior run.
   // This code ensures all sessions for the shop are cleared from our Supabase table.
   if (shop) {
-    const { error } = await supabaseAdmin
-      .from("shopify_sessions") // Table name from SupabaseSessionStorage
-      .delete()
-      .eq("shop", shop);
+    const { error } = await supabaseAdmin.rpc("delete_shopify_sessions_by_shop", {
+      p_shop: shop
+    });
 
     if (error) {
       console.error(

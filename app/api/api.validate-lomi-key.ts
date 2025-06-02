@@ -53,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     const { data: rpcData, error: rpcError } = await supabaseAdmin.rpc(
-      "validate_and_store_lomi_key_for_shop",
+      "validate_and_store_shopify_lomi_key_for_shop",
       {
         p_shop_domain: shopDomain,
         p_lomi_api_key_to_validate: lomiApiKey,
@@ -62,7 +62,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     if (rpcError) {
       console.error(
-        `RPC 'validate_and_store_lomi_key_for_shop' error for shop ${shopDomain}:`,
+        `RPC 'validate_and_store_shopify_lomi_key_for_shop' error for shop ${shopDomain}:`,
         rpcError,
       );
       return data<ActionData>(

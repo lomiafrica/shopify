@@ -10,7 +10,7 @@ interface ShopifyLomiApiKey {
 
 /**
  * Retrieves the Lomi API key for a given Shopify store_id using RPC.
- * store_id is the UUID from the shopify.stores table.
+ * store_id is the UUID from the shopify_stores table.
  */
 export async function getLomiApiKeyByStoreId(
   storeId: string,
@@ -20,7 +20,7 @@ export async function getLomiApiKeyByStoreId(
     throw new Error("Supabase admin client is not initialized.");
   }
 
-  const { data, error } = await supabaseAdmin.rpc("get_lomi_api_key", {
+  const { data, error } = await supabaseAdmin.rpc("get_shopify_lomi_api_key", {
     p_store_id: storeId,
   });
 
@@ -28,7 +28,7 @@ export async function getLomiApiKeyByStoreId(
     // PGRST116 (No rows found) might not apply directly to RPCs returning a single value like TEXT
     // Check if data is null or error indicates not found, if RPC is designed to error on not found.
     // For now, we assume if there's an error, it's problematic, or data is null if not found.
-    console.error("Error calling RPC get_lomi_api_key:", error);
+    console.error("Error calling RPC get_shopify_lomi_api_key:", error);
     // If the RPC returns null for not found without erroring, this throw might be too aggressive.
     // However, if it errors on not found, this is fine.
     // Let's assume the RPC returns null if not found and doesn't error for that specific case.
@@ -41,7 +41,7 @@ export async function getLomiApiKeyByStoreId(
     // If it's any other error, or if the RPC is expected to error on not found:
     // throw error;
     // For now, let's be a bit more forgiving and assume null data means not found or actual error
-    // The RPC `get_lomi_api_key` simply returns TEXT or NULL from select, so error means something else went wrong.
+    // The RPC `get_shopify_lomi_api_key` simply returns TEXT or NULL from select, so error means something else went wrong.
     if (data === null && error) {
       // If data is null AND there is an error, then it is an actual error.
       throw error;
@@ -52,7 +52,7 @@ export async function getLomiApiKeyByStoreId(
 
 /**
  * Saves or updates the Lomi API key for a given Shopify store_id using RPC.
- * store_id is the UUID from the shopify.stores table.
+ * store_id is the UUID from the shopify_stores table.
  * This function assumes the API key has already been validated.
  */
 export async function saveLomiApiKey(
@@ -64,16 +64,16 @@ export async function saveLomiApiKey(
     throw new Error("Supabase admin client is not initialized.");
   }
 
-  const { data, error } = await supabaseAdmin.rpc("upsert_lomi_api_key", {
+  const { data, error } = await supabaseAdmin.rpc("upsert_shopify_lomi_api_key", {
     p_store_id: storeId,
     p_lomi_api_key: apiKey,
   });
 
   if (error) {
-    console.error("Error calling RPC upsert_lomi_api_key:", error);
+    console.error("Error calling RPC upsert_shopify_lomi_api_key:", error);
     throw error;
   }
-  // The RPC returns SETOF shopify.api_keys, so data will be an array.
+  // The RPC returns SETOF shopify_api_keys, so data will be an array.
   // Since we upsert based on a unique store_id, we expect one row.
   return data && data.length > 0 ? (data[0] as ShopifyLomiApiKey) : null;
 }

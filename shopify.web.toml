@@ -4,3 +4,10 @@ webhooks_path = "/webhooks/app/uninstalled"
 
 [commands]
 dev = "bun exec remix vite:dev"
+
+[env]
+SHOPIFY_CLIENT_ID = "1174b3d8d0cc7144e799e04d62557d26"
+
+[web]
+application_url = "https://shopify.lomi.africa"
+backend_port = 3000

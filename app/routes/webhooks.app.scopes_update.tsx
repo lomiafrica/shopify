@@ -9,10 +9,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const currentScopes = payload?.current as string[] | undefined;
 
   if (session && currentScopes && currentScopes.length > 0) {
-    const { error } = await supabaseAdmin
-      .from("shopify_sessions")
-      .update({ scope: currentScopes.join(",") })
-      .eq("id", session.id);
+    const { error } = await supabaseAdmin.rpc("update_shopify_session_scope", {
+      p_session_id: session.id,
+      p_scope: currentScopes.join(",")
+    });
 
     if (error) {
       console.error(
