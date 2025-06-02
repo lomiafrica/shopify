@@ -140,26 +140,40 @@ export class SupabaseSessionStorage {
   }
 
   private deserializeSession(dbSession: any): SessionInterface {
+    // Ensure 'expires' is undefined if not a valid date string, not new Date(null)
+    const expiresDate = dbSession.expires ? new Date(dbSession.expires) : undefined;
+
+    // Prefer camelCase, fallback to lowercase for compatibility if necessary,
+    // but ideally the database/RPC should be consistent.
+    const isOnline = dbSession.isOnline !== undefined ? dbSession.isOnline : dbSession.isonline;
+    const accessToken = dbSession.accessToken !== undefined ? dbSession.accessToken : dbSession.accesstoken;
+    const userId = dbSession.userId !== undefined ? dbSession.userId : dbSession.userid;
+    const firstName = dbSession.firstName !== undefined ? dbSession.firstName : dbSession.firstname;
+    const lastName = dbSession.lastName !== undefined ? dbSession.lastName : dbSession.lastname;
+    const accountOwner = dbSession.accountOwner !== undefined ? dbSession.accountOwner : dbSession.accountowner;
+    const emailVerified = dbSession.emailVerified !== undefined ? dbSession.emailVerified : dbSession.emailverified;
+
     return new Session({
       id: dbSession.id,
       shop: dbSession.shop,
       state: dbSession.state,
-      isOnline: dbSession.isOnline || dbSession.isonline,
+      isOnline: isOnline,
       scope: dbSession.scope,
-      expires: dbSession.expires ? new Date(dbSession.expires) : undefined,
-      accessToken: dbSession.accessToken || dbSession.accesstoken,
-      onlineAccessInfo: dbSession.userId || dbSession.userid
+      expires: expiresDate,
+      accessToken: accessToken,
+      onlineAccessInfo: userId
         ? {
             associated_user: {
-              id: dbSession.userId || dbSession.userid,
-              first_name: dbSession.firstName || dbSession.firstname,
-              last_name: dbSession.lastName || dbSession.lastname,
-              email: dbSession.email,
-              account_owner: dbSession.accountOwner || dbSession.accountowner,
-              locale: dbSession.locale,
-              collaborator: dbSession.collaborator,
-              email_verified: dbSession.emailVerified || dbSession.emailverified,
+              id: userId,
+              first_name: firstName,
+              last_name: lastName,
+              email: dbSession.email, // Assuming email is consistently cased
+              account_owner: accountOwner,
+              locale: dbSession.locale, // Assuming locale is consistently cased
+              collaborator: dbSession.collaborator, // Assuming collaborator is consistently cased
+              email_verified: emailVerified,
             },
+            // These fields seem to be directly from Shopify and likely consistently cased
             expires_in: dbSession.expires_in,
             associated_user_scope: dbSession.associated_user_scope,
           }
