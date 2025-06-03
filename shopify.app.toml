@@ -1,6 +1,6 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "1174b3d8d0cc7144e799e04d62557d26"
+client_id = "9b77c560341e051a079adff2f33ba2e2"
 application_url = "https://shopify.lomi.africa"
 embedded = true
 name = "lomi."

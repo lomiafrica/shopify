@@ -6,7 +6,7 @@ webhooks_path = "/webhooks/app/uninstalled"
 dev = "bun exec remix vite:dev"
 
 [env]
-SHOPIFY_CLIENT_ID = "1174b3d8d0cc7144e799e04d62557d26"
+SHOPIFY_CLIENT_ID = "9b77c560341e051a079adff2f33ba2e2"
 
 [web]
 application_url = "https://shopify.lomi.africa"
