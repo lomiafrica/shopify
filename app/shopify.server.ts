@@ -3,12 +3,12 @@ import { shopifyApp } from "@shopify/shopify-app-remix/server";
 import { DeliveryMethod, ApiVersion } from "@shopify/shopify-api";
 import { SupabaseSessionStorage } from "./utils/session-storage";
 
-if (!process.env.SHOPIFY_CLIENT_ID) {
-  throw new Error("Missing SHOPIFY_CLIENT_ID environment variable");
+if (!process.env.SHOPIFY_API_KEY) {
+  throw new Error("Missing SHOPIFY_API_KEY environment variable");
 }
 
-if (!process.env.SHOPIFY_CLIENT_SECRET) {
-  throw new Error("Missing SHOPIFY_CLIENT_SECRET environment variable");
+if (!process.env.SHOPIFY_API_SECRET) {
+  throw new Error("Missing SHOPIFY_API_SECRET environment variable");
 }
 
 if (!process.env.SHOPIFY_APP_URL) {
@@ -20,8 +20,8 @@ if (!process.env.SHOPIFY_SCOPES) {
 }
 
 const shopify = shopifyApp({
-  apiKey: process.env.SHOPIFY_CLIENT_ID,
-  apiSecretKey: process.env.SHOPIFY_CLIENT_SECRET,
+  apiKey: process.env.SHOPIFY_API_KEY,
+  apiSecretKey: process.env.SHOPIFY_API_SECRET,
   appUrl: process.env.SHOPIFY_APP_URL,
   scopes: (process.env.SHOPIFY_SCOPES || "")
     .split(",")
