@@ -2,20 +2,28 @@ import type { HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, useLoaderData, useRouteError } from "@remix-run/react";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
+import { AppProvider as PolarisAppProvider, Frame, Navigation } from "@shopify/polaris";
+import appBridgePkg from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
-import { Frame, Navigation } from "@shopify/polaris";
+import polarisTranslations from "@shopify/polaris/locales/en.json";
 import { authenticate } from "../shopify.server";
 import { Analytics } from "@vercel/analytics/remix"
+
+const { Provider: AppBridgeProvider } = appBridgePkg;
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-  return { apiKey: process.env.SHOPIFY_API_KEY || "" };
+  const url = new URL(request.url);
+  return {
+    apiKey: process.env.SHOPIFY_API_KEY || "",
+    host: url.searchParams.get("host") || "",
+  };
 };
 
 export default function App() {
-  const { apiKey } = useLoaderData<typeof loader>();
+  const { apiKey, host } = useLoaderData<typeof loader>();
 
   const navigationMarkup = (
     <Navigation location="/">
@@ -43,13 +51,24 @@ export default function App() {
     </Navigation>
   );
 
+  // App Bridge configuration
+  const appBridgeConfig = {
+    apiKey,
+    host,
+    forceRedirect: true,
+  };
+
   return (
-    <AppProvider isEmbeddedApp apiKey={apiKey}>
-      <Frame navigation={navigationMarkup}>
-        <Outlet />
-      </Frame>
+    <PolarisAppProvider i18n={polarisTranslations}>
+      <AppBridgeProvider config={appBridgeConfig}>
+        <AppProvider isEmbeddedApp apiKey={apiKey}>
+          <Frame navigation={navigationMarkup}>
+            <Outlet />
+          </Frame>
+        </AppProvider>
+      </AppBridgeProvider>
       <Analytics />
-    </AppProvider>
+    </PolarisAppProvider>
   );
 }
 
@@ -59,5 +78,13 @@ export function ErrorBoundary() {
 }
 
 export const headers: HeadersFunction = (headersArgs) => {
-  return boundary.headers(headersArgs);
+  const boundaryHeaders = boundary.headers(headersArgs);
+
+  // Add CSP headers for embedded apps
+  boundaryHeaders.set(
+    "Content-Security-Policy",
+    "frame-ancestors https://*.shopify.com https://admin.shopify.com https://*.myshopify.com; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.shopify.com https://admin.shopify.com https://cdn.shopify.com data: blob: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.shopify.com https://admin.shopify.com https://cdn.shopify.com;"
+  );
+
+  return boundaryHeaders;
 };

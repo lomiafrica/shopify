@@ -29,7 +29,7 @@ const shopify = shopifyApp({
     .filter((scope) => scope),
   authPathPrefix: "/auth",
   sessionStorage: new SupabaseSessionStorage(),
-  apiVersion: ApiVersion.January23,
+  apiVersion: ApiVersion.January24,
   isEmbeddedApp: true,
   webhooks: {
     APP_UNINSTALLED: {
