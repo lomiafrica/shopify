@@ -168,7 +168,7 @@ export default function SettingsPage() {
                   <Text as="p" variant="bodyMd">
                     Visit our{" "}
                     <Button
-                      url="https://developers.lomi.africa/"
+                      url="https://docs.lomi.africa/"
                       external
                       variant="plain"
                     >
