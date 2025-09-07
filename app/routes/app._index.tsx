@@ -249,7 +249,7 @@ export default function Index() {
                         target="_blank"
                         removeUnderline
                       >
-                        lomi. is open source
+                        lomi. is open-source
                       </Link>
                     </List.Item>
                     <List.Item>
