@@ -48,7 +48,7 @@ export default function SupportPage() {
                   <List type="bullet">
                     <List.Item>
                       View our{" "}
-                      <Link url="https://developers.lomi.africa" external>
+                      <Link url="https://docs.lomi.africa" external>
                         API documentation
                       </Link>
                     </List.Item>
