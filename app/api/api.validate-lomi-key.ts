@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { data } from "@remix-run/node";
 import { authenticate } from "~/shopify.server"; // Assuming this is your Shopify admin authentication utility
-import { supabaseAdmin } from "../utils/supabase/server"; // Corrected relative path
+import { supabaseAdmin } from "../lib/supabase/server"; // Corrected relative path
 
 interface ActionData {
   success: boolean;

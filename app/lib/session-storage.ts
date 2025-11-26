@@ -1,6 +1,6 @@
 import { Session } from "@shopify/shopify-api";
 import type { Session as SessionInterface } from "@shopify/shopify-api";
-import { supabaseAdmin } from "@/app/utils/supabase/server";
+import { supabaseAdmin } from "@/app/lib/supabase/server";
 
 export class SupabaseSessionStorage {
   async storeSession(session: SessionInterface): Promise<boolean> {

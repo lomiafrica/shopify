@@ -119,7 +119,7 @@ interface CreateCheckoutSessionRequest {
   amount: number; // Amount in smallest currency unit
   currency_code: string; // 3-letter ISO currency code (e.g., "XOF")
   title?: string;
-  public_description?: string;
+  description?: string;
   customer_email?: string;
   customer_name?: string;
   customer_phone?: string;
@@ -146,7 +146,7 @@ interface CheckoutSession {
   currency_code: string;
   allowed_providers: string[];
   title?: string;
-  public_description?: string; // Not in example response, but good to anticipate
+  description?: string; // Not in example response, but good to anticipate
   customer_email?: string; // In GET response, could be in create response too
   customer_name?: string; // In GET response
   customer_phone?: string; // In GET response

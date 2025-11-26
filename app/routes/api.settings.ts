@@ -1,7 +1,7 @@
 import { data } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { supabaseAdmin } from "@/app/utils/supabase/server";
+import { supabaseAdmin } from "@/app/lib/supabase/server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);

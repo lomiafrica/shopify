@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { Button, Card, Page, Text, Banner } from "@shopify/polaris";
-import { SupabaseSessionStorage } from "~/utils/session-storage";
+import { SupabaseSessionStorage } from "@/app/lib/session-storage";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);

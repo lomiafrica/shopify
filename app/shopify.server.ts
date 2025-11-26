@@ -1,7 +1,7 @@
 import "./polyfills/crypto";
 import { shopifyApp } from "@shopify/shopify-app-remix/server";
 import { DeliveryMethod, ApiVersion } from "@shopify/shopify-api";
-import { SupabaseSessionStorage } from "./utils/session-storage";
+import { SupabaseSessionStorage } from "./lib/session-storage";
 
 if (!process.env.SHOPIFY_API_KEY) {
   throw new Error("Missing SHOPIFY_API_KEY environment variable");
