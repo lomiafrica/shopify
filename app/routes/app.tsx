@@ -1,19 +1,12 @@
 import type { HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, useLoaderData, useRouteError } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
-import {
-  AppProvider as PolarisAppProvider,
-  Frame,
-  Navigation,
-} from "@shopify/polaris";
-import appBridgePkg from "@shopify/app-bridge-react";
+import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import polarisTranslations from "@shopify/polaris/locales/en.json";
 import { authenticate } from "../shopify.server";
 import { Analytics } from "@vercel/analytics/remix";
-
-const { Provider: AppBridgeProvider } = appBridgePkg;
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
@@ -27,50 +20,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function App() {
-  const { apiKey, host } = useLoaderData<typeof loader>();
-
-  const navigationMarkup = (
-    <Navigation location="/">
-      <Navigation.Section
-        items={[
-          {
-            url: "/app",
-            label: "Dashboard",
-            exactMatch: true,
-          },
-          {
-            url: "/app/transactions",
-            label: "Transactions",
-          },
-          {
-            url: "/app/support",
-            label: "Support",
-          },
-          {
-            url: "/app/settings",
-            label: "Settings",
-          },
-        ]}
-      />
-    </Navigation>
-  );
-
-  // App Bridge configuration
-  const appBridgeConfig = {
-    apiKey,
-    host,
-    forceRedirect: true,
-  };
+  const { apiKey } = useLoaderData<typeof loader>();
 
   return (
     <PolarisAppProvider i18n={polarisTranslations}>
-      <AppBridgeProvider config={appBridgeConfig}>
-        <AppProvider isEmbeddedApp apiKey={apiKey}>
-          <Frame navigation={navigationMarkup}>
-            <Outlet />
-          </Frame>
-        </AppProvider>
-      </AppBridgeProvider>
+      <AppProvider isEmbeddedApp apiKey={apiKey}>
+        <ui-nav-menu>
+          <Link to="/app" rel="home">
+            Dashboard
+          </Link>
+          <Link to="/app/transactions">Transactions</Link>
+          <Link to="/app/support">Support</Link>
+          <Link to="/app/settings">Settings</Link>
+        </ui-nav-menu>
+        <Outlet />
+      </AppProvider>
       <Analytics />
     </PolarisAppProvider>
   );
