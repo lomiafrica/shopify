@@ -3,7 +3,7 @@ roles = ["frontend", "backend"]
 webhooks_path = "/webhooks/app/uninstalled"
 
 [commands]
-dev = "bun exec remix vite:dev"
+dev = "pnpm run dev"
 
 [env]
 SHOPIFY_CLIENT_ID = "9b77c560341e051a079adff2f33ba2e2"
