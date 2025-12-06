@@ -1,4 +1,3 @@
-import pkg from "@shopify/app-bridge-react";
 import {
   Page,
   Layout,
@@ -13,7 +12,7 @@ import {
 import { useNavigate } from "@remix-run/react";
 import { useCallback } from "react";
 
-const { TitleBar } = pkg;
+// TitleBar handled via <ui-title-bar> web component
 
 export default function SupportPage() {
   const navigate = useNavigate();
@@ -24,12 +23,13 @@ export default function SupportPage() {
 
   return (
     <Page
+      fullWidth
       backAction={{
         content: "Back",
         onAction: handleBack,
       }}
     >
-      <TitleBar title="Support" />
+      <ui-title-bar title="Support" />
       <Layout>
         <Layout.Section>
           <Card roundedAbove="sm">

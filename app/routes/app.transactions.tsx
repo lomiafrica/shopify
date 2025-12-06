@@ -1,4 +1,3 @@
-import pkg from "@shopify/app-bridge-react";
 import {
   Page,
   Layout,
@@ -14,7 +13,7 @@ import {
 import { useState, useCallback } from "react";
 import { useNavigate } from "@remix-run/react";
 
-const { TitleBar } = pkg;
+// TitleBar handled via <ui-title-bar> web component
 
 export default function TransactionsPage() {
   const navigate = useNavigate();
@@ -78,7 +77,7 @@ export default function TransactionsPage() {
         onAction: handleBack,
       }}
     >
-      <TitleBar title="Transactions" />
+      <ui-title-bar title="Transactions" />
       <Layout>
         <Layout.Section>
           <Card roundedAbove="sm">

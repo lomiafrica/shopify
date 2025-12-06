@@ -1,4 +1,3 @@
-import pkg from "@shopify/app-bridge-react";
 import {
   Page,
   Layout,
@@ -14,7 +13,7 @@ import {
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "@remix-run/react";
 
-const { TitleBar } = pkg;
+// TitleBar handled via <ui-title-bar> web component
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -82,12 +81,13 @@ export default function SettingsPage() {
 
   return (
     <Page
+      fullWidth
       backAction={{
         content: "Back",
         onAction: handleBack,
       }}
     >
-      <TitleBar title="Settings" />
+      <ui-title-bar title="Settings" />
       <Layout>
         <Layout.Section>
           {showSuccess && (

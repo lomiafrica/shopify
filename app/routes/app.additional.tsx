@@ -1,4 +1,3 @@
-import pkg from "@shopify/app-bridge-react";
 import {
   Box,
   Card,
@@ -10,12 +9,12 @@ import {
   BlockStack,
 } from "@shopify/polaris";
 
-const { TitleBar } = pkg;
+// TitleBar handled via <ui-title-bar> web component
 
 export default function AdditionalPage() {
   return (
     <Page>
-      <TitleBar title="Additional page" />
+      <ui-title-bar title="Additional page" />
       <Layout>
         <Layout.Section>
           <Card>
