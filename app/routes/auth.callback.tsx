@@ -11,12 +11,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       Object.fromEntries(request.headers.entries()),
     );
 
-    const result = await authenticate.admin(request);
-    console.log("Authentication successful in callback:", result.session.shop);
+    const { session, redirect } = await authenticate.admin(request);
+    console.log("Authentication successful in callback:", session.shop);
 
     // Redirect to the main app after successful authentication
     const appUrl = new URL("/app", url.origin);
-    appUrl.searchParams.set("shop", result.session.shop);
+    appUrl.searchParams.set("shop", session.shop);
 
     if (url.searchParams.get("host")) {
       appUrl.searchParams.set("host", url.searchParams.get("host")!);
@@ -24,15 +24,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     console.log("Redirecting to:", appUrl.toString());
 
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: appUrl.toString(),
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
+    return redirect(appUrl.toString());
   } catch (error) {
     // If the error is a Response, it's a redirect thrown by the Shopify library or Remix
     // We should throw it so Remix can handle the redirect
