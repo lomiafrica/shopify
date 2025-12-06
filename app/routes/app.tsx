@@ -2,12 +2,16 @@ import type { HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, useLoaderData, useRouteError } from "@remix-run/react";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
-import { AppProvider as PolarisAppProvider, Frame, Navigation } from "@shopify/polaris";
+import {
+  AppProvider as PolarisAppProvider,
+  Frame,
+  Navigation,
+} from "@shopify/polaris";
 import appBridgePkg from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import polarisTranslations from "@shopify/polaris/locales/en.json";
 import { authenticate } from "../shopify.server";
-import { Analytics } from "@vercel/analytics/remix"
+import { Analytics } from "@vercel/analytics/remix";
 
 const { Provider: AppBridgeProvider } = appBridgePkg;
 
@@ -83,7 +87,7 @@ export const headers: HeadersFunction = (headersArgs) => {
   // Add CSP headers for embedded apps
   boundaryHeaders.set(
     "Content-Security-Policy",
-    "frame-ancestors https://*.shopify.com https://admin.shopify.com https://*.myshopify.com; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.shopify.com https://admin.shopify.com https://cdn.shopify.com data: blob: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.shopify.com https://admin.shopify.com https://cdn.shopify.com;"
+    "frame-ancestors https://*.shopify.com https://admin.shopify.com https://*.myshopify.com; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.shopify.com https://admin.shopify.com https://cdn.shopify.com data: blob: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.shopify.com https://admin.shopify.com https://cdn.shopify.com;",
   );
 
   return boundaryHeaders;

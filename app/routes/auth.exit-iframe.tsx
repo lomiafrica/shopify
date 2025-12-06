@@ -63,8 +63,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         </a>
       </p>
       <form action="${authUrl.toString()}" method="get" target="_top" style="margin-top: 20px;">
-        <input type="hidden" name="shop" value="${shop || ''}" />
-        <input type="hidden" name="host" value="${host || ''}" />
+        <input type="hidden" name="shop" value="${shop || ""}" />
+        <input type="hidden" name="host" value="${host || ""}" />
         <button type="submit" style="background: #006FBB; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-family: inherit;">
           Continue to Authentication
         </button>
@@ -77,12 +77,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
         "X-Frame-Options": "ALLOWALL",
-        "Content-Security-Policy": "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; frame-ancestors * 'self'; object-src 'none';",
+        "Content-Security-Policy":
+          "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; frame-ancestors * 'self'; object-src 'none';",
       },
-    }
+    },
   );
 };
 

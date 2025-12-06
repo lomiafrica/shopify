@@ -79,8 +79,17 @@ export async function action({ request }: ActionFunctionArgs) {
     const result = rpcData as ActionData;
 
     if (!result || typeof result.success !== "boolean") {
-        console.error(`Invalid RPC response structure for shop ${shopDomain}:`, result);
-        return data<ActionData>({ success: false, message: "Invalid response from validation service." }, { status: 500 });
+      console.error(
+        `Invalid RPC response structure for shop ${shopDomain}:`,
+        result,
+      );
+      return data<ActionData>(
+        {
+          success: false,
+          message: "Invalid response from validation service.",
+        },
+        { status: 500 },
+      );
     }
 
     // Capture the webhook secret if provided and update settings
@@ -96,31 +105,47 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     if (result.success && webhookSecret && result.store_id) {
-         // Update the store's metadata with the webhook secret
-         // We use the 'shopify_stores' table in public schema
-         
-         const { data: storeData } = await supabaseAdmin.from('shopify_stores').select('metadata').eq('store_id', result.store_id).single();
-         const currentMetadata = storeData?.metadata || {};
-         const newMetadata = { ...currentMetadata as object, webhook_secret: webhookSecret };
+      // Update the store's metadata with the webhook secret
+      // We use the 'shopify_stores' table in public schema
 
-         const { error: updateError } = await supabaseAdmin
-            .from('shopify_stores') // Updates public.shopify_stores
-            .update({ metadata: newMetadata })
-            .eq('store_id', result.store_id);
+      const { data: storeData } = await supabaseAdmin
+        .from("shopify_stores")
+        .select("metadata")
+        .eq("store_id", result.store_id)
+        .single();
+      const currentMetadata = storeData?.metadata || {};
+      const newMetadata = {
+        ...(currentMetadata as object),
+        webhook_secret: webhookSecret,
+      };
 
-         if (updateError) {
-             console.error("Failed to update webhook secret in store metadata:", updateError.message);
-         }
+      const { error: updateError } = await supabaseAdmin
+        .from("shopify_stores") // Updates public.shopify_stores
+        .update({ metadata: newMetadata })
+        .eq("store_id", result.store_id);
+
+      if (updateError) {
+        console.error(
+          "Failed to update webhook secret in store metadata:",
+          updateError.message,
+        );
+      }
     }
 
     return data<ActionData>(result, { status: result.success ? 200 : 400 });
   } catch (error) {
-    console.error(`Unexpected error in /api/validate-lomi-key for shop ${shopDomain}:`, error);
+    console.error(
+      `Unexpected error in /api/validate-lomi-key for shop ${shopDomain}:`,
+      error,
+    );
     let errorMessage = "Internal server error during key validation.";
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    return data<ActionData>({ success: false, message: errorMessage, errorDetails: error }, { status: 500 });
+    return data<ActionData>(
+      { success: false, message: errorMessage, errorDetails: error },
+      { status: 500 },
+    );
   }
 }
 

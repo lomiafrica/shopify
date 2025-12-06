@@ -7,9 +7,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
 
   try {
-    const { data: settings, error } = await supabaseAdmin.rpc("get_shopify_shop_settings", {
-      p_shop: session.shop
-    });
+    const { data: settings, error } = await supabaseAdmin.rpc(
+      "get_shopify_shop_settings",
+      {
+        p_shop: session.shop,
+      },
+    );
 
     if (error) throw error;
 
@@ -32,13 +35,16 @@ export async function action({ request }: ActionFunctionArgs) {
     const requestData = await request.json();
 
     // Use RPC function to upsert shop settings
-    const { error: upsertError } = await supabaseAdmin.rpc("upsert_shopify_shop_settings", {
-      p_shop: session.shop,
-      p_api_key: requestData.api_key,
-      p_api_secret: requestData.api_secret,
-      p_merchant_id: requestData.merchant_id,
-      p_webhook_url: requestData.webhook_url
-    });
+    const { error: upsertError } = await supabaseAdmin.rpc(
+      "upsert_shopify_shop_settings",
+      {
+        p_shop: session.shop,
+        p_api_key: requestData.api_key,
+        p_api_secret: requestData.api_secret,
+        p_merchant_id: requestData.merchant_id,
+        p_webhook_url: requestData.webhook_url,
+      },
+    );
 
     if (upsertError) throw upsertError;
 

@@ -5,18 +5,22 @@
 if (!globalThis.crypto) {
   try {
     // Try to use Node.js built-in crypto
-    const nodeRequire = typeof require !== 'undefined' ? require : undefined;
+    const nodeRequire = typeof require !== "undefined" ? require : undefined;
 
     if (nodeRequire) {
       // Use require for better compatibility
       let webcrypto;
       try {
-        webcrypto = nodeRequire('node:crypto').webcrypto;
+        webcrypto = nodeRequire("node:crypto").webcrypto;
       } catch {
-        webcrypto = nodeRequire('crypto').webcrypto;
+        webcrypto = nodeRequire("crypto").webcrypto;
       }
 
-      if (webcrypto && typeof webcrypto.getRandomValues === 'function' && webcrypto.subtle) {
+      if (
+        webcrypto &&
+        typeof webcrypto.getRandomValues === "function" &&
+        webcrypto.subtle
+      ) {
         globalThis.crypto = webcrypto;
       }
     }
@@ -26,4 +30,3 @@ if (!globalThis.crypto) {
 }
 
 export {};
-

@@ -134,7 +134,7 @@ export default function LomiSettingsPage() {
                 className="rounded-sm"
               />
               <p className="text-xs text-gray-500">
-                Found in your lomi. dashboard under Developers {'>'} Webhooks.
+                Found in your lomi. dashboard under Developers {">"} Webhooks.
               </p>
             </div>
           </CardContent>

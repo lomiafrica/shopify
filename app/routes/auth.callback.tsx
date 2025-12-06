@@ -6,7 +6,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     console.log("Auth callback route accessed");
     const url = new URL(request.url);
     console.log("Callback URL:", url.toString());
-    console.log("Callback headers:", Object.fromEntries(request.headers.entries()));
+    console.log(
+      "Callback headers:",
+      Object.fromEntries(request.headers.entries()),
+    );
 
     const result = await authenticate.admin(request);
     console.log("Authentication successful in callback:", result.session.shop);
@@ -26,14 +29,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       headers: {
         Location: appUrl.toString(),
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   } catch (error) {
     console.error("Authentication callback error:", error);
     console.error("Error details:", {
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
       requestUrl: request.url,
       requestHeaders: Object.fromEntries(request.headers.entries()),

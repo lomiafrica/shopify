@@ -64,10 +64,13 @@ export async function saveLomiApiKey(
     throw new Error("Supabase admin client is not initialized.");
   }
 
-  const { data, error } = await supabaseAdmin.rpc("upsert_shopify_lomi_api_key", {
-    p_store_id: storeId,
-    p_lomi_api_key: apiKey,
-  });
+  const { data, error } = await supabaseAdmin.rpc(
+    "upsert_shopify_lomi_api_key",
+    {
+      p_store_id: storeId,
+      p_lomi_api_key: apiKey,
+    },
+  );
 
   if (error) {
     console.error("Error calling RPC upsert_shopify_lomi_api_key:", error);

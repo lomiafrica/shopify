@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import crypto from "crypto";
+import { GraphqlClient } from "@shopify/shopify-api";
 import shopify from "../shopify.server";
 import { supabaseAdmin } from "@/app/lib/supabase/server";
 
@@ -58,7 +59,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
     // 3. Logic: Create Order in Shopify
     // We need an offline session to assume the identity of the shop
-    const offlineSessionId = shopify.session.getOfflineId(shop);
+    // Manual offline session ID construction (standard pattern)
+    // Note: shopify.api.session.getOfflineId() is unavailable on the app object type, so we use manual construction.
+    const offlineSessionId = `offline_${shop}`;
     const session = await shopify.sessionStorage.loadSession(offlineSessionId);
 
     if (!session) {
@@ -66,14 +69,15 @@ export async function action({ request }: ActionFunctionArgs) {
       return json({ message: "Session not found" }, { status: 200 });
     }
 
-    const client = new shopify.clients.Graphql({ session });
+    // Use imported GraphqlClient directly to avoid type issues with shopifyApp object
+    const client = new GraphqlClient({ session });
 
     // Create a Draft Order first (best practice for programmatic orders)
     // We map the transaction amount.
     // Lomi amount is likely in standard units (e.g. 5000 for 5000 XOF).
     // Shopify DraftOrderCreate expects amount as string.
     const amount = payload.data.amount;
-    const currency = payload.data.currency_code;
+    // const currency = payload.data.currency_code; // Unused
     const customerEmail = payload.data.customer?.email;
 
     const draftOrderData = {
@@ -117,7 +121,10 @@ export async function action({ request }: ActionFunctionArgs) {
     const draftOrderResult = response.body.data?.draftOrderCreate;
 
     if (draftOrderResult?.userErrors?.length > 0) {
-      console.error("Shopify Draft Order Creation Failed:", draftOrderResult.userErrors);
+      console.error(
+        "Shopify Draft Order Creation Failed:",
+        draftOrderResult.userErrors,
+      );
       return json({ error: "Order creation failed" }, { status: 500 });
     }
 

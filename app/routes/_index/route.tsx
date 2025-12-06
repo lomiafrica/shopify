@@ -27,9 +27,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { showForm: Boolean(shopify.login) };
 };
 
-export const links = () => [
-  { rel: "stylesheet", href: polarisStyles },
-];
+export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export default function App() {
   const { showForm } = useLoaderData<typeof loader>();
@@ -69,19 +67,20 @@ export default function App() {
           )}
           <ul className={styles.list}>
             <li>
-              <strong>Seamless integration</strong>Effortlessly connect
-              lomi. to your Shopify store in minutes. Start accepting payments
-              quickly with our user-friendly setup, no complex coding required.
+              <strong>Seamless integration</strong>Effortlessly connect lomi. to
+              your Shopify store in minutes. Start accepting payments quickly
+              with our user-friendly setup, no complex coding required.
             </li>
             <li>
               <strong>Reach more customers</strong>Enable your customers to pay
-              using popular local payment methods. Expand your market across West
-              Africa by offering familiar and trusted payment options.
+              using popular local payment methods. Expand your market across
+              West Africa by offering familiar and trusted payment options.
             </li>
             <li>
-              <strong>Secure and reliable</strong>Process transactions
-              with confidence. lomi. ensures top-tier security for every one of your payment and
-              provides reliable, instant payouts to your bank account.
+              <strong>Secure and reliable</strong>Process transactions with
+              confidence. lomi. ensures top-tier security for every one of your
+              payment and provides reliable, instant payouts to your bank
+              account.
             </li>
           </ul>
         </div>

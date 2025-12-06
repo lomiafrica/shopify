@@ -1,24 +1,16 @@
 {
-    "compilerOptions": {
-        "module": "esnext",
-        "target": "esnext",
-        "lib": [
-            "dom",
-            "esnext"
-        ],
-        "jsx": "react-jsx",
-        "moduleResolution": "node",
-        "strict": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
-        "allowSyntheticDefaultImports": true,
-        "types": [
-            "node",
-            "react"
-        ]
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["dom", "esnext"],
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node", "react"]
+  },
+  "include": ["src/**/*"]
 }
