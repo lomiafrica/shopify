@@ -34,7 +34,7 @@ const shopify = shopifyApp({
   webhooks: {
     APP_UNINSTALLED: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks",
+      callbackUrl: "/webhooks/app/uninstalled",
     },
   },
   hooks: {
@@ -45,6 +45,7 @@ const shopify = shopifyApp({
   future: {
     v3_webhookAdminContext: true,
     v3_authenticatePublic: true,
+    unstable_newEmbeddedAuthStrategy: true,
   },
 });
 

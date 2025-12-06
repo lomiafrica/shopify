@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { supabaseAdmin } from "@/app/lib/supabase/server";
+import { SupabaseSessionStorage } from "@/app/lib/session-storage";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic } = await authenticate.webhook(request);
@@ -11,24 +11,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // If this webhook already ran, the session might have been deleted previously by ShopifyAppRemix's default handling or a prior run.
   // This code ensures all sessions for the shop are cleared from our Supabase table.
   if (shop) {
-    const { error } = await supabaseAdmin.rpc(
-      "delete_shopify_sessions_by_shop",
-      {
-        p_shop: shop,
-      },
-    );
+    const sessionStorage = new SupabaseSessionStorage();
+    const sessions = await sessionStorage.findSessionsByShop(shop);
 
-    if (error) {
-      console.error(
-        `Failed to delete sessions from Supabase for shop ${shop}:`,
-        error.message,
-      );
-      // Consider returning a 500 error to Shopify to signal an issue,
-      // though Shopify might retry the webhook. For uninstalls, it might be less critical.
-      // return new Response("Failed to delete sessions", { status: 500 });
-    } else {
+    if (sessions.length > 0) {
+      const sessionIds = sessions.map((s) => s.id);
+      await sessionStorage.deleteSessions(sessionIds);
       console.log(
-        `Successfully deleted sessions from Supabase for shop ${shop}`,
+        `[AppUninstalled] Deleted ${sessionIds.length} sessions for shop ${shop}`
       );
     }
   } else {
