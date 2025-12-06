@@ -34,6 +34,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       },
     });
   } catch (error) {
+    // If the error is a Response, it's a redirect thrown by the Shopify library or Remix
+    // We should throw it so Remix can handle the redirect
+    if (error instanceof Response) {
+      throw error;
+    }
+
     console.error("Authentication callback error:", error);
     console.error("Error details:", {
       message: error instanceof Error ? error.message : "Unknown error",
