@@ -78,7 +78,11 @@ export default function App() {
 
 // Shopify needs Remix to catch some thrown responses, so that their headers are included in the response.
 export function ErrorBoundary() {
-  return boundary.error(useRouteError());
+  return (
+    <PolarisAppProvider i18n={polarisTranslations}>
+      {boundary.error(useRouteError())}
+    </PolarisAppProvider>
+  );
 }
 
 export const headers: HeadersFunction = (headersArgs) => {

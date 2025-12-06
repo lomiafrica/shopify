@@ -1,6 +1,7 @@
-api_version = "2024-04"
+api_version = "2025-01"
 
 [[extensions]]
+uid = "9d29d622-d714-6d38-c4d2-238df29cb87cd655187a"
 type = "ui_extension"
 name = "lomi. Checkout"
 handle = "lomi-checkout"
