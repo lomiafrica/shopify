@@ -1,9 +1,6 @@
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { Toast } from "@shopify/app-bridge-react";
-
-// Assuming Shadcn UI components are available. Adjust import paths if necessary.
-// Trying '~/components/ui/...' as a common Remix alias for 'app/components/ui/...'
+import pkg from "@shopify/app-bridge-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import {
@@ -18,6 +15,8 @@ import { Label } from "@/app/components/ui/label";
 
 // This page POSTs to the existing action at /api/api.validate-lomi-key
 // No loader or action is defined in this file itself for that part.
+
+const { Toast } = pkg;
 
 interface ActionData {
   success?: boolean;
