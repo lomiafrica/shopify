@@ -1,4 +1,6 @@
 import { Form, useActionData, useNavigation } from "@remix-run/react";
+import { useEffect, useState } from "react";
+import { Toast } from "@shopify/app-bridge-react";
 
 // Assuming Shadcn UI components are available. Adjust import paths if necessary.
 // Trying '~/components/ui/...' as a common Remix alias for 'app/components/ui/...'
@@ -28,6 +30,22 @@ export default function LomiSettingsPage() {
   const actionData = useActionData<ActionData>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+
+  // Show Toast when action returns message
+  useEffect(() => {
+    if (actionData?.message) {
+      setToastMessage(actionData.message);
+      setIsError(!actionData.success);
+    }
+  }, [actionData]);
+
+  // Dismiss Toast handler
+  const toggleToast = () => {
+    setToastMessage(null);
+    setIsError(false);
+  };
 
   // Attempt to get the initial masked key from actionData if a submission just happened
   // or potentially from a loader if we decide to load it initially.
@@ -36,8 +54,26 @@ export default function LomiSettingsPage() {
     : null;
 
   return (
-    <div className="p-4 md:p-6">
-      <Card className="max-w-2xl mx-auto rounded-sm">
+    <div className="p-6 max-w-2xl mx-auto font-sans space-y-8">
+      {/* Render Native Shopify Toast */}
+      {toastMessage && (
+        <Toast
+          content={toastMessage}
+          error={isError}
+          onDismiss={toggleToast}
+          duration={4500}
+        />
+      )}
+
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          Settings
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 text-lg">
+          Configure your payment integration details.
+        </p>
+      </div>
+      <Card className="rounded-xl border shadow-sm">
         <CardHeader>
           <CardTitle>lomi. API Key Configuration</CardTitle>
           <CardDescription>
@@ -82,6 +118,25 @@ export default function LomiSettingsPage() {
                 </p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="lomiWebhookSecret"
+                className="text-xs text-muted-foreground"
+              >
+                lomi. Webhook Secret
+              </Label>
+              <Input
+                id="lomiWebhookSecret"
+                name="lomiWebhookSecret"
+                type="password"
+                placeholder="Enter your Lomi Webhook Secret"
+                className="rounded-sm"
+              />
+              <p className="text-xs text-gray-500">
+                Found in your lomi. dashboard under Developers {'>'} Webhooks.
+              </p>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col items-start space-y-4">
             <Button
@@ -93,18 +148,7 @@ export default function LomiSettingsPage() {
               {/* Adhering to style-guide */}
               {isSubmitting ? "Saving..." : "Save and Validate API Key"}
             </Button>
-            {actionData && actionData.message && (
-              <div
-                className={`p-3 w-full rounded-sm ${
-                  /* Adhering to style-guide colors */
-                  actionData.success
-                    ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                    : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300"
-                }`}
-              >
-                <p>{actionData.message}</p>
-              </div>
-            )}
+            {/* Inline message removed in favor of Toast */}
           </CardFooter>
         </Form>
       </Card>

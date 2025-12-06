@@ -1,19 +1,33 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData, Link as RemixLink, useNavigation } from "@remix-run/react";
 import pkg from "@shopify/app-bridge-react";
 import {
-  Page,
+  SkeletonPage,
   Layout,
-  Text,
-  Card,
-  BlockStack,
-  List,
-  Link,
-  InlineStack,
-  DataTable,
+  LegacyCard,
+  SkeletonBodyText,
+  SkeletonDisplayText,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import {
+  Activity,
+  CreditCard,
+  Settings,
+  HelpCircle,
+  TrendingUp,
+  AlertCircle,
+  ExternalLink
+} from "lucide-react";
 
+// @ts-ignore
 const { TitleBar } = pkg;
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -25,249 +39,182 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       totalTransactions: 0,
       successfulTransactions: 0,
       failedTransactions: 0,
-      totalAmount: "0.00",
+      totalAmount: 0, // Changed to number for formatting
+      currency: 'XOF'
     },
     recentTransactions: [],
   };
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($product: ProductCreateInput!) {
-        productCreate(product: $product) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
-          }
-        }
-      }`,
-    {
-      variables: {
-        product: {
-          title: `${color} Snowboard`,
-        },
-      },
-    },
-  );
-  const responseJson = await response.json();
-
-  const product = responseJson.data!.productCreate!.product!;
-  const variantId = product.variants.edges[0]!.node!.id!;
-
-  const variantResponse = await admin.graphql(
-    `#graphql
-    mutation shopifyRemixTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-        productVariants {
-          id
-          price
-          barcode
-          createdAt
-        }
-      }
-    }`,
-    {
-      variables: {
-        productId: product.id,
-        variants: [{ id: variantId, price: "100.00" }],
-      },
-    },
-  );
-
-  const variantResponseJson = await variantResponse.json();
-
-  return {
-    product: responseJson!.data!.productCreate!.product,
-    variant:
-      variantResponseJson!.data!.productVariantsBulkUpdate!.productVariants,
-  };
-};
-
 export default function Index() {
-  const { stats } = useFetcher<typeof loader>().data || {
-    stats: {
-      totalTransactions: 0,
-      successfulTransactions: 0,
-      failedTransactions: 0,
-      totalAmount: "0.00",
-    },
+  const { stats } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+
+  // Explicit Currency Formatting (e.g. "150 000 F CFA")
+  const formatCurrency = (amount: number, currency = 'XOF') => {
+    // Replicate logic from apps/dashboard/src/lib/utils/format.ts
+    const locale = 'fr-FR'; // fr-FR uses space for thousands
+    const normalizedCurrency = currency === 'XOF' ? 'F CFA' : currency;
+
+    if (currency === 'XOF') {
+      const formattedNumber = new Intl.NumberFormat(locale, {
+        style: 'decimal',
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+      }).format(amount).replace(/\s/g, " "); // Ensure regular spaces
+      return `${formattedNumber} ${normalizedCurrency}`;
+    }
+
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
   };
 
-  return (
-    <Page>
-      <TitleBar title="Welcome !" />
-      <BlockStack gap="500">
+  if (isLoading) {
+    return (
+      <SkeletonPage primaryAction>
         <Layout>
           <Layout.Section>
-            <Card>
-              <BlockStack gap="500">
-                <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Welcome to your lomi. dashboard on Shopify 🌟
-                  </Text>
-                  <Text variant="bodyMd" as="p" tone="subdued">
-                    Monitor your transactions, configure settings, and get
-                    support all in one place.
-                  </Text>
-                </BlockStack>
-
-                {/* Stats Overview */}
-                <InlineStack gap="300" wrap={false} align="start">
-                  <Card background="bg-surface-secondary">
-                    <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd" tone="subdued">
-                        Total Transactions
-                      </Text>
-                      <Text as="p" variant="heading3xl">
-                        {stats.totalTransactions}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                  <Card background="bg-surface-success">
-                    <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd" tone="success">
-                        Successful
-                      </Text>
-                      <Text as="p" variant="heading3xl" tone="success">
-                        {stats.successfulTransactions}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                  <Card background="bg-surface-critical">
-                    <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd" tone="critical">
-                        Failed
-                      </Text>
-                      <Text as="p" variant="heading3xl" tone="critical">
-                        {stats.failedTransactions}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                  <Card background="bg-surface-secondary">
-                    <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd">
-                        Total Amount
-                      </Text>
-                      <Text as="p" variant="heading3xl">
-                        ${stats.totalAmount}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                </InlineStack>
-
-                {/* Recent Transactions */}
-                <Card>
-                  <BlockStack gap="400">
-                    <InlineStack align="space-between">
-                      <Text as="h3" variant="headingMd">
-                        Recent Transactions
-                      </Text>
-                      <Link url="/app/transactions" removeUnderline>
-                        View all
-                      </Link>
-                    </InlineStack>
-                    <DataTable
-                      columnContentTypes={[
-                        "text",
-                        "text",
-                        "numeric",
-                        "text",
-                        "text",
-                      ]}
-                      headings={[
-                        "Transaction ID",
-                        "Date",
-                        "Amount",
-                        "Status",
-                        "Customer",
-                      ]}
-                      rows={[["No transactions yet", "-", "-", "-", "-"]]}
-                    />
-                  </BlockStack>
-                </Card>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
-
-          <Layout.Section variant="oneThird">
-            <BlockStack gap="500">
-              <Card>
-                <BlockStack gap="300">
-                  <Text as="h2" variant="headingMd">
-                    Actions
-                  </Text>
-                  <List type="bullet">
-                    <List.Item>
-                      <Link url="/app/settings" removeUnderline>
-                        Configure your API keys
-                      </Link>
-                    </List.Item>
-                    <List.Item>
-                      <Link url="/app/support" removeUnderline>
-                        Get support
-                      </Link>
-                    </List.Item>
-                  </List>
-                </BlockStack>
-              </Card>
-
-              <Card>
-                <BlockStack gap="300">
-                  <Text as="h2" variant="headingMd">
-                    Resources
-                  </Text>
-                  <List type="bullet">
-                    <List.Item>
-                      <Link
-                        url="https://docs.lomi.africa/docs/reference/setup/overview"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        API documentation
-                      </Link>
-                    </List.Item>
-                    <List.Item>
-                      <Link
-                        url="https://docs.lomi.africa/docs/core/freedom/open-source"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        lomi. is open-source
-                      </Link>
-                    </List.Item>
-                    <List.Item>
-                      <Link
-                        url="https://status.lomi.africa"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        System status
-                      </Link>
-                    </List.Item>
-                  </List>
-                </BlockStack>
-              </Card>
-            </BlockStack>
+            <LegacyCard sectioned>
+              <SkeletonDisplayText size="small" />
+              <SkeletonBodyText lines={2} />
+            </LegacyCard>
+            <LegacyCard sectioned>
+              <SkeletonDisplayText size="small" />
+              <SkeletonBodyText lines={2} />
+            </LegacyCard>
           </Layout.Section>
         </Layout>
-      </BlockStack>
-    </Page>
+      </SkeletonPage>
+    );
+  }
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-8 font-sans">
+      <TitleBar title="Dashboard" />
+
+      {/* Header Section */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          Welcome back to lomi.
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 max-w-2xl text-lg">
+          Monitor your payments, manage settings, and grow your business with localized payment solutions.
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="rounded-xl border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(stats.totalAmount, stats.currency)}</div>
+            <p className="text-xs text-muted-foreground">
+              +20.1% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Transactions</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalTransactions}</div>
+            <p className="text-xs text-muted-foreground">
+              +180 since last hour
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.totalTransactions > 0
+                ? Math.round((stats.successfulTransactions / stats.totalTransactions) * 100)
+                : 0}%
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.successfulTransactions} successful payments
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Failed</CardTitle>
+            <AlertCircle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{stats.failedTransactions}</div>
+            <p className="text-xs text-muted-foreground">
+              Action required on 2 items
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="grid gap-6 md:grid-cols-7">
+
+        {/* Recent Activity (Placeholder for now) */}
+        <Card className="md:col-span-4 rounded-xl border shadow-sm">
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>
+              Your recent transactions from Shopify checkout.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4 items-center justify-center p-8 text-center bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-dashed">
+              <Activity className="h-8 w-8 text-gray-400" />
+              <div className="space-y-1">
+                <p className="font-medium text-sm text-gray-900 dark:text-gray-100">No transactions yet</p>
+                <p className="text-sm text-gray-500">
+                  Transactions processed via lomi. will appear here.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="md:col-span-3 space-y-6">
+          <Card className="rounded-xl border shadow-sm">
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>Manage your store integration</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <RemixLink to="/app/settings" className="w-full">
+                <Button variant="outline" className="w-full justify-start gap-2 h-12 text-md">
+                  <Settings className="h-4 w-4" />
+                  Configure API Keys
+                </Button>
+              </RemixLink>
+              <a href="https://docs.lomi.africa" target="_blank" rel="noreferrer" className="w-full">
+                <Button variant="ghost" className="w-full justify-start gap-2 h-10 text-muted-foreground hover:text-primary">
+                  <ExternalLink className="h-4 w-4" />
+                  Read Documentation
+                </Button>
+              </a>
+              <a href="mailto:support@lomi.africa" className="w-full">
+                <Button variant="ghost" className="w-full justify-start gap-2 h-10 text-muted-foreground hover:text-primary">
+                  <HelpCircle className="h-4 w-4" />
+                  Contact Support
+                </Button>
+              </a>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }
