@@ -1,7 +1,23 @@
 import { json } from "@remix-run/node";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { supabaseAdmin } from "@/app/lib/supabase/server";
+
+/**
+ * Loader handles OPTIONS preflight requests and GET requests
+ * This is critical for CORS when checkout extensions call this endpoint
+ */
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { cors } = await authenticate.public.checkout(request);
+
+  // For OPTIONS preflight requests, return empty response with CORS headers
+  if (request.method === "OPTIONS") {
+    return cors(new Response(null, { status: 204 }));
+  }
+
+  // For GET requests, return a simple health check
+  return cors(json({ status: "ok", method: "GET" }));
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const { sessionToken, cors } = await authenticate.public.checkout(request);
