@@ -1,5 +1,27 @@
 import { Session } from "@shopify/shopify-api";
 import type { Session as SessionInterface } from "@shopify/shopify-api";
+
+interface DatabaseSession {
+  id?: string;
+  shop: string;
+  state?: string;
+  isOnline?: boolean;
+  isonline?: boolean;
+  scope?: string;
+  expires?: string | null;
+  accessToken?: string;
+  accesstoken?: string;
+  userId?: string;
+  userid?: string;
+  firstName?: string;
+  firstname?: string;
+  lastName?: string;
+  lastname?: string;
+  accountOwner?: boolean;
+  accountowner?: boolean;
+  email?: string;
+  locale?: string;
+}
 import { supabaseAdmin } from "@/app/lib/supabase/server";
 
 export class SupabaseSessionStorage {
@@ -217,7 +239,9 @@ export class SupabaseSessionStorage {
       console.log(
         `[SupabaseSessionStorage] Found ${dbSessions.length} session(s) for shop ${shop} via RPC.`,
       );
-      return dbSessions.map((session: any) => this.deserializeSession(session));
+      return dbSessions.map((session: DatabaseSession) =>
+        this.deserializeSession(session),
+      );
     } catch (error) {
       console.error(
         "[SupabaseSessionStorage] Exception during findSessionsByShop:",
@@ -227,7 +251,7 @@ export class SupabaseSessionStorage {
     }
   }
 
-  private deserializeSession(dbSession: any): SessionInterface {
+  private deserializeSession(dbSession: DatabaseSession): SessionInterface {
     // Ensure 'expires' is undefined if not a valid date string, not new Date(null)
     const expiresDate = dbSession.expires
       ? new Date(dbSession.expires)

@@ -11,7 +11,7 @@ import {
   Banner,
   InlineStack,
 } from "@shopify/polaris";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate, useFetcher, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -68,28 +68,18 @@ export default function SettingsPage() {
 
   const [apiKey, setApiKey] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const isSubmitting = fetcher.state === "submitting";
+  const fetcherResponse = fetcher.data as
+    | { success?: boolean; message?: string }
+    | undefined;
+  const showSuccess = fetcherResponse?.success === true;
+  const error =
+    fetcherResponse?.success === false ? fetcherResponse.message : null;
   const isConfigured = loaderData.isConfigured || showSuccess;
 
-  // Handle fetcher response
-  useEffect(() => {
-    if (fetcher.data) {
-      const data = fetcher.data as { success?: boolean; message?: string };
-      if (data.success) {
-        setShowSuccess(true);
-        setError(null);
-        setApiKey("");
-        setWebhookSecret("");
-      } else if (data.message) {
-        setError(data.message);
-        setShowSuccess(false);
-      }
-    }
-  }, [fetcher.data]);
+  // Note: Form clearing after success removed to avoid setState in effect
 
   const handleSubmit = useCallback(() => {
     if (!apiKey.trim()) {
@@ -312,7 +302,9 @@ export default function SettingsPage() {
                           <Text as="span" fontWeight="bold">
                             3.
                           </Text>
-                          <Text as="span">Add "lomi. Checkout" block</Text>
+                          <Text as="span">
+                            Add &ldquo;lomi. Checkout&rdquo; block
+                          </Text>
                         </InlineStack>
                         <InlineStack gap="200" blockAlign="start">
                           <Text as="span" fontWeight="bold">

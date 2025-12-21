@@ -55,7 +55,6 @@ export default function App() {
                     name="shop"
                     label="Shop domain"
                     helpText="e.g: my-shop-domain.myshopify.com"
-                    autoFocus
                     value={shop}
                     onChange={setShop}
                     autoComplete="on"

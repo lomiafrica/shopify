@@ -1,8 +1,8 @@
 // We will define LomiApiError here for now, and can move it to @/utils/errors later.
 class LomiApiError extends Error {
   status: number;
-  details?: any;
-  constructor(message: string, status: number, details?: any) {
+  details?: unknown;
+  constructor(message: string, status: number, details?: unknown) {
     super(message);
     this.name = "LomiApiError";
     this.status = status;
@@ -27,7 +27,7 @@ interface RequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE";
   path: string;
   apiKey: string;
-  body?: Record<string, any>;
+  body?: Record<string, unknown>;
   params?: Record<string, string>;
 }
 
@@ -100,7 +100,7 @@ async function lomiApiRequest<T_Data>({
       error instanceof Error
         ? error.message
         : "An unexpected error occurred during the Lomi API request",
-      (error as any).status || 500,
+      (error as { status?: number }).status || 500,
       error,
     );
   }

@@ -76,7 +76,7 @@ export default function AuthReset() {
             <br />
             <Text as="p">
               This will clear all stored sessions and restart the OAuth flow.
-              Use this if you're experiencing authentication issues.
+              Use this if you&apos;re experiencing authentication issues.
             </Text>
 
             {error === "callback_failed" && (

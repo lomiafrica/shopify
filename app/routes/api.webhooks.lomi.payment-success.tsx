@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
       .single();
 
     // Extract secret from metadata (safely handling potential nulls/types)
-    // @ts-ignore
+    // @ts-expect-error - metadata may not be properly typed
     const apiSecret = storeData?.metadata?.webhook_secret;
 
     if (storeError || !apiSecret) {
@@ -117,7 +117,7 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     });
 
-    // @ts-ignore
+    // @ts-expect-error - response.body.data may not be properly typed
     const draftOrderResult = response.body.data?.draftOrderCreate;
 
     if (draftOrderResult?.userErrors?.length > 0) {

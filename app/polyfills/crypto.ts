@@ -24,7 +24,7 @@ if (!globalThis.crypto) {
         globalThis.crypto = webcrypto;
       }
     }
-  } catch (error) {
+  } catch {
     // Polyfill failed, but that's okay - the app may still work
   }
 }
