@@ -6,13 +6,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     console.log("Auth callback route accessed");
     const url = new URL(request.url);
     console.log("Callback URL:", url.toString());
-    console.log(
-      "Callback headers:",
-      Object.fromEntries(request.headers.entries()),
-    );
 
     const { session, redirect } = await authenticate.admin(request);
     console.log("Authentication successful in callback:", session.shop);
+
+    // Note: Store registration happens when the user saves their API key
+    // via install_shopify_store RPC. No mock data creation here.
 
     // Redirect to the main app after successful authentication
     const appUrl = new URL("/app", url.origin);
@@ -37,7 +36,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
       requestUrl: request.url,
-      requestHeaders: Object.fromEntries(request.headers.entries()),
     });
 
     // For debugging purposes, let's see what the actual error is

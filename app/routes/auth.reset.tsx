@@ -1,10 +1,17 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { Button, Card, Page, Text, Banner, AppProvider } from "@shopify/polaris";
+import {
+  Button,
+  Card,
+  Page,
+  Text,
+  Banner,
+  AppProvider,
+} from "@shopify/polaris";
 import polarisTranslations from "@shopify/polaris/locales/en.json";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
-import { SupabaseSessionStorage } from "@/app/lib/session-storage";
+import { SupabaseSessionStorage } from "@/app/lib/utils/session-storage";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
@@ -68,8 +75,8 @@ export default function AuthReset() {
             </Text>
             <br />
             <Text as="p">
-              This will clear all stored sessions and restart the OAuth flow. Use
-              this if you're experiencing authentication issues.
+              This will clear all stored sessions and restart the OAuth flow.
+              Use this if you're experiencing authentication issues.
             </Text>
 
             {error === "callback_failed" && (

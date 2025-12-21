@@ -57,7 +57,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     // Get merchant-specific dashboard stats
     const { data: statsData, error: statsError } = await supabaseAdmin.rpc(
       "get_shopify_dashboard_stats",
-      { p_shop: shop }
+      { p_shop: shop },
     );
 
     if (statsError) {
@@ -79,27 +79,29 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     if (stats.isConfigured) {
       const { data: txData, error: txError } = await supabaseAdmin.rpc(
         "get_shopify_recent_transactions",
-        { p_shop: shop, p_limit: 5 }
+        { p_shop: shop, p_limit: 5 },
       );
 
       if (txError) {
         console.warn("Error fetching recent transactions:", txError);
       } else if (txData) {
-        recentTransactions = txData.map((tx: {
-          transaction_id: string;
-          amount: number;
-          currency: string;
-          status: string;
-          created_at: string;
-          customer_name: string | null;
-        }) => ({
-          id: tx.transaction_id,
-          amount: Number(tx.amount) || 0,
-          currency: tx.currency || "XOF",
-          status: tx.status || "unknown",
-          created_at: tx.created_at,
-          customer_name: tx.customer_name,
-        }));
+        recentTransactions = txData.map(
+          (tx: {
+            transaction_id: string;
+            amount: number;
+            currency: string;
+            status: string;
+            created_at: string;
+            customer_name: string | null;
+          }) => ({
+            id: tx.transaction_id,
+            amount: Number(tx.amount) || 0,
+            currency: tx.currency || "XOF",
+            status: tx.status || "unknown",
+            created_at: tx.created_at,
+            customer_name: tx.customer_name,
+          }),
+        );
       }
     }
   } catch (err) {
@@ -134,7 +136,9 @@ export default function Index() {
   // Calculate success rate
   const successRate =
     stats.totalTransactions > 0
-      ? Math.round((stats.successfulTransactions / stats.totalTransactions) * 100)
+      ? Math.round(
+          (stats.successfulTransactions / stats.totalTransactions) * 100,
+        )
       : 0;
 
   if (isLoading) {
@@ -173,8 +177,9 @@ export default function Index() {
             }}
           >
             <p>
-              To start accepting payments and viewing your transaction data, you need to
-              connect your lomi. account by entering your API keys in Settings.
+              To start accepting payments and viewing your transaction data, you
+              need to connect your lomi. account by entering your API keys in
+              Settings.
             </p>
           </CalloutCard>
         )}
@@ -186,8 +191,8 @@ export default function Index() {
               Welcome back to lomi.
             </Text>
             <Text as="p" tone="subdued">
-              Monitor your payments, manage settings, and grow your business with
-              localized payment solutions.
+              Monitor your payments, manage settings, and grow your business
+              with localized payment solutions.
             </Text>
           </BlockStack>
         </Card>
@@ -235,7 +240,13 @@ export default function Index() {
                 <Text
                   as="p"
                   variant="headingXl"
-                  tone={successRate >= 80 ? "success" : successRate >= 50 ? "caution" : "critical"}
+                  tone={
+                    successRate >= 80
+                      ? "success"
+                      : successRate >= 50
+                        ? "caution"
+                        : "critical"
+                  }
                 >
                   {successRate}%
                 </Text>
@@ -288,13 +299,23 @@ export default function Index() {
                           </Text>
                         </BlockStack>
                         <BlockStack gap="050" align="end">
-                          <Text as="span" variant="bodyMd" fontWeight="semibold">
+                          <Text
+                            as="span"
+                            variant="bodyMd"
+                            fontWeight="semibold"
+                          >
                             {formatCurrency(tx.amount, tx.currency)}
                           </Text>
                           <Text
                             as="span"
                             variant="bodySm"
-                            tone={tx.status === "completed" ? "success" : tx.status === "failed" ? "critical" : "subdued"}
+                            tone={
+                              tx.status === "completed"
+                                ? "success"
+                                : tx.status === "failed"
+                                  ? "critical"
+                                  : "subdued"
+                            }
                           >
                             {tx.status}
                           </Text>
@@ -304,7 +325,11 @@ export default function Index() {
                   </BlockStack>
                 ) : (
                   <EmptyState
-                    heading={stats.isConfigured ? "No transactions yet" : "Connect your account"}
+                    heading={
+                      stats.isConfigured
+                        ? "No transactions yet"
+                        : "Connect your account"
+                    }
                     image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
                   >
                     <p>
@@ -329,14 +354,29 @@ export default function Index() {
                 </Text>
                 <BlockStack gap="300">
                   <Link to="/app/settings">
-                    <Button fullWidth variant={stats.isConfigured ? "secondary" : "primary"}>
-                      {stats.isConfigured ? "Manage API Keys" : "Configure API Keys"}
+                    <Button
+                      fullWidth
+                      variant={stats.isConfigured ? "secondary" : "primary"}
+                    >
+                      {stats.isConfigured
+                        ? "Manage API Keys"
+                        : "Configure API Keys"}
                     </Button>
                   </Link>
-                  <Button url="https://docs.lomi.africa" external fullWidth variant="plain">
+                  <Button
+                    url="https://docs.lomi.africa"
+                    external
+                    fullWidth
+                    variant="plain"
+                  >
                     Read Documentation
                   </Button>
-                  <Button url="mailto:support@lomi.africa" external fullWidth variant="plain">
+                  <Button
+                    url="mailto:support@lomi.africa"
+                    external
+                    fullWidth
+                    variant="plain"
+                  >
                     Contact Support
                   </Button>
                 </BlockStack>

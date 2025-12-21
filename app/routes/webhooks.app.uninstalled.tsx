@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { SupabaseSessionStorage } from "@/app/lib/session-storage";
+import { SupabaseSessionStorage } from "@/app/lib/utils/session-storage";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic } = await authenticate.webhook(request);
@@ -18,7 +18,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const sessionIds = sessions.map((s) => s.id);
       await sessionStorage.deleteSessions(sessionIds);
       console.log(
-        `[AppUninstalled] Deleted ${sessionIds.length} sessions for shop ${shop}`
+        `[AppUninstalled] Deleted ${sessionIds.length} sessions for shop ${shop}`,
       );
     }
   } else {

@@ -5,6 +5,7 @@ import {
   useCartLines,
   useTotalAmount,
   useSessionToken,
+  useShop,
   Banner,
 } from "@shopify/ui-extensions-react/checkout";
 import { useState } from "react";
@@ -14,6 +15,7 @@ export default reactExtension("purchase.checkout.block.render", () => (
 ));
 
 function Extension() {
+  const { myshopifyDomain } = useShop();
   const { get: getSessionToken } = useSessionToken();
   const cartLines = useCartLines();
   const totalAmount = useTotalAmount();
@@ -26,8 +28,10 @@ function Extension() {
     try {
       const token = await getSessionToken();
 
-      // Call the proxy endpoint in the Remix app
-      const response = await fetch("/api/create-checkout", {
+      // Use App Proxy URL: https://{shop}/apps/lomi/create-checkout
+      const proxyUrl = `https://${myshopifyDomain}/apps/lomi/create-checkout`;
+
+      const response = await fetch(proxyUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
