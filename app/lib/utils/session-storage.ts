@@ -21,6 +21,11 @@ interface DatabaseSession {
   accountowner?: boolean;
   email?: string;
   locale?: string;
+  emailVerified?: boolean;
+  emailverified?: boolean;
+  collaborator?: boolean;
+  expires_in?: number;
+  associated_user_scope?: string;
 }
 import { supabaseAdmin } from "@/app/lib/supabase/server";
 
@@ -287,17 +292,17 @@ export class SupabaseSessionStorage {
         : dbSession.emailverified;
 
     return new Session({
-      id: dbSession.id,
+      id: dbSession.id!,
       shop: dbSession.shop,
-      state: dbSession.state,
-      isOnline: isOnline,
+      state: dbSession.state!,
+      isOnline: isOnline!,
       scope: dbSession.scope,
       expires: expiresDate,
       accessToken: accessToken,
       onlineAccessInfo: userId
         ? {
             associated_user: {
-              id: userId,
+              id: parseInt(userId, 10),
               first_name: firstName,
               last_name: lastName,
               email: dbSession.email, // Assuming email is consistently cased
@@ -307,8 +312,8 @@ export class SupabaseSessionStorage {
               email_verified: emailVerified,
             },
             // These fields seem to be directly from Shopify and likely consistently cased
-            expires_in: dbSession.expires_in,
-            associated_user_scope: dbSession.associated_user_scope,
+            expires_in: dbSession.expires_in || 0,
+            associated_user_scope: dbSession.associated_user_scope || "",
           }
         : undefined,
     });

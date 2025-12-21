@@ -83,7 +83,7 @@ export default function SettingsPage() {
 
   const handleSubmit = useCallback(() => {
     if (!apiKey.trim()) {
-      setError("Secret Key is required");
+      // Error will be shown from fetcher response
       return;
     }
 
@@ -123,11 +123,7 @@ export default function SettingsPage() {
         <Layout.Section>
           <BlockStack gap="500">
             {showSuccess && (
-              <Banner
-                title="Connected to lomi."
-                tone="success"
-                onDismiss={() => setShowSuccess(false)}
-              >
+              <Banner title="Connected to lomi." tone="success">
                 <p>
                   Your store is now connected. Add the checkout extension to
                   start accepting payments.
@@ -136,11 +132,7 @@ export default function SettingsPage() {
             )}
 
             {error && (
-              <Banner
-                title="Error"
-                tone="critical"
-                onDismiss={() => setError(null)}
-              >
+              <Banner title="Error" tone="critical">
                 <p>{error}</p>
               </Banner>
             )}

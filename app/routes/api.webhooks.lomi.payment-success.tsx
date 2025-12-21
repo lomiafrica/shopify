@@ -38,7 +38,6 @@ export async function action({ request }: ActionFunctionArgs) {
       .single();
 
     // Extract secret from metadata (safely handling potential nulls/types)
-    // @ts-expect-error - metadata may not be properly typed
     const apiSecret = storeData?.metadata?.webhook_secret;
 
     if (storeError || !apiSecret) {

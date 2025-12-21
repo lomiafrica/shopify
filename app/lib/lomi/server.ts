@@ -179,7 +179,7 @@ export async function createLomiCheckoutSession(
     method: "POST",
     path,
     apiKey,
-    body: data,
+    body: data as unknown as Record<string, unknown>,
   });
 }
 
