@@ -79,6 +79,8 @@ export async function action({ request }: ActionFunctionArgs) {
       success_url: requestData.successUrl || `https://${session.shop}/checkout`, // Fallback
       cancel_url: requestData.cancelUrl || `https://${session.shop}/cart`,
       amount: requestData.totalAmount, // If trusted, or calculate from lines
+      // Integration source for analytics and revenue attribution
+      integration_source: "shopify",
       // We might need to map line items if Lomi API supports them directly in session creation
       // Based on DTO, it supports product_id/quantity BUT also we likely want a generic amount for now if products aren't synced.
       // Ideally, products should be synced, but for "Express Pay", just passing the total amount is a good start if allowed.

@@ -137,8 +137,8 @@ export default function Index() {
   const successRate =
     stats.totalTransactions > 0
       ? Math.round(
-          (stats.successfulTransactions / stats.totalTransactions) * 100,
-        )
+        (stats.successfulTransactions / stats.totalTransactions) * 100,
+      )
       : 0;
 
   if (isLoading) {
@@ -198,81 +198,73 @@ export default function Index() {
         </Card>
 
         {/* Stats Grid */}
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <BlockStack gap="200">
-                <Text as="h3" variant="headingSm" tone="subdued">
-                  Total Revenue
-                </Text>
-                <Text as="p" variant="headingXl">
-                  {formatCurrency(stats.totalRevenue, stats.currency)}
-                </Text>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  All completed transactions
-                </Text>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <Card>
+            <BlockStack gap="200">
+              <Text as="h3" variant="headingSm" tone="subdued">
+                Total Revenue
+              </Text>
+              <Text as="p" variant="headingXl">
+                {formatCurrency(stats.totalRevenue, stats.currency)}
+              </Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                All completed transactions
+              </Text>
+            </BlockStack>
+          </Card>
 
-          <Layout.Section>
-            <Card>
-              <BlockStack gap="200">
-                <Text as="h3" variant="headingSm" tone="subdued">
-                  Transactions
-                </Text>
-                <Text as="p" variant="headingXl">
-                  {stats.totalTransactions}
-                </Text>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  {stats.successfulTransactions} successful
-                </Text>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
+          <Card>
+            <BlockStack gap="200">
+              <Text as="h3" variant="headingSm" tone="subdued">
+                Transactions
+              </Text>
+              <Text as="p" variant="headingXl">
+                {stats.totalTransactions}
+              </Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                {stats.successfulTransactions} successful
+              </Text>
+            </BlockStack>
+          </Card>
 
-          <Layout.Section>
-            <Card>
-              <BlockStack gap="200">
-                <Text as="h3" variant="headingSm" tone="subdued">
-                  Success Rate
-                </Text>
-                <Text
-                  as="p"
-                  variant="headingXl"
-                  tone={
-                    successRate >= 80
-                      ? "success"
-                      : successRate >= 50
-                        ? "caution"
-                        : "critical"
-                  }
-                >
-                  {successRate}%
-                </Text>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Payment success rate
-                </Text>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
+          <Card>
+            <BlockStack gap="200">
+              <Text as="h3" variant="headingSm" tone="subdued">
+                Success Rate
+              </Text>
+              <Text
+                as="p"
+                variant="headingXl"
+                tone={
+                  successRate >= 80
+                    ? "success"
+                    : successRate >= 50
+                      ? "caution"
+                      : "critical"
+                }
+              >
+                {successRate}%
+              </Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Payment success rate
+              </Text>
+            </BlockStack>
+          </Card>
 
-          <Layout.Section>
-            <Card>
-              <BlockStack gap="200">
-                <Text as="h3" variant="headingSm" tone="subdued">
-                  Failed
-                </Text>
-                <Text as="p" variant="headingXl" tone="critical">
-                  {stats.failedTransactions}
-                </Text>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Failed transactions
-                </Text>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
-        </Layout>
+          <Card>
+            <BlockStack gap="200">
+              <Text as="h3" variant="headingSm" tone="subdued">
+                Failed
+              </Text>
+              <Text as="p" variant="headingXl" tone="critical">
+                {stats.failedTransactions}
+              </Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Failed transactions
+              </Text>
+            </BlockStack>
+          </Card>
+        </div>
 
         {/* Main Content */}
         <Layout>
