@@ -9,16 +9,46 @@ import {
   BlockStack,
   Box,
   ChoiceList,
+  Spinner,
+  Text,
+  Banner,
+  Pagination,
 } from "@shopify/polaris";
-import { useState, useCallback } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useState, useCallback, useEffect } from "react";
+import { useFetcher } from "@remix-run/react";
 
-// TitleBar handled via <ui-title-bar> web component
+interface Transaction {
+  transaction_id: string;
+  created_at: string;
+  gross_amount: number;
+  net_amount: number;
+  fee_amount: number;
+  currency_code: string;
+  status: string;
+  transaction_type: string;
+  customer_name?: string;
+  customer_email?: string;
+  product_name?: string;
+  product_description?: string;
+}
+
+interface TransactionsData {
+  transactions: Transaction[];
+  hasMore: boolean;
+  totalCount?: number;
+}
+
+interface ErrorData {
+  error: string;
+}
+
+type FetcherData = TransactionsData | ErrorData;
 
 export default function TransactionsPage() {
-  const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [queryValue, setQueryValue] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const fetcher = useFetcher<FetcherData>();
 
   const handleStatusChange = useCallback(
     (value: string[]) => setSelectedStatus(value),
@@ -37,9 +67,20 @@ export default function TransactionsPage() {
     handleQueryValueRemove();
   }, [handleStatusRemove, handleQueryValueRemove]);
 
-  const handleBack = useCallback(() => {
-    navigate("/app");
-  }, [navigate]);
+  const handleRefresh = useCallback(() => {
+    fetcher.load(
+      `/api/transactions?page=${currentPage}&pageSize=20&search=${encodeURIComponent(queryValue)}${selectedStatus.length > 0 ? `&status=${selectedStatus[0]}` : ""}`,
+    );
+  }, [fetcher, currentPage, queryValue, selectedStatus]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
+  // Load data on mount and when filters change
+  useEffect(() => {
+    handleRefresh();
+  }, [handleRefresh]);
 
   const filters = [
     {
@@ -54,6 +95,7 @@ export default function TransactionsPage() {
             { label: "Processing", value: "processing" },
             { label: "Completed", value: "completed" },
             { label: "Failed", value: "failed" },
+            { label: "Refunded", value: "refunded" },
           ]}
           selected={selectedStatus}
           onChange={handleStatusChange}
@@ -63,20 +105,61 @@ export default function TransactionsPage() {
     },
   ];
 
-  const rows = [
-    ["#1234", "2024-02-08", "John Doe", "$100.00", "Completed"],
-    ["#1235", "2024-02-08", "Jane Smith", "$75.50", "Pending"],
-    ["#1236", "2024-02-08", "Bob Johnson", "$200.00", "Processing"],
-  ];
+  // Transform transactions data for DataTable
+  const rows =
+    fetcher.data && "transactions" in fetcher.data
+      ? fetcher.data.transactions.map((tx: Transaction) => [
+          tx.transaction_id.substring(0, 8) + "...", // Shortened ID
+          new Date(tx.created_at).toLocaleDateString(),
+          tx.customer_name || tx.customer_email || "Anonymous",
+          `${tx.gross_amount.toLocaleString()} ${tx.currency_code}`,
+          tx.status.charAt(0).toUpperCase() + tx.status.slice(1),
+        ])
+      : [];
+
+  // Show loading state
+  if (fetcher.state === "loading" && !fetcher.data) {
+    return (
+      <Page fullWidth>
+        <ui-title-bar title="Transactions" />
+        <Layout>
+          <Layout.Section>
+            <Card roundedAbove="sm">
+              <Box padding="400">
+                <BlockStack gap="400" inlineAlign="center">
+                  <Spinner size="large" />
+                  <Text variant="bodyMd" as="p">
+                    Loading transactions...
+                  </Text>
+                </BlockStack>
+              </Box>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </Page>
+    );
+  }
+
+  // Show error state
+  if (fetcher.data && "error" in fetcher.data) {
+    return (
+      <Page fullWidth>
+        <ui-title-bar title="Transactions" />
+        <Layout>
+          <Layout.Section>
+            <Banner tone="critical">
+              <Text variant="bodyMd" as="p">
+                {fetcher.data.error}
+              </Text>
+            </Banner>
+          </Layout.Section>
+        </Layout>
+      </Page>
+    );
+  }
 
   return (
-    <Page
-      fullWidth
-      backAction={{
-        content: "Back",
-        onAction: handleBack,
-      }}
-    >
+    <Page fullWidth>
       <ui-title-bar title="Transactions" />
       <Layout>
         <Layout.Section>
@@ -91,29 +174,69 @@ export default function TransactionsPage() {
                   onClearAll={handleClearAll}
                 />
               </Box>
-              <Box padding="400">
-                <DataTable
-                  columnContentTypes={[
-                    "text",
-                    "text",
-                    "text",
-                    "numeric",
-                    "text",
-                  ]}
-                  headings={[
-                    "Transaction ID",
-                    "Date",
-                    "Customer",
-                    "Amount",
-                    "Status",
-                  ]}
-                  rows={rows}
-                />
-              </Box>
+
+              {rows.length === 0 ? (
+                <Box padding="400">
+                  <BlockStack gap="400" inlineAlign="center">
+                    <Text variant="bodyMd" as="p">
+                      No transactions found
+                    </Text>
+                    {queryValue || selectedStatus.length > 0 ? (
+                      <Button onClick={handleClearAll} variant="plain">
+                        Clear filters
+                      </Button>
+                    ) : null}
+                  </BlockStack>
+                </Box>
+              ) : (
+                <>
+                  <Box padding="400">
+                    <DataTable
+                      columnContentTypes={[
+                        "text",
+                        "text",
+                        "text",
+                        "text",
+                        "text",
+                      ]}
+                      headings={[
+                        "Transaction ID",
+                        "Date",
+                        "Customer",
+                        "Amount",
+                        "Status",
+                      ]}
+                      rows={rows}
+                    />
+                  </Box>
+
+                  {fetcher.data &&
+                    "totalCount" in fetcher.data &&
+                    fetcher.data.totalCount &&
+                    fetcher.data.totalCount > 20 && (
+                      <Box padding="400">
+                        <Pagination
+                          hasPrevious={currentPage > 1}
+                          hasNext={fetcher.data.hasMore}
+                          onPrevious={() => handlePageChange(currentPage - 1)}
+                          onNext={() => handlePageChange(currentPage + 1)}
+                          label={`Page ${currentPage}`}
+                        />
+                      </Box>
+                    )}
+                </>
+              )}
+
               <Box padding="400">
                 <ButtonGroup>
-                  <Button>Export</Button>
-                  <Button variant="primary">Refresh</Button>
+                  <Button disabled>Export</Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleRefresh}
+                    loading={fetcher.state === "loading"}
+                  >
+                    Refresh
+                  </Button>
                 </ButtonGroup>
               </Box>
             </BlockStack>

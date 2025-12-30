@@ -30,8 +30,8 @@ export default function App() {
             Dashboard
           </Link>
           <Link to="/app/transactions">Transactions</Link>
-          <Link to="/app/support">Support</Link>
           <Link to="/app/settings">Settings</Link>
+          <Link to="/app/support">Support</Link>
         </ui-nav-menu>
         <Outlet />
       </AppProvider>

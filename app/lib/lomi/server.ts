@@ -115,7 +115,6 @@ async function lomiApiRequest<T_Data>({
 interface CreateCheckoutSessionRequest {
   success_url: string;
   cancel_url: string;
-  allowed_providers: string[]; // e.g., ["ORANGE", "WAVE", "NOWPAYMENTS"]
   amount: number; // Amount in smallest currency unit
   currency_code: string; // 3-letter ISO currency code (e.g., "XOF")
   title?: string;
@@ -144,7 +143,6 @@ interface CheckoutSession {
   cancel_url: string;
   amount: number;
   currency_code: string;
-  allowed_providers: string[];
   title?: string;
   description?: string; // Not in example response, but good to anticipate
   customer_email?: string; // In GET response, could be in create response too

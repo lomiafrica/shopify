@@ -12,7 +12,7 @@ import {
   InlineStack,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
-import { useNavigate, useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { authenticate } from "~/shopify.server";
@@ -40,13 +40,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
       isConfigured: shopSettings?.is_configured || false,
       maskedKey: shopSettings?.api_key
         ? shopSettings.api_key.length > 12
-          ? shopSettings.api_key.substring(0, 12) + "••••••••"
-          : "••••••••"
+          ? shopSettings.api_key.substring(0, 12) + "••••••••••••••••"
+          : "••••••••••••••••"
         : null,
       maskedWebhookSecret: shopSettings?.webhook_secret
         ? shopSettings.webhook_secret.length > 5
-          ? shopSettings.webhook_secret.substring(0, 5) + "••••••••"
-          : "••••••••"
+          ? shopSettings.webhook_secret.substring(0, 5) + "••••••••••••••••"
+          : "••••••••••••••••"
         : null,
       webhookUrl,
     });
@@ -62,11 +62,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function SettingsPage() {
-  const navigate = useNavigate();
   const fetcher = useFetcher();
   const loaderData = useLoaderData<typeof loader>();
 
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(loaderData.maskedKey || "");
   const [webhookSecret, setWebhookSecret] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -99,10 +98,6 @@ export default function SettingsPage() {
     });
   }, [apiKey, webhookSecret, fetcher]);
 
-  const handleBack = useCallback(() => {
-    navigate("/app");
-  }, [navigate]);
-
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(loaderData.webhookUrl).then(() => {
       setCopied(true);
@@ -111,13 +106,7 @@ export default function SettingsPage() {
   }, [loaderData.webhookUrl]);
 
   return (
-    <Page
-      fullWidth
-      backAction={{
-        content: "Back",
-        onAction: handleBack,
-      }}
-    >
+    <Page fullWidth>
       <ui-title-bar title="Settings" />
       <Layout>
         <Layout.Section>
@@ -147,98 +136,111 @@ export default function SettingsPage() {
             )}
 
             <Card roundedAbove="sm">
-              <BlockStack gap="400">
-                <Box padding="400">
+              <Box padding="400">
+                <BlockStack gap="200">
                   <Text variant="headingMd" as="h2">
-                    {isConfigured ? "Update API Key" : "Connect to lomi."}
+                    {isConfigured ? "Update access tokens" : "Connect to lomi."}
+                  </Text>
+                  <Text as="p" tone="subdued">
+                    Configure your access tokens to enable payments.
                   </Text>
                   <Box paddingBlockStart="200">
-                    <Text as="p" tone="subdued">
-                      Configure your API keys to enable payments.
-                    </Text>
-                  </Box>
-                </Box>
-                <Box padding="400">
-                  <FormLayout>
-                    <TextField
-                      label="Secret Key"
-                      value={apiKey}
-                      onChange={setApiKey}
-                      type="password"
-                      autoComplete="off"
-                      placeholder="lomi_sk_... or lomi_sk_test_..."
-                      helpText={
-                        <span>
-                          From{" "}
-                          <a
-                            href="https://dashboard.lomi.africa/settings/access-tokens"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ textDecoration: "underline" }}
+                    <FormLayout>
+                      <TextField
+                        label="Secret key"
+                        value={apiKey}
+                        onChange={setApiKey}
+                        type="password"
+                        autoComplete="off"
+                        placeholder="lomi_sk_..."
+                        helpText={
+                          loaderData.maskedKey ? (
+                            <span>
+                              Your current api key is shown above. To update it,
+                              replace the masked values with a new key.
+                            </span>
+                          ) : (
+                            <span>
+                              You can create a new API key in the{" "}
+                              <a
+                                href="https://dashboard.lomi.africa/settings/access-tokens"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ textDecoration: "underline" }}
+                              >
+                                dashboard
+                              </a>
+                              .
+                            </span>
+                          )
+                        }
+                        requiredIndicator
+                      />
+
+                      <Box paddingBlockStart="200">
+                        <Text variant="headingSm" as="h3">
+                          Webhook configuration
+                        </Text>
+                        <Text as="p" tone="subdued">
+                          Required to sync payment status to Shopify orders.
+                        </Text>
+                      </Box>
+
+                      <TextField
+                        label="Your Webhook URL"
+                        value={loaderData.webhookUrl}
+                        autoComplete="off"
+                        readOnly
+                        helpText="Create a new webhook with this endpoint in your lomi. merchant dashboard."
+                        connectedRight={
+                          <Button
+                            onClick={handleCopyUrl}
+                            accessibilityLabel="Copy Webhook URL"
+                            size="large"
                           >
-                            lomi. Dashboard
-                          </a>{" "}
-                          → Developers → API Keys.
-                        </span>
-                      }
-                      requiredIndicator
-                    />
+                            {copied ? "Copied!" : "Copy"}
+                          </Button>
+                        }
+                      />
 
-                    <Box paddingBlockStart="200">
-                      <Text variant="headingSm" as="h3">
-                        Webhook Configuration
-                      </Text>
-                      <Text as="p" tone="subdued">
-                        Required to sync payment status to Shopify orders.
-                      </Text>
-                    </Box>
+                      <TextField
+                        label="Webhook Secret"
+                        value={webhookSecret}
+                        onChange={setWebhookSecret}
+                        type="password"
+                        autoComplete="off"
+                        placeholder={
+                          loaderData.maskedWebhookSecret || "whsec_..."
+                        }
+                        helpText={
+                          loaderData.maskedWebhookSecret
+                            ? "Secret is configured. Enter a new one to update."
+                            : "Paste the secret you receive after creating the webhook."
+                        }
+                      />
 
-                    <TextField
-                      label="Your Webhook URL"
-                      value={loaderData.webhookUrl}
-                      autoComplete="off"
-                      readOnly
-                      helpText="Copy this URL and add it to your lomi. Dashboard Webhooks."
-                      connectedRight={
-                        <Button
-                          onClick={handleCopyUrl}
-                          accessibilityLabel="Copy Webhook URL"
+                      <Box paddingBlockStart="400">
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
                         >
-                          {copied ? "Copied!" : "Copy"}
-                        </Button>
-                      }
-                    />
-
-                    <TextField
-                      label="Webhook Secret"
-                      value={webhookSecret}
-                      onChange={setWebhookSecret}
-                      type="password"
-                      autoComplete="off"
-                      placeholder={
-                        loaderData.maskedWebhookSecret || "whsec_..."
-                      }
-                      helpText={
-                        loaderData.maskedWebhookSecret
-                          ? "Secret is configured. Enter a new one to update."
-                          : "Paste the secret you receive after creating the webhook."
-                      }
-                    />
-
-                    <Box paddingBlockStart="400">
-                      <Button
-                        onClick={handleSubmit}
-                        loading={isSubmitting}
-                        variant="primary"
-                      >
-                        {isConfigured
-                          ? "Update Connection"
-                          : "Connect to lomi."}
-                      </Button>
-                    </Box>
-                  </FormLayout>
-                </Box>
-              </BlockStack>
+                          <Button
+                            onClick={handleSubmit}
+                            loading={isSubmitting}
+                            variant="primary"
+                          >
+                            {isConfigured
+                              ? "Update connection"
+                              : "Connect to lomi."}
+                          </Button>
+                        </div>
+                      </Box>
+                    </FormLayout>
+                  </Box>
+                </BlockStack>
+              </Box>
             </Card>
           </BlockStack>
         </Layout.Section>
@@ -249,21 +251,26 @@ export default function SettingsPage() {
               <BlockStack gap="200">
                 <Box padding="400">
                   <Text variant="headingMd" as="h2">
-                    Need Help?
+                    Need some assistance?
                   </Text>
                   <Box paddingBlockStart="200">
                     <Text as="p" variant="bodyMd">
-                      Visit our documentation to learn how to get your API keys.
+                      Visit our docs to learn how to get started with lomi. on
+                      Shopify.
                     </Text>
                   </Box>
-                  <Box paddingBlockStart="400">
-                    <Button
-                      url="https://docs.lomi.africa/"
-                      external
-                      variant="plain"
+                  <Box paddingBlockStart="200">
+                    <div
+                      style={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                      View Documentation
-                    </Button>
+                      <Button
+                        url="https://docs.lomi.africa/"
+                        external
+                        variant="plain"
+                      >
+                        Documentation
+                      </Button>
+                    </div>
                   </Box>
                 </Box>
               </BlockStack>

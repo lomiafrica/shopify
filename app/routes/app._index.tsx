@@ -137,8 +137,8 @@ export default function Index() {
   const successRate =
     stats.totalTransactions > 0
       ? Math.round(
-        (stats.successfulTransactions / stats.totalTransactions) * 100,
-      )
+          (stats.successfulTransactions / stats.totalTransactions) * 100,
+        )
       : 0;
 
   if (isLoading) {
@@ -198,7 +198,13 @@ export default function Index() {
         </Card>
 
         {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "16px",
+          }}
+        >
           <Card>
             <BlockStack gap="200">
               <Text as="h3" variant="headingSm" tone="subdued">
