@@ -63,31 +63,17 @@ function Extension() {
 
       const data = await response.json();
 
-      if (data.url) {
-        // Use Shopify's UI API to open URL if possible, or just standard window if allowed (sandbox might restrict)
-        // Standard window.open might be blocked.
-        // Checkout extensions typically can't redirect top-level easily without user action.
-        // We are in a Button onPress, so it counts as user action.
-        // However, Shopify recommends using `ui.overlay.openUrl` or similar?
-        // Actually, for redirecting to payment, usually specific targets are used (payment extensions).
-        // Since this is a "Block" extension, we might just use console log for now or try linking.
-        // But let's assume `console.log` for V1 and we likely need to output a Link or use a specific API.
-        // `ui` object might have capabilities.
+      // The lomi API returns checkout_url, not url
+      const checkoutUrl = data.checkout_url || data.url;
 
-        // Checking docs: standard `open(url, "_top")` might work if triggered by user.
-        // Or using `Link` component.
-        // Let's try attempting a direct location change via a hidden link or just standard approach.
-        // Actually, the best way in extensions is often `globalThis.open(url, '_self')`? No, sandbox.
-        // We will assume for now that we can just display the link if redirect fails, or that the response is a URL we can navigate to.
-
-        // NOTE: In strict sandbox, navigation is improved by using the `Link` component or `ui` utilities.
-        // Let's log it for now and try to redirect.
-        console.log("Redirecting to:", data.url);
-        // Use globalThis.open to redirect - works in Shopify checkout sandbox
+      if (checkoutUrl) {
+        console.log("Redirecting to lomi checkout:", checkoutUrl);
+        // Use globalThis.open to redirect - triggered by user button press
         if (typeof globalThis !== "undefined" && globalThis.open) {
-          globalThis.open(data.url, "_top");
+          globalThis.open(checkoutUrl, "_top");
         }
       } else {
+        console.error("API response:", data);
         throw new Error("No checkout URL returned");
       }
     } catch (err) {
