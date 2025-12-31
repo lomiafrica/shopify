@@ -129,12 +129,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
     // 3. Call Lomi API
     const lomiResponse = await fetch(
-      "https://api.lomi.africa/v1/checkout-sessions",
+      "https://api.lomi.africa/checkout-sessions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
+          "X-API-Key": apiKey,
         },
         body: JSON.stringify(payload),
       },
