@@ -112,13 +112,13 @@ export default function TransactionsPage() {
   const rows =
     fetcher.data && "transactions" in fetcher.data
       ? fetcher.data.transactions.map((tx: Transaction) => [
-        tx.transaction_id.substring(0, 8) + "...", // Shortened ID
-        new Date(tx.created_at).toLocaleDateString(),
-        tx.customer_name || tx.customer_email || "Anonymous",
-        `${tx.gross_amount.toLocaleString()} ${tx.currency_code}`,
-        `${tx.net_amount.toLocaleString()} ${tx.currency_code}`,
-        tx.status.charAt(0).toUpperCase() + tx.status.slice(1),
-      ])
+          tx.transaction_id.substring(0, 8) + "...", // Shortened ID
+          new Date(tx.created_at).toLocaleDateString(),
+          tx.customer_name || tx.customer_email || "Anonymous",
+          `${tx.gross_amount.toLocaleString()} ${tx.currency_code}`,
+          `${tx.net_amount.toLocaleString()} ${tx.currency_code}`,
+          tx.status.charAt(0).toUpperCase() + tx.status.slice(1),
+        ])
       : [];
 
   // Show loading state

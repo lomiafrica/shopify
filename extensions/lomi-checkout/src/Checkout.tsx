@@ -100,7 +100,12 @@ function Extension() {
 
   return (
     <BlockStack spacing="tight">
-      <BlockStack spacing="base" padding="base" border="base" cornerRadius="base">
+      <BlockStack
+        spacing="base"
+        padding="base"
+        border="base"
+        cornerRadius="base"
+      >
         <InlineStack spacing="tight" blockAlignment="center">
           <Text size="medium" emphasis="bold">
             Pay with lomi.
