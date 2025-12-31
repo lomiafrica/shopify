@@ -96,7 +96,9 @@ export default function SettingsPage() {
       method: "POST",
       action: "/api/validate-lomi-key",
     });
-  }, [apiKey, webhookSecret, fetcher]);
+    // Note: `fetcher` is intentionally excluded from dependencies as it changes identity on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKey, webhookSecret]);
 
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(loaderData.webhookUrl).then(() => {

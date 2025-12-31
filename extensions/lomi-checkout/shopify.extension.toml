@@ -7,7 +7,7 @@ name = "lomi. Checkout"
 handle = "lomi-checkout"
 
   [[extensions.targeting]]
-  target = "purchase.checkout.block.render"
+  target = "purchase.checkout.payment-method-list.render-before"
   module = "./src/Checkout.tsx"
 
   [extensions.capabilities]

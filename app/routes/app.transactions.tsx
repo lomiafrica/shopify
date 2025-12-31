@@ -71,7 +71,10 @@ export default function TransactionsPage() {
     fetcher.load(
       `/api/transactions?page=${currentPage}&pageSize=20&search=${encodeURIComponent(queryValue)}${selectedStatus.length > 0 ? `&status=${selectedStatus[0]}` : ""}`,
     );
-  }, [fetcher, currentPage, queryValue, selectedStatus]);
+    // Note: `fetcher` is intentionally excluded from dependencies as it changes identity
+    // on every render in Remix, which would cause an infinite loop with the useEffect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, queryValue, selectedStatus]);
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);

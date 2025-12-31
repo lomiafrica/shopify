@@ -4,19 +4,46 @@ import { authenticate } from "../shopify.server";
 import { supabaseAdmin } from "@/app/lib/supabase/server";
 
 /**
+ * Helper to add CORS headers for checkout extensions
+ */
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, X-Shopify-Access-Token",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+/**
  * Loader handles OPTIONS preflight requests and GET requests
- * This is critical for CORS when checkout extensions call this endpoint
+ * IMPORTANT: We handle OPTIONS BEFORE authentication to prevent redirects
  */
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { cors } = await authenticate.public.checkout(request);
-
-  // For OPTIONS preflight requests, return empty response with CORS headers
+  // Handle OPTIONS preflight BEFORE any authentication
+  // This prevents Shopify from redirecting the preflight request
   if (request.method === "OPTIONS") {
-    return cors(new Response(null, { status: 204 }));
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders(),
+    });
   }
 
-  // For GET requests, return a simple health check
-  return cors(json({ status: "ok", method: "GET" }));
+  // For GET requests, try to authenticate but fall back gracefully
+  try {
+    const { cors } = await authenticate.public.checkout(request);
+    return cors(json({ status: "ok", method: "GET" }));
+  } catch {
+    // If authentication fails, still respond with health check
+    return new Response(JSON.stringify({ status: "ok", method: "GET" }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders(),
+      },
+    });
+  }
 }
 
 export async function action({ request }: ActionFunctionArgs) {

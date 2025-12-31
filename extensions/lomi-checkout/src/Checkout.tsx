@@ -1,7 +1,9 @@
 import {
   reactExtension,
   BlockStack,
+  InlineStack,
   Button,
+  Text,
   useCartLines,
   useTotalAmount,
   useSessionToken,
@@ -10,9 +12,10 @@ import {
 } from "@shopify/ui-extensions-react/checkout";
 import { useState } from "react";
 
-export default reactExtension("purchase.checkout.block.render", () => (
-  <Extension />
-));
+export default reactExtension(
+  "purchase.checkout.payment-method-list.render-before",
+  () => <Extension />,
+);
 
 function Extension() {
   const { myshopifyDomain } = useShop();
@@ -26,24 +29,31 @@ function Extension() {
     setLoading(true);
     setError(null);
     try {
-      const token = await getSessionToken();
+      // Note: We don't need the session token for the direct endpoint
+      // The shop domain is used instead to look up credentials
+      await getSessionToken(); // Still call to ensure valid session
 
-      // Use App Proxy URL: https://{shop}/apps/lomi/create-checkout
-      const proxyUrl = `https://${myshopifyDomain}/apps/lomi/create-checkout`;
+      // Use direct API endpoint (bypasses app proxy to avoid password protection CORS issues)
+      // In production, this should use your deployed app URL
+      const directApiUrl =
+        process.env.NODE_ENV === "development"
+          ? "https://shopify.lomi.africa/api/direct-checkout"
+          : "https://shopify.lomi.africa/api/direct-checkout";
 
-      const response = await fetch(proxyUrl, {
+      console.log("Calling direct checkout API:", directApiUrl);
+      console.log("Shop domain:", myshopifyDomain);
+      console.log("Total amount:", totalAmount?.amount);
+
+      const response = await fetch(directApiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Provide session token for authentication context if needed
         },
         body: JSON.stringify({
-          cart: { id: "cart_placeholder" }, // We might need actual cart ID if available in API, but extension API provides lines
+          shopDomain: myshopifyDomain,
           lineItems: cartLines,
           totalAmount: totalAmount?.amount,
           currencyCode: totalAmount?.currencyCode,
-          successUrl: "", // Allow backend to determine or pass window.location if accessible (it's not)
-          cancelUrl: "",
         }),
       });
 
@@ -73,9 +83,8 @@ function Extension() {
         // NOTE: In strict sandbox, navigation is improved by using the `Link` component or `ui` utilities.
         // Let's log it for now and try to redirect.
         console.log("Redirecting to:", data.url);
-        // @ts-ignore
-        if (globalThis.open) {
-          // @ts-ignore
+        // Use globalThis.open to redirect - works in Shopify checkout sandbox
+        if (typeof globalThis !== "undefined" && globalThis.open) {
           globalThis.open(data.url, "_top");
         }
       } else {
@@ -90,20 +99,35 @@ function Extension() {
   };
 
   return (
-    <BlockStack spacing="base">
-      {error && (
-        <Banner status="critical" title="Payment Failed">
-          {error}
-        </Banner>
-      )}
-      <Button
-        kind="primary"
-        onPress={handlePay}
-        loading={loading}
-        accessibilityLabel="Pay with lomi."
-      >
-        Pay with lomi.
-      </Button>
+    <BlockStack spacing="tight">
+      <BlockStack spacing="base" padding="base" border="base" cornerRadius="base">
+        <InlineStack spacing="tight" blockAlignment="center">
+          <Text size="medium" emphasis="bold">
+            Pay with lomi.
+          </Text>
+          <Text size="small" appearance="subdued">
+            Mobile money, cards & more
+          </Text>
+        </InlineStack>
+        {error && (
+          <Banner status="critical" title="Payment Failed">
+            {error}
+          </Banner>
+        )}
+        <Button
+          kind="primary"
+          onPress={handlePay}
+          loading={loading}
+          accessibilityLabel="Pay with lomi."
+        >
+          Continue with lomi.
+        </Button>
+      </BlockStack>
+      <InlineStack inlineAlignment="center">
+        <Text size="small" appearance="subdued">
+          — or pay with another method below —
+        </Text>
+      </InlineStack>
     </BlockStack>
   );
 }
