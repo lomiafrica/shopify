@@ -3,6 +3,7 @@ import {
   BlockStack,
   InlineStack,
   Button,
+  Link,
   Text,
   useCartLines,
   useTotalAmount,
@@ -24,21 +25,17 @@ function Extension() {
   const totalAmount = useTotalAmount();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
   const handlePay = async () => {
     setLoading(true);
     setError(null);
-    try {
-      // Note: We don't need the session token for the direct endpoint
-      // The shop domain is used instead to look up credentials
-      await getSessionToken(); // Still call to ensure valid session
+    setCheckoutUrl(null);
 
-      // Use direct API endpoint (bypasses app proxy to avoid password protection CORS issues)
-      // In production, this should use your deployed app URL
-      const directApiUrl =
-        process.env.NODE_ENV === "development"
-          ? "https://shopify.lomi.africa/api/direct-checkout"
-          : "https://shopify.lomi.africa/api/direct-checkout";
+    try {
+      await getSessionToken();
+
+      const directApiUrl = "https://shopify.lomi.africa/api/direct-checkout";
 
       console.log("Calling direct checkout API:", directApiUrl);
       console.log("Shop domain:", myshopifyDomain);
@@ -62,16 +59,11 @@ function Extension() {
       }
 
       const data = await response.json();
+      const url = data.checkout_url || data.url;
 
-      // The lomi API returns checkout_url, not url
-      const checkoutUrl = data.checkout_url || data.url;
-
-      if (checkoutUrl) {
-        console.log("Redirecting to lomi checkout:", checkoutUrl);
-        // Use globalThis.open to redirect - triggered by user button press
-        if (typeof globalThis !== "undefined" && globalThis.open) {
-          globalThis.open(checkoutUrl, "_top");
-        }
+      if (url) {
+        console.log("Got lomi. checkout URL:", url);
+        setCheckoutUrl(url);
       } else {
         console.error("API response:", data);
         throw new Error("No checkout URL returned");
@@ -100,20 +92,36 @@ function Extension() {
             Mobile money, cards & more
           </Text>
         </InlineStack>
+
         {error && (
           <Banner status="critical" title="Payment Failed">
             {error}
           </Banner>
         )}
-        <Button
-          kind="primary"
-          onPress={handlePay}
-          loading={loading}
-          accessibilityLabel="Pay with lomi."
-        >
-          Continue with lomi.
-        </Button>
+
+        {checkoutUrl ? (
+          <BlockStack spacing="base">
+            <Banner status="success" title="Ready to pay!">
+              Click the button below to complete your payment with lomi.
+            </Banner>
+            <Link to={checkoutUrl} external>
+              <Button kind="primary" accessibilityLabel="Complete payment with lomi.">
+                Complete payment with lomi.
+              </Button>
+            </Link>
+          </BlockStack>
+        ) : (
+          <Button
+            kind="primary"
+            onPress={handlePay}
+            loading={loading}
+            accessibilityLabel="Pay with lomi."
+          >
+            Continue with lomi.
+          </Button>
+        )}
       </BlockStack>
+
       <InlineStack inlineAlignment="center">
         <Text size="small" appearance="subdued">
           — or pay with another method below —
