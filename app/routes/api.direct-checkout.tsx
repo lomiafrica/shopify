@@ -67,7 +67,15 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     const requestData = await request.json();
-    const { lineItems, totalAmount, currencyCode, shopDomain } = requestData;
+    const {
+      lineItems,
+      totalAmount,
+      currencyCode,
+      shopDomain,
+      customerEmail,
+      customerName,
+      customerPhone,
+    } = requestData;
 
     // Validate required fields
     if (!shopDomain) {
@@ -82,6 +90,9 @@ export async function action({ request }: ActionFunctionArgs) {
     const shop = shopDomain.replace(/^https?:\/\//, "");
 
     console.log("[direct-checkout] Processing checkout for shop:", shop);
+    if (customerEmail) {
+      console.log("[direct-checkout] Customer email:", customerEmail);
+    }
 
     // 1. Retrieve the Lomi API Key for this shop
     const { data: settings, error: settingsError } = await supabaseAdmin.rpc(
@@ -109,21 +120,50 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const apiKey = settings[0].api_key;
+    const allowCouponCode = settings[0].allow_coupon_code ?? false;
+    const requireBillingAddress = settings[0].require_billing_address ?? true;
     console.log("[direct-checkout] Found API key for shop:", shop);
 
-    // 2. Construct the payload for Lomi API
-    const payload = {
+    // 2. Construct the payload for lomi. API
+    // Serialize line items for webhook to create proper Shopify order
+    const serializedLineItems = lineItems?.map((item: {
+      title?: string;
+      merchandise?: { id?: string };
+      quantity?: number;
+      cost?: { totalAmount?: { amount?: string } };
+    }) => ({
+      title: item.title || "Product",
+      variant_id: item.merchandise?.id || null,
+      quantity: item.quantity || 1,
+      price: item.cost?.totalAmount?.amount || "0",
+    })) || [];
+
+    const payload: Record<string, unknown> = {
       description: "Shopify Checkout",
       currency_code: currencyCode || "XOF",
       success_url: `https://${shop}/checkout/thank-you`,
       cancel_url: `https://${shop}/cart`,
       amount: totalAmount,
       integration_source: "shopify",
+      allow_coupon_code: allowCouponCode,
+      require_billing_address: requireBillingAddress,
       metadata: {
         shopify_shop: shop,
         line_items_count: lineItems?.length || 0,
+        shopify_line_items: JSON.stringify(serializedLineItems),
       },
     };
+
+    // Add customer details if available
+    if (customerEmail) {
+      payload.customer_email = customerEmail;
+    }
+    if (customerName) {
+      payload.customer_name = customerName;
+    }
+    if (customerPhone) {
+      payload.customer_phone = customerPhone;
+    }
 
     console.log("[direct-checkout] Calling lomi API with payload:", payload);
 

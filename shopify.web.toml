@@ -9,5 +9,5 @@ dev = "pnpm run dev"
 SHOPIFY_CLIENT_ID = "9b77c560341e051a079adff2f33ba2e2"
 
 [web]
-application_url = "https://shopify.lomi.africa"
+application_url = "https://connect.lomi.africa"
 backend_port = 3000

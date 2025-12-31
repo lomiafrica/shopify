@@ -5,6 +5,13 @@ import { GraphqlClient } from "@shopify/shopify-api";
 import shopify from "../shopify.server";
 import { supabaseAdmin } from "@/app/lib/supabase/server";
 
+interface ShopifyLineItem {
+  title: string;
+  variant_id: string | null;
+  quantity: number;
+  price: string;
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, { status: 405 });
@@ -13,7 +20,10 @@ export async function action({ request }: ActionFunctionArgs) {
   const signature = request.headers.get("X-Lomi-Signature");
   const event = request.headers.get("X-Lomi-Event");
 
+  console.log("[webhook] Received lomi. webhook:", event);
+
   if (!signature || event !== "PAYMENT_SUCCEEDED") {
+    console.log("[webhook] Invalid request - missing signature or wrong event");
     return json({ error: "Invalid request" }, { status: 400 });
   }
 
@@ -21,83 +31,117 @@ export async function action({ request }: ActionFunctionArgs) {
     const rawBody = await request.text();
     const payload = JSON.parse(rawBody);
 
-    // 1. Identification: Identify the Shopify Shop from metadata
+    console.log("[webhook] Payload:", JSON.stringify(payload, null, 2));
+
+    // 1. Extract shop from metadata
     const shop = payload?.data?.metadata?.shopify_shop;
 
     if (!shop) {
-      console.error("Missing shopify_shop in metadata");
+      console.error("[webhook] Missing shopify_shop in metadata");
       return json({ error: "Missing metadata" }, { status: 400 });
     }
 
-    // 2. Security: Fetch stored Webhook Secret for this shop metadata to verify signature
-    // Using public.shopify_stores
-    const { data: storeData, error: storeError } = await supabaseAdmin
-      .from("shopify_stores")
-      .select("metadata")
-      .eq("shop_domain", shop)
-      .single();
+    console.log("[webhook] Processing for shop:", shop);
 
-    // Extract secret from metadata (safely handling potential nulls/types)
-    const apiSecret = storeData?.metadata?.webhook_secret;
+    // 2. Fetch webhook secret using the correct RPC
+    const { data: settings, error: settingsError } = await supabaseAdmin.rpc(
+      "get_shopify_shop_settings",
+      { p_shop: shop },
+    );
 
-    if (storeError || !apiSecret) {
-      console.error(`No API secret found for shop ${shop} in metadata`);
-      // Return 200 to acknowledge receipt but log error (prevent loop)
-      return json({ message: "Configuration error" }, { status: 200 });
+    if (settingsError || !settings || settings.length === 0) {
+      console.error("[webhook] Failed to get shop settings:", settingsError);
+      return json({ message: "Shop not configured" }, { status: 200 });
     }
 
+    const webhookSecret = settings[0].webhook_secret;
+
+    if (!webhookSecret) {
+      console.error("[webhook] No webhook secret configured for shop:", shop);
+      // Return 200 to prevent retries but log the configuration error
+      return json({ message: "Webhook secret not configured" }, { status: 200 });
+    }
+
+    // 3. Verify signature
     const expectedSignature = crypto
-      .createHmac("sha256", apiSecret)
+      .createHmac("sha256", webhookSecret)
       .update(rawBody)
       .digest("hex");
 
     if (signature !== expectedSignature) {
-      console.error("Invalid signature for webhook");
+      console.error("[webhook] Invalid signature");
       return json({ error: "Invalid signature" }, { status: 401 });
     }
 
-    // 3. Logic: Create Order in Shopify
-    // We need an offline session to assume the identity of the shop
-    // Manual offline session ID construction (standard pattern)
-    // Note: shopify.api.session.getOfflineId() is unavailable on the app object type, so we use manual construction.
+    console.log("[webhook] Signature verified successfully");
+
+    // 4. Get Shopify session for API calls
     const offlineSessionId = `offline_${shop}`;
     const session = await shopify.sessionStorage.loadSession(offlineSessionId);
 
     if (!session) {
-      console.error(`No offline session found for shop ${shop}`);
+      console.error("[webhook] No offline session found for shop:", shop);
       return json({ message: "Session not found" }, { status: 200 });
     }
 
-    // Use imported GraphqlClient directly to avoid type issues with shopifyApp object
     const client = new GraphqlClient({ session });
 
-    // Create a Draft Order first (best practice for programmatic orders)
-    // We map the transaction amount.
-    // Lomi amount is likely in standard units (e.g. 5000 for 5000 XOF).
-    // Shopify DraftOrderCreate expects amount as string.
-    const amount = payload.data.amount;
-    // const currency = payload.data.currency_code; // Unused
-    const customerEmail = payload.data.customer?.email;
+    // 5. Parse line items from metadata
+    let lineItems: ShopifyLineItem[] = [];
+    try {
+      const rawLineItems = payload?.data?.metadata?.shopify_line_items;
+      if (rawLineItems) {
+        lineItems = JSON.parse(rawLineItems);
+      }
+    } catch {
+      console.log("[webhook] Could not parse line items, using fallback");
+    }
 
-    const draftOrderData = {
-      lineItems: [
+    // 6. Build draft order line items
+    const amount = payload.data.amount;
+    const customerEmail = payload.data.customer?.email;
+    const customerName = payload.data.customer?.name;
+
+    let draftOrderLineItems;
+
+    if (lineItems.length > 0) {
+      // Use actual line items from Shopify checkout
+      draftOrderLineItems = lineItems.map((item) => {
+        if (item.variant_id) {
+          // If we have a variant ID, use it
+          return {
+            variantId: item.variant_id,
+            quantity: item.quantity,
+          };
+        } else {
+          // Custom line item (no variant)
+          return {
+            title: item.title,
+            originalUnitPrice: item.price,
+            quantity: item.quantity,
+          };
+        }
+      });
+    } else {
+      // Fallback: create a single line item
+      draftOrderLineItems = [
         {
-          title: "Lomi Payment",
+          title: "lomi. Payment",
           originalUnitPrice: amount.toString(),
           quantity: 1,
         },
-      ],
-      tags: ["lomi-payment", "paid"],
-      financialStatus: "PAID",
-      email: customerEmail,
-    };
+      ];
+    }
 
-    // Use GraphQL to create Draft Order
+    console.log("[webhook] Creating draft order with", draftOrderLineItems.length, "line items");
+
+    // 7. Create Draft Order
     const createDraftOrderMutation = `
       mutation draftOrderCreate($input: DraftOrderInput!) {
         draftOrderCreate(input: $input) {
           draftOrder {
             id
+            name
           }
           userErrors {
             field
@@ -107,32 +151,47 @@ export async function action({ request }: ActionFunctionArgs) {
       }
     `;
 
+    const draftOrderInput: Record<string, unknown> = {
+      lineItems: draftOrderLineItems,
+      tags: ["lomi-payment", "paid"],
+      note: "Payment processed via lomi.",
+    };
+
+    if (customerEmail) {
+      draftOrderInput.email = customerEmail;
+    }
+
+    if (customerName) {
+      draftOrderInput.shippingAddress = {
+        firstName: customerName.split(" ")[0] || customerName,
+        lastName: customerName.split(" ").slice(1).join(" ") || "",
+      };
+    }
+
     const response = await client.query({
       data: {
         query: createDraftOrderMutation,
-        variables: {
-          input: draftOrderData,
-        },
+        variables: { input: draftOrderInput },
       },
     });
 
-    // @ts-expect-error - response.body.data may not be properly typed
+    // @ts-expect-error - response.body typing issue
     const draftOrderResult = response.body.data?.draftOrderCreate;
 
     if (draftOrderResult?.userErrors?.length > 0) {
-      console.error(
-        "Shopify Draft Order Creation Failed:",
-        draftOrderResult.userErrors,
-      );
-      return json({ error: "Order creation failed" }, { status: 500 });
+      console.error("[webhook] Draft order creation failed:", draftOrderResult.userErrors);
+      return json({ error: "Order creation failed", details: draftOrderResult.userErrors }, { status: 500 });
     }
 
     const draftOrderId = draftOrderResult?.draftOrder?.id;
+    const draftOrderName = draftOrderResult?.draftOrder?.name;
 
-    // Complete the Draft Order to make it a real Order
+    console.log("[webhook] Draft order created:", draftOrderName);
+
+    // 8. Complete the Draft Order to make it a real Order
     const completeDraftOrderMutation = `
-      mutation draftOrderComplete($id: ID!) {
-        draftOrderComplete(id: $id) {
+      mutation draftOrderComplete($id: ID!, $paymentPending: Boolean) {
+        draftOrderComplete(id: $id, paymentPending: $paymentPending) {
           draftOrder {
             order {
               id
@@ -147,18 +206,36 @@ export async function action({ request }: ActionFunctionArgs) {
       }
     `;
 
-    await client.query({
+    const completeResponse = await client.query({
       data: {
         query: completeDraftOrderMutation,
         variables: {
           id: draftOrderId,
+          paymentPending: false, // Mark as paid
         },
       },
     });
 
-    return json({ success: true, order_id: draftOrderId });
+    // @ts-expect-error - response.body typing issue
+    const completeResult = completeResponse.body.data?.draftOrderComplete;
+
+    if (completeResult?.userErrors?.length > 0) {
+      console.error("[webhook] Draft order completion failed:", completeResult.userErrors);
+      return json({ error: "Order completion failed" }, { status: 500 });
+    }
+
+    const orderName = completeResult?.draftOrder?.order?.name;
+    const orderId = completeResult?.draftOrder?.order?.id;
+
+    console.log("[webhook] Order created successfully:", orderName);
+
+    return json({
+      success: true,
+      order_id: orderId,
+      order_name: orderName,
+    });
   } catch (error) {
-    console.error("Webhook processing error:", error);
+    console.error("[webhook] Processing error:", error);
     return json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

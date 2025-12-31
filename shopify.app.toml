@@ -2,7 +2,7 @@
 
 client_id = "9b77c560341e051a079adff2f33ba2e2"
 name = "lomi."
-application_url = "https://shopify.lomi.africa"
+application_url = "https://connect.lomi.africa"
 embedded = true
 handle = "lomi-app"
 
@@ -26,14 +26,14 @@ scopes = "read_checkouts,read_orders,write_checkouts,write_orders,write_products
 
 [auth]
 redirect_urls = [
-  "https://shopify.lomi.africa/auth/callback",
-  "https://shopify.lomi.africa/auth/shopify/callback",
-  "https://shopify.lomi.africa/api/auth/callback",
-  "https://shopify.lomi.africa/auth/exit-iframe"
+  "https://connect.lomi.africa/auth/callback",
+  "https://connect.lomi.africa/auth/shopify/callback",
+  "https://connect.lomi.africa/api/auth/callback",
+  "https://connect.lomi.africa/auth/exit-iframe"
 ]
 
 [app_proxy]
-url = "https://shopify.lomi.africa/api"
+url = "https://connect.lomi.africa/api"
 subpath = "lomi"
 prefix = "apps"
 

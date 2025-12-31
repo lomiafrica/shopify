@@ -137,8 +137,8 @@ export default function Index() {
   const successRate =
     stats.totalTransactions > 0
       ? Math.round(
-          (stats.successfulTransactions / stats.totalTransactions) * 100,
-        )
+        (stats.successfulTransactions / stats.totalTransactions) * 100,
+      )
       : 0;
 
   if (isLoading) {
@@ -188,11 +188,11 @@ export default function Index() {
         <Card>
           <BlockStack gap="200">
             <Text as="h2" variant="headingLg">
-              Welcome back to lomi.
+              Welcome back
             </Text>
             <Text as="p" tone="subdued">
               Monitor your payments, manage settings, and grow your business
-              with localized payment solutions.
+              with a payment solution adapted to West Africa.
             </Text>
           </BlockStack>
         </Card>
@@ -208,7 +208,7 @@ export default function Index() {
           <Card>
             <BlockStack gap="200">
               <Text as="h3" variant="headingSm" tone="subdued">
-                Total Revenue
+                Total revenue
               </Text>
               <Text as="p" variant="headingXl">
                 {formatCurrency(stats.totalRevenue, stats.currency)}
@@ -236,7 +236,7 @@ export default function Index() {
           <Card>
             <BlockStack gap="200">
               <Text as="h3" variant="headingSm" tone="subdued">
-                Success Rate
+                Success rate
               </Text>
               <Text
                 as="p"
@@ -276,9 +276,9 @@ export default function Index() {
         <Layout>
           <Layout.Section>
             <Card>
-              <BlockStack gap="400">
+              <BlockStack gap="200">
                 <Text as="h2" variant="headingMd">
-                  Recent Activity
+                  Recent activity
                 </Text>
                 <Text as="p" tone="subdued">
                   Your recent transactions from Shopify checkout.
@@ -343,9 +343,9 @@ export default function Index() {
 
           <Layout.Section variant="oneThird">
             <Card>
-              <BlockStack gap="400">
+              <BlockStack gap="200">
                 <Text as="h2" variant="headingMd">
-                  Quick Actions
+                  Quick actions
                 </Text>
                 <Text as="p" tone="subdued">
                   Manage your store integration
@@ -357,25 +357,25 @@ export default function Index() {
                       variant={stats.isConfigured ? "secondary" : "primary"}
                     >
                       {stats.isConfigured
-                        ? "Manage API Keys"
-                        : "Configure API Keys"}
+                        ? "Manage access tokens"
+                        : "Configure access tokens"}
                     </Button>
                   </Link>
                   <Button
-                    url="https://docs.lomi.africa"
+                    url="https://docs.lomi.africa/docs"
                     external
                     fullWidth
                     variant="plain"
                   >
-                    Read Documentation
+                    Documentation
                   </Button>
                   <Button
-                    url="mailto:support@lomi.africa"
+                    url="mailto:hello@lomi.africa"
                     external
                     fullWidth
                     variant="plain"
                   >
-                    Contact Support
+                    Support
                   </Button>
                 </BlockStack>
               </BlockStack>

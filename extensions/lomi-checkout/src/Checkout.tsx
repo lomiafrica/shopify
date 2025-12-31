@@ -9,9 +9,11 @@ import {
   useTotalAmount,
   useSessionToken,
   useShop,
-  Banner,
+  useEmail,
+  usePhone,
+  useShippingAddress,
 } from "@shopify/ui-extensions-react/checkout";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default reactExtension(
   "purchase.checkout.payment-method-list.render-before",
@@ -23,23 +25,47 @@ function Extension() {
   const { get: getSessionToken } = useSessionToken();
   const cartLines = useCartLines();
   const totalAmount = useTotalAmount();
-  const [loading, setLoading] = useState(false);
+
+  // Get buyer identity if available
+  const email = useEmail();
+  const phone = usePhone();
+  const shippingAddress = useShippingAddress();
+
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
-  const handlePay = async () => {
+  // Create checkout session immediately when component mounts
+  const createCheckout = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setCheckoutUrl(null);
 
     try {
       await getSessionToken();
 
-      const directApiUrl = "https://shopify.lomi.africa/api/direct-checkout";
+      const directApiUrl = "https://connect.lomi.africa/api/direct-checkout";
 
-      console.log("Calling direct checkout API:", directApiUrl);
-      console.log("Shop domain:", myshopifyDomain);
-      console.log("Total amount:", totalAmount?.amount);
+      // Build customer data from available buyer identity
+      const customerData: {
+        customerEmail?: string;
+        customerName?: string;
+        customerPhone?: string;
+      } = {};
+
+      if (email) {
+        customerData.customerEmail = email;
+      }
+      if (phone) {
+        customerData.customerPhone = phone;
+      }
+      if (shippingAddress?.firstName || shippingAddress?.lastName) {
+        customerData.customerName = [
+          shippingAddress?.firstName,
+          shippingAddress?.lastName,
+        ]
+          .filter(Boolean)
+          .join(" ");
+      }
 
       const response = await fetch(directApiUrl, {
         method: "POST",
@@ -51,6 +77,7 @@ function Extension() {
           lineItems: cartLines,
           totalAmount: totalAmount?.amount,
           currencyCode: totalAmount?.currencyCode,
+          ...customerData,
         }),
       });
 
@@ -62,19 +89,25 @@ function Extension() {
       const url = data.checkout_url || data.url;
 
       if (url) {
-        console.log("Got lomi. checkout URL:", url);
+        console.log("lomi. checkout ready:", url);
         setCheckoutUrl(url);
       } else {
-        console.error("API response:", data);
         throw new Error("No checkout URL returned");
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to process payment. Please try again.");
+      setError("Failed to load lomi. checkout. Tap to retry.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [myshopifyDomain, cartLines, totalAmount, getSessionToken, email, phone, shippingAddress]);
+
+  // Create checkout session on mount
+  useEffect(() => {
+    if (totalAmount?.amount) {
+      createCheckout();
+    }
+  }, [totalAmount?.amount, createCheckout]);
 
   return (
     <BlockStack spacing="tight">
@@ -94,32 +127,27 @@ function Extension() {
         </InlineStack>
 
         {error && (
-          <Banner status="critical" title="Payment Failed">
+          <Button kind="secondary" onPress={createCheckout}>
             {error}
-          </Banner>
-        )}
-
-        {checkoutUrl ? (
-          <BlockStack spacing="base">
-            <Banner status="success" title="Ready to pay!">
-              Click the button below to complete your payment with lomi.
-            </Banner>
-            <Link to={checkoutUrl} external>
-              <Button kind="primary" accessibilityLabel="Complete payment with lomi.">
-                Complete payment with lomi.
-              </Button>
-            </Link>
-          </BlockStack>
-        ) : (
-          <Button
-            kind="primary"
-            onPress={handlePay}
-            loading={loading}
-            accessibilityLabel="Pay with lomi."
-          >
-            Continue with lomi.
           </Button>
         )}
+
+        {!error && checkoutUrl ? (
+          <Link to={checkoutUrl} external>
+            <Button kind="primary" accessibilityLabel="Pay with lomi.">
+              Pay with lomi.
+            </Button>
+          </Link>
+        ) : !error ? (
+          <Button
+            kind="primary"
+            loading={loading}
+            disabled
+            accessibilityLabel="Loading lomi. checkout"
+          >
+            Loading...
+          </Button>
+        ) : null}
       </BlockStack>
 
       <InlineStack inlineAlignment="center">

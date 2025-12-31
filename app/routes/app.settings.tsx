@@ -10,6 +10,8 @@ import {
   Box,
   Banner,
   InlineStack,
+  Checkbox,
+  Divider,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -17,8 +19,6 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { authenticate } from "~/shopify.server";
 import { supabaseAdmin } from "@/app/lib/supabase/server";
-
-// TitleBar handled via <ui-title-bar> web component
 
 // Loader to check if the shop is already configured
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -49,6 +49,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
           : "••••••••••••••••"
         : null,
       webhookUrl,
+      // Checkout settings
+      allowCouponCode: shopSettings?.allow_coupon_code ?? false,
+      requireBillingAddress: shopSettings?.require_billing_address ?? true,
     });
   } catch (error) {
     console.error("Error loading settings:", error);
@@ -57,6 +60,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       maskedKey: null,
       maskedWebhookSecret: null,
       webhookUrl,
+      allowCouponCode: false,
+      requireBillingAddress: true,
     });
   }
 }
@@ -69,6 +74,10 @@ export default function SettingsPage() {
   const [webhookSecret, setWebhookSecret] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // Checkout settings
+  const [allowCouponCode, setAllowCouponCode] = useState(loaderData.allowCouponCode);
+  const [requireBillingAddress, setRequireBillingAddress] = useState(loaderData.requireBillingAddress);
+
   const isSubmitting = fetcher.state === "submitting";
   const fetcherResponse = fetcher.data as
     | { success?: boolean; message?: string }
@@ -78,11 +87,8 @@ export default function SettingsPage() {
     fetcherResponse?.success === false ? fetcherResponse.message : null;
   const isConfigured = loaderData.isConfigured || showSuccess;
 
-  // Note: Form clearing after success removed to avoid setState in effect
-
   const handleSubmit = useCallback(() => {
     if (!apiKey.trim()) {
-      // Error will be shown from fetcher response
       return;
     }
 
@@ -91,14 +97,16 @@ export default function SettingsPage() {
     if (webhookSecret.trim()) {
       formData.append("lomiWebhookSecret", webhookSecret);
     }
+    // Add checkout settings
+    formData.append("allowCouponCode", String(allowCouponCode));
+    formData.append("requireBillingAddress", String(requireBillingAddress));
 
     fetcher.submit(formData, {
       method: "POST",
       action: "/api/validate-lomi-key",
     });
-    // Note: `fetcher` is intentionally excluded from dependencies as it changes identity on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey, webhookSecret]);
+  }, [apiKey, webhookSecret, allowCouponCode, requireBillingAddress]);
 
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(loaderData.webhookUrl).then(() => {
@@ -219,6 +227,33 @@ export default function SettingsPage() {
                             ? "Secret is configured. Enter a new one to update."
                             : "Paste the secret you receive after creating the webhook."
                         }
+                      />
+
+                      <Box paddingBlockStart="300">
+                        <Divider />
+                      </Box>
+
+                      <Box paddingBlockStart="200">
+                        <Text variant="headingSm" as="h3">
+                          Checkout options
+                        </Text>
+                        <Text as="p" tone="subdued">
+                          Customize the lomi. checkout experience for your customers.
+                        </Text>
+                      </Box>
+
+                      <Checkbox
+                        label="Enable lomi. discount codes"
+                        checked={allowCouponCode}
+                        onChange={setAllowCouponCode}
+                        helpText="Allow customers to apply lomi. discount codes at checkout."
+                      />
+
+                      <Checkbox
+                        label="Require billing address"
+                        checked={requireBillingAddress}
+                        onChange={setRequireBillingAddress}
+                        helpText="Require customers to enter their billing address during checkout."
                       />
 
                       <Box paddingBlockStart="400">

@@ -24,6 +24,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const shopDomain = session.shop;
   let lomiApiKey = "";
   let webhookSecret: string | null = null;
+  let allowCouponCode = false;
+  let requireBillingAddress = true;
 
   try {
     const formData = await request.formData();
@@ -40,6 +42,13 @@ export async function action({ request }: ActionFunctionArgs) {
     if (typeof secretFromForm === "string" && secretFromForm.trim()) {
       webhookSecret = secretFromForm.trim();
     }
+
+    // Read checkout settings
+    const allowCouponCodeFromForm = formData.get("allowCouponCode");
+    allowCouponCode = allowCouponCodeFromForm === "true";
+
+    const requireBillingAddressFromForm = formData.get("requireBillingAddress");
+    requireBillingAddress = requireBillingAddressFromForm !== "false"; // Default to true
   } catch (error) {
     console.error("Error parsing form data:", error);
     return data<ActionData>(
@@ -146,7 +155,9 @@ export async function action({ request }: ActionFunctionArgs) {
         p_api_key: lomiApiKey,
         p_api_secret: "", // Not used
         p_merchant_id: merchantId?.toString() || "",
-        p_webhook_secret: webhookSecret || "", // Store webhook secret here for now
+        p_webhook_secret: webhookSecret || "",
+        p_allow_coupon_code: allowCouponCode,
+        p_require_billing_address: requireBillingAddress,
       },
     );
 
