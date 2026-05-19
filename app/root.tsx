@@ -6,12 +6,15 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
+import globalsStylesheet from "./globals.css?url";
+
 export const links = () => [
   {
     rel: "icon",
     href: "/favicon.ico",
     type: "image/x-icon",
   },
+  { rel: "stylesheet", href: globalsStylesheet },
 ];
 
 export default function App() {
