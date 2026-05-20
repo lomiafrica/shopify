@@ -11,8 +11,8 @@ class LomiApiError extends Error {
   }
 }
 
-const LOMI_API_BASE_URL_TEST = "https://sandbox.api.lomi.africa/v1";
-const LOMI_API_BASE_URL_LIVE = "https://api.lomi.africa/v1";
+const LOMI_API_BASE_URL_TEST = "https://sandbox.api.lomi.africa";
+const LOMI_API_BASE_URL_LIVE = "https://api.lomi.africa";
 
 // Determine the base URL based on the environment (e.g., from environment variables)
 // For now, let's default to the test environment.
