@@ -117,6 +117,14 @@ interface CreateCheckoutSessionRequest {
   cancel_url: string;
   amount: number; // Amount in smallest currency unit
   currency_code: string; // 3-letter ISO currency code (e.g., "XOF")
+  integration_source?:
+    | "system"
+    | "shopify"
+    | "woocommerce"
+    | "prestashop"
+    | "magento"
+    | "odoo"
+    | "bubble";
   title?: string;
   description?: string;
   customer_email?: string;
