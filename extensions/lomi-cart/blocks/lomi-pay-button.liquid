@@ -1,0 +1,45 @@
+<div class="lomi-cart-pay" data-lomi-cart-pay>
+  <button
+    type="button"
+    class="lomi-cart-pay__button button button--primary"
+    data-lomi-pay-button
+    aria-label="{{ block.settings.button_label | escape }}"
+  >
+    <span data-lomi-pay-label>{{ block.settings.button_label }}</span>
+    <span data-lomi-pay-loading hidden>{{ block.settings.loading_label }}</span>
+  </button>
+  <p class="lomi-cart-pay__hint" data-lomi-pay-hint>
+    {{ block.settings.hint_text }}
+  </p>
+  <p class="lomi-cart-pay__error" data-lomi-pay-error hidden role="alert"></p>
+</div>
+
+<script src="{{ 'lomi-cart-pay.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Pay with lomi.",
+  "target": "section",
+  "templates": ["cart"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Pay with lomi."
+    },
+    {
+      "type": "text",
+      "id": "loading_label",
+      "label": "Loading label",
+      "default": "Loading..."
+    },
+    {
+      "type": "text",
+      "id": "hint_text",
+      "label": "Hint text",
+      "default": "Mobile money, cards and more — pay without leaving your cart."
+    }
+  ]
+}
+{% endschema %}

@@ -177,9 +177,9 @@ export default function Index() {
             }}
           >
             <p>
-              To start accepting payments and viewing your transaction data, you
-              need to connect your lomi. account by entering your API keys in
-              Settings.
+              To accept payments from the cart with lomi., connect your account
+              in Settings, then add the &ldquo;Pay with lomi.&rdquo; block to
+              your cart template in the theme editor.
             </p>
           </CalloutCard>
         )}
@@ -281,7 +281,7 @@ export default function Index() {
                   Recent activity
                 </Text>
                 <Text as="p" tone="subdued">
-                  Your recent transactions from Shopify checkout.
+                  Your recent transactions from lomi. cart payments.
                 </Text>
 
                 {recentTransactions.length > 0 ? (

@@ -26,6 +26,8 @@ export async function action({ request }: ActionFunctionArgs) {
   let webhookSecret: string | null = null;
   let allowCouponCode = false;
   let requireBillingAddress = true;
+  let shippingMode = "subtotal_only";
+  let flatShippingFee = "";
 
   try {
     const formData = await request.formData();
@@ -49,6 +51,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
     const requireBillingAddressFromForm = formData.get("requireBillingAddress");
     requireBillingAddress = requireBillingAddressFromForm !== "false"; // Default to true
+
+    const shippingModeFromForm = formData.get("shippingMode");
+    if (typeof shippingModeFromForm === "string" && shippingModeFromForm.trim()) {
+      shippingMode = shippingModeFromForm.trim();
+    }
+
+    const flatShippingFeeFromForm = formData.get("flatShippingFee");
+    if (typeof flatShippingFeeFromForm === "string") {
+      flatShippingFee = flatShippingFeeFromForm.trim();
+    }
   } catch (error) {
     console.error("Error parsing form data:", error);
     return data<ActionData>(
@@ -148,6 +160,11 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     // Step 3: Store the API key in shopify_api_keys using upsert_shopify_shop_settings RPC
+    const parsedFlatFee =
+      flatShippingFee && shippingMode === "subtotal_plus_flat_fee"
+        ? parseFloat(flatShippingFee)
+        : null;
+
     const { error: settingsError } = await supabaseAdmin.rpc(
       "upsert_shopify_shop_settings",
       {
@@ -158,6 +175,11 @@ export async function action({ request }: ActionFunctionArgs) {
         p_webhook_secret: webhookSecret || "",
         p_allow_coupon_code: allowCouponCode,
         p_require_billing_address: requireBillingAddress,
+        p_shipping_mode: shippingMode,
+        p_flat_shipping_fee:
+          parsedFlatFee != null && Number.isFinite(parsedFlatFee)
+            ? parsedFlatFee
+            : null,
       },
     );
 
@@ -179,7 +201,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return data<ActionData>({
       success: true,
       message:
-        "lomi. connected successfully! You can now add the checkout extension.",
+        "lomi. connected successfully! Add the cart payment block in your theme editor.",
       store_id: storeId,
       organization_id: organizationId,
       lomi_api_key_masked: maskedKey,

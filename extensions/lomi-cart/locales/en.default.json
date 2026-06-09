@@ -1,0 +1,9 @@
+{
+  "lomi": {
+    "pay_button": "Pay with lomi.",
+    "loading": "Loading...",
+    "hint": "Mobile money, cards and more — pay without leaving your cart.",
+    "error_empty": "Your cart is empty",
+    "error_generic": "Payment could not be started. Please try again."
+  }
+}

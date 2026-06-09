@@ -12,6 +12,7 @@ import {
   InlineStack,
   Checkbox,
   Divider,
+  Select,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -37,6 +38,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const shopSettings = settings && settings.length > 0 ? settings[0] : null;
 
     return json({
+      shop: session.shop,
       isConfigured: shopSettings?.is_configured || false,
       maskedKey: shopSettings?.api_key
         ? shopSettings.api_key.length > 12
@@ -49,19 +51,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
           : "••••••••••••••••"
         : null,
       webhookUrl,
-      // Checkout settings
       allowCouponCode: shopSettings?.allow_coupon_code ?? false,
       requireBillingAddress: shopSettings?.require_billing_address ?? true,
+      shippingMode: shopSettings?.shipping_mode ?? "subtotal_only",
+      flatShippingFee:
+        shopSettings?.flat_shipping_fee != null
+          ? String(shopSettings.flat_shipping_fee)
+          : "",
     });
   } catch (error) {
     console.error("Error loading settings:", error);
     return json({
+      shop: session.shop,
       isConfigured: false,
       maskedKey: null,
       maskedWebhookSecret: null,
       webhookUrl,
       allowCouponCode: false,
       requireBillingAddress: true,
+      shippingMode: "subtotal_only",
+      flatShippingFee: "",
     });
   }
 }
@@ -77,6 +86,16 @@ export default function SettingsPage() {
   // Checkout settings
   const [allowCouponCode, setAllowCouponCode] = useState(loaderData.allowCouponCode);
   const [requireBillingAddress, setRequireBillingAddress] = useState(loaderData.requireBillingAddress);
+  const [shippingMode, setShippingMode] = useState(loaderData.shippingMode);
+  const [flatShippingFee, setFlatShippingFee] = useState(loaderData.flatShippingFee);
+
+  const shippingModeOptions = [
+    { label: "Subtotal only (no shipping on cart pay)", value: "subtotal_only" },
+    {
+      label: "Subtotal + flat shipping fee",
+      value: "subtotal_plus_flat_fee",
+    },
+  ];
 
   const isSubmitting = fetcher.state === "submitting";
   const fetcherResponse = fetcher.data as
@@ -100,13 +119,22 @@ export default function SettingsPage() {
     // Add checkout settings
     formData.append("allowCouponCode", String(allowCouponCode));
     formData.append("requireBillingAddress", String(requireBillingAddress));
+    formData.append("shippingMode", shippingMode);
+    formData.append("flatShippingFee", flatShippingFee);
 
     fetcher.submit(formData, {
       method: "POST",
       action: "/api/validate-lomi-key",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey, webhookSecret, allowCouponCode, requireBillingAddress]);
+  }, [
+    apiKey,
+    webhookSecret,
+    allowCouponCode,
+    requireBillingAddress,
+    shippingMode,
+    flatShippingFee,
+  ]);
 
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(loaderData.webhookUrl).then(() => {
@@ -121,11 +149,19 @@ export default function SettingsPage() {
       <Layout>
         <Layout.Section>
           <BlockStack gap="500">
+            <Banner title="Cart payment integration" tone="info">
+              <p>
+                This app lets customers pay from the cart with lomi. (mobile
+                money, cards, and more). It is distributed as a custom install
+                app — not a native Shopify payment method in checkout.
+              </p>
+            </Banner>
+
             {showSuccess && (
               <Banner title="Connected to lomi." tone="success">
                 <p>
-                  Your store is now connected. Add the checkout extension to
-                  start accepting payments.
+                  Your store is now connected. Add the &ldquo;Pay with
+                  lomi.&rdquo; block to your cart page in the theme editor.
                 </p>
               </Banner>
             )}
@@ -256,6 +292,25 @@ export default function SettingsPage() {
                         helpText="Require customers to enter their billing address during checkout."
                       />
 
+                      <Select
+                        label="Shipping amount on cart pay"
+                        options={shippingModeOptions}
+                        onChange={setShippingMode}
+                        value={shippingMode}
+                        helpText="Cart bypass cannot read Shopify checkout shipping rates. Choose how much to charge before redirecting to lomi."
+                      />
+
+                      {shippingMode === "subtotal_plus_flat_fee" ? (
+                        <TextField
+                          label="Flat shipping fee"
+                          type="number"
+                          value={flatShippingFee}
+                          onChange={setFlatShippingFee}
+                          autoComplete="off"
+                          helpText="Added to the cart subtotal on the Shopify draft order (shop currency)."
+                        />
+                      ) : null}
+
                       <Box paddingBlockStart="400">
                         <div
                           style={{
@@ -326,27 +381,31 @@ export default function SettingsPage() {
                           <Text as="span" fontWeight="bold">
                             1.
                           </Text>
-                          <Text as="span">Go to Settings → Checkout</Text>
+                          <Text as="span">
+                            Online Store → Themes → Customize
+                          </Text>
                         </InlineStack>
                         <InlineStack gap="200" blockAlign="start">
                           <Text as="span" fontWeight="bold">
                             2.
                           </Text>
-                          <Text as="span">Click Customize</Text>
+                          <Text as="span">Open the Cart template</Text>
                         </InlineStack>
                         <InlineStack gap="200" blockAlign="start">
                           <Text as="span" fontWeight="bold">
                             3.
                           </Text>
                           <Text as="span">
-                            Add &ldquo;lomi. Checkout&rdquo; block
+                            Add the &ldquo;Pay with lomi.&rdquo; app block
                           </Text>
                         </InlineStack>
                         <InlineStack gap="200" blockAlign="start">
                           <Text as="span" fontWeight="bold">
                             4.
                           </Text>
-                          <Text as="span">Save and test!</Text>
+                          <Text as="span">
+                            Save, add items to cart, and test payment
+                          </Text>
                         </InlineStack>
                       </BlockStack>
                     </Box>
