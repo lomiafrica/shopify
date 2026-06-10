@@ -51,3 +51,4 @@ const shopify = shopifyApp({
 
 export default shopify;
 export const authenticate = shopify.authenticate;
+export const login = shopify.login;

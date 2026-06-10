@@ -136,6 +136,7 @@ interface CreateCheckoutSessionRequest {
   metadata?: Record<string, string>; // Key-value pairs, string values, max 50 keys
   expiration_minutes?: number; // Default: 30
   allow_coupon_code?: boolean; // Default: false
+  require_billing_address?: boolean;
 }
 
 // This interface represents the structure inside the "data" object of the response

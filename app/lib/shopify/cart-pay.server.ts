@@ -93,12 +93,13 @@ export async function startCartPayment({
       shopify_shop: shop,
       shopify_draft_order_id: draft.draftOrderId,
       shopify_draft_order_name: draft.draftOrderName,
-      shopify_checkout_session_id: lomiSession.checkout_session_id,
       plugin: "shopify-lomi",
     },
   });
 
-  const checkoutUrl = lomiSession.url || (lomiSession as { checkout_url?: string }).checkout_url;
+  const checkoutUrl =
+    lomiSession.url ||
+    (lomiSession as { checkout_url?: string }).checkout_url;
 
   if (!checkoutUrl) {
     throw new Error("Lomi did not return a checkout URL");
