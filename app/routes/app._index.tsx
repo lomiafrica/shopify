@@ -362,7 +362,7 @@ export default function Index() {
                     </Button>
                   </Link>
                   <Button
-                    url="https://docs.lomi.africa/docs"
+                    url="https://docs.lomi.africa"
                     external
                     fullWidth
                     variant="plain"
