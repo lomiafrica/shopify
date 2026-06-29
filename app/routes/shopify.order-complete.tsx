@@ -4,9 +4,22 @@ import { useLoaderData } from "@remix-run/react";
 import shopify from "../shopify.server";
 import { getDraftOrderStatus } from "@/app/lib/shopify/draft-order.server";
 
+const VALID_SHOP_DOMAIN_RE = /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/;
+
+function sanitizeShopDomain(raw: string | null): string | null {
+  if (!raw) return null;
+  const cleaned = raw
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "");
+  if (!VALID_SHOP_DOMAIN_RE.test(cleaned)) return null;
+  return cleaned;
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const shop = url.searchParams.get("shop");
+  const shop = sanitizeShopDomain(url.searchParams.get("shop"));
   const draft = url.searchParams.get("draft");
 
   if (!shop || !draft) {
@@ -20,7 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 
-  const offlineSessionId = `offline_${shop.replace(/^https?:\/\//, "")}`;
+  const offlineSessionId = `offline_${shop}`;
   const session = await shopify.sessionStorage.loadSession(offlineSessionId);
 
   if (!session) {
@@ -59,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function OrderCompletePage() {
   const data = useLoaderData<typeof loader>();
-  const shopHost = data.shop?.replace(/^https?:\/\//, "") ?? "";
+  const shopHost = data.shop ?? "";
   const storeUrl = shopHost ? `https://${shopHost}` : "/";
   const displayOrder = data.orderName || data.draftName;
 
