@@ -198,7 +198,12 @@ export async function action({ request }: ActionFunctionArgs) {
       .update(rawBody)
       .digest("hex");
 
-    if (signature !== expectedSignature) {
+    const sigBuffer = Buffer.from(signature, "utf8");
+    const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+    if (
+      sigBuffer.length !== expectedBuffer.length ||
+      !crypto.timingSafeEqual(sigBuffer, expectedBuffer)
+    ) {
       return json({ error: "Invalid signature" }, { status: 401 });
     }
 
