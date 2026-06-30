@@ -11,8 +11,8 @@ class LomiApiError extends Error {
   }
 }
 
-const LOMI_API_BASE_URL_TEST = "https://sandbox.api.lomi.africa";
-const LOMI_API_BASE_URL_LIVE = "https://api.lomi.africa";
+const LOMI_API_URL_TEST = "https://sandbox.api.lomi.africa";
+const LOMI_API_URL_LIVE = "https://api.lomi.africa";
 
 // Determine the base URL based on the environment (e.g., from environment variables)
 // For now, let's default to the test environment.
@@ -20,7 +20,7 @@ const LOMI_API_BASE_URL_LIVE = "https://api.lomi.africa";
 const getLomiApiBaseUrl = () => {
   // This should be replaced with a proper environment check
   const isProduction = process.env.NODE_ENV === "production";
-  return isProduction ? LOMI_API_BASE_URL_LIVE : LOMI_API_BASE_URL_TEST;
+  return isProduction ? LOMI_API_URL_LIVE : LOMI_API_URL_TEST;
 };
 
 interface RequestOptions {
