@@ -2,7 +2,7 @@
   "lomi": {
     "pay_button": "Payer avec lomi.",
     "loading": "Chargement...",
-    "hint": "Mobile money, cartes et plus — payez sans quitter votre panier.",
+    "hint": "Mobile money, cartes et plus, payez sans quitter votre panier.",
     "error_empty": "Votre panier est vide",
     "error_generic": "Impossible de démarrer le paiement. Réessayez."
   }
