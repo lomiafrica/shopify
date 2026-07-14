@@ -29,11 +29,26 @@ interface DatabaseSession {
 }
 import { supabaseAdmin } from "@/app/lib/supabase/server";
 
+function safeSessionLog(session: SessionInterface | DatabaseSession) {
+  return {
+    id: session.id,
+    shop: session.shop,
+    isOnline:
+      "isOnline" in session
+        ? session.isOnline
+        : "isonline" in session
+          ? session.isonline
+          : undefined,
+    scope: session.scope,
+    expires: session.expires,
+  };
+}
+
 export class SupabaseSessionStorage {
   async storeSession(session: SessionInterface): Promise<boolean> {
     console.log(
       "[SupabaseSessionStorage] Attempting to store session:",
-      JSON.stringify(session, null, 2),
+      JSON.stringify(safeSessionLog(session), null, 2),
     );
     try {
       const { error } = await supabaseAdmin.rpc("manage_shopify_session", {
@@ -108,7 +123,13 @@ export class SupabaseSessionStorage {
 
       console.log(
         "[SupabaseSessionStorage] RPC response - data:",
-        JSON.stringify(dbSessions, null, 2),
+        JSON.stringify(
+          Array.isArray(dbSessions)
+            ? dbSessions.map((row) => safeSessionLog(row))
+            : dbSessions,
+          null,
+          2,
+        ),
       );
       console.log(
         "[SupabaseSessionStorage] RPC response - error:",
@@ -133,7 +154,7 @@ export class SupabaseSessionStorage {
 
       console.log(
         "[SupabaseSessionStorage] Session data loaded via RPC:",
-        JSON.stringify(dbSession, null, 2),
+        JSON.stringify(safeSessionLog(dbSession), null, 2),
       );
       const deserializedSession = this.deserializeSession(dbSession);
       console.log(
