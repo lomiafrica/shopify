@@ -20,6 +20,11 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { authenticate } from "~/shopify.server";
 import { supabaseAdmin } from "@/app/lib/supabase/server";
+import {
+  fetchSetupHealthChecks,
+  isTestLomiApiKey,
+  type SetupHealthCheck,
+} from "@/app/lib/lomi/merchant-errors";
 
 // Loader to check if the shop is already configured
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -36,6 +41,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
 
     const shopSettings = settings && settings.length > 0 ? settings[0] : null;
+    const requestUrl = new URL(request.url);
+    const setupHealth = await fetchSetupHealthChecks(
+      shopSettings?.api_key,
+      shopSettings?.webhook_secret,
+      webhookUrl,
+      requestUrl.protocol === "https:",
+    );
 
     return json({
       shop: session.shop,
@@ -45,6 +57,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
           ? shopSettings.api_key.substring(0, 12) + "••••••••••••••••"
           : "••••••••••••••••"
         : null,
+      isTestMode: shopSettings?.api_key
+        ? isTestLomiApiKey(shopSettings.api_key)
+        : true,
+      setupHealth,
       maskedWebhookSecret: shopSettings?.webhook_secret
         ? shopSettings.webhook_secret.length > 5
           ? shopSettings.webhook_secret.substring(0, 5) + "••••••••••••••••"
@@ -67,6 +83,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       maskedKey: null,
       maskedWebhookSecret: null,
       webhookUrl,
+      setupHealth: [] as SetupHealthCheck[],
+      isTestMode: true,
       allowCouponCode: false,
       requireBillingAddress: true,
       shippingMode: "subtotal_only",
@@ -177,8 +195,45 @@ export default function SettingsPage() {
                 <p>
                   Your store is connected to lomi. with key:{" "}
                   {loaderData.maskedKey}
+                  {loaderData.isTestMode
+                    ? " (test mode — sandbox API)"
+                    : " (live mode)"}
                 </p>
               </Banner>
+            )}
+
+            {loaderData.setupHealth.length > 0 && (
+              <Card roundedAbove="sm">
+                <Box padding="400">
+                  <BlockStack gap="300">
+                    <Text variant="headingMd" as="h2">
+                      Setup health
+                    </Text>
+                    <BlockStack gap="200">
+                      {loaderData.setupHealth.map((check) => (
+                        <InlineStack
+                          key={check.label}
+                          align="space-between"
+                          blockAlign="start"
+                          wrap={false}
+                        >
+                          <Text as="span" fontWeight="semibold">
+                            {check.label}
+                          </Text>
+                          <Text as="span" tone="subdued">
+                            {check.message}
+                          </Text>
+                        </InlineStack>
+                      ))}
+                    </BlockStack>
+                    <Text as="p" tone="subdued">
+                      Test and live keys use different webhook secrets. Paste the
+                      matching pair from Dashboard → Developers when switching
+                      modes.
+                    </Text>
+                  </BlockStack>
+                </Box>
+              </Card>
             )}
 
             <Card roundedAbove="sm">
@@ -203,7 +258,9 @@ export default function SettingsPage() {
                           loaderData.maskedKey ? (
                             <span>
                               Your current api key is shown above. To update it,
-                              replace the masked values with a new key.
+                              replace the masked values with a new key. Use a
+                              test key (`lomi_sk_test_…`) for sandbox or a live
+                              key for production.
                             </span>
                           ) : (
                             <span>
@@ -356,7 +413,7 @@ export default function SettingsPage() {
                       style={{ display: "flex", justifyContent: "flex-end" }}
                     >
                       <Button
-                        url="https://docs.lomi.africa/"
+                        url="https://docs.lomi.africa/build/ecommerce-extensions/shopify"
                         external
                         variant="plain"
                       >

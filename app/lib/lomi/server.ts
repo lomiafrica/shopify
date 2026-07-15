@@ -1,4 +1,8 @@
-// We will define LomiApiError here for now, and can move it to @/utils/errors later.
+import {
+  formatMerchantFacingApiError,
+  resolveLomiApiBaseUrl,
+} from "./merchant-errors";
+
 class LomiApiError extends Error {
   status: number;
   details?: unknown;
@@ -10,18 +14,6 @@ class LomiApiError extends Error {
     Object.setPrototypeOf(this, LomiApiError.prototype);
   }
 }
-
-const LOMI_API_URL_TEST = "https://sandbox.api.lomi.africa";
-const LOMI_API_URL_LIVE = "https://api.lomi.africa";
-
-// Determine the base URL based on the environment (e.g., from environment variables)
-// For now, let's default to the test environment.
-// In a real app, you'd use process.env.NODE_ENV or a specific LOMI_ENV variable.
-const getLomiApiBaseUrl = () => {
-  // This should be replaced with a proper environment check
-  const isProduction = process.env.NODE_ENV === "production";
-  return isProduction ? LOMI_API_URL_LIVE : LOMI_API_URL_TEST;
-};
 
 interface RequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE";
@@ -38,7 +30,7 @@ async function lomiApiRequest<T_Data>({
   body,
   params,
 }: RequestOptions): Promise<T_Data> {
-  const baseUrl = getLomiApiBaseUrl();
+  const baseUrl = resolveLomiApiBaseUrl(apiKey);
   const url = new URL(`${baseUrl}${path}`);
 
   if (params) {
@@ -69,7 +61,11 @@ async function lomiApiRequest<T_Data>({
       const errorDetails = responseBody?.error || responseBody;
       const errorMessage =
         errorDetails?.message ||
-        `Lomi API request failed with status ${response.status}`;
+        formatMerchantFacingApiError(
+          response.status,
+          "Request failed",
+          apiKey.toLowerCase().includes("_test_"),
+        );
       console.error("Lomi API Error:", errorDetails || responseBody);
       throw new LomiApiError(
         errorMessage,
