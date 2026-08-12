@@ -1,0 +1,41 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/root.tsx",
+    "app/entry.server.tsx",
+    "app/routes.ts",
+    "app/routes/**/*.{ts,tsx}",
+    "vite.config.ts",
+    ".graphqlrc.ts",
+    "extensions/**/*.{js,ts,tsx}"
+  ],
+  "project": ["app/**/*.{ts,tsx}", "extensions/**/*.{js,ts,tsx}", "*.{ts,tsx}"],
+  "ignore": [
+    "app/lib/utils/cn.ts",
+    "app/lib/supabase/client.ts",
+    "app/lib/supabase/shopify.config.server.ts"
+  ],
+  "ignoreDependencies": [
+    "@radix-ui/react-label",
+    "@radix-ui/react-slot",
+    "@shopify/app-bridge",
+    "@shopify/app-bridge-react",
+    "@shopify/ui-extensions",
+    "@shopify/ui-extensions-react",
+    "class-variance-authority",
+    "clsx",
+    "lucide-react",
+    "tailwind-merge",
+    "tw-animate-css",
+    "@graphql-codegen/introspection",
+    "@graphql-codegen/typescript"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "enumMembers": "off"
+  }
+}
