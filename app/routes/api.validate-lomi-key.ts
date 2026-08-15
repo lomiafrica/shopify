@@ -32,7 +32,7 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     const formData = await request.formData();
     const keyFromForm = formData.get("lomiApiKey");
-    if (typeof keyFromForm !== "string" || !keyFromForm.trim()) {
+    if (!isString(keyFromForm) || !keyFromForm.trim()) {
       return data<ActionData>(
         { success: false, message: "lomi. Secret Key is required." },
         { status: 400 },
@@ -41,7 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
     lomiApiKey = keyFromForm.trim();
 
     const secretFromForm = formData.get("lomiWebhookSecret");
-    if (typeof secretFromForm === "string" && secretFromForm.trim()) {
+    if (isString(secretFromForm) && secretFromForm.trim()) {
       webhookSecret = secretFromForm.trim();
     }
 
@@ -53,12 +53,12 @@ export async function action({ request }: ActionFunctionArgs) {
     requireBillingAddress = requireBillingAddressFromForm !== "false"; // Default to true
 
     const shippingModeFromForm = formData.get("shippingMode");
-    if (typeof shippingModeFromForm === "string" && shippingModeFromForm.trim()) {
+    if (isString(shippingModeFromForm) && shippingModeFromForm.trim()) {
       shippingMode = shippingModeFromForm.trim();
     }
 
     const flatShippingFeeFromForm = formData.get("flatShippingFee");
-    if (typeof flatShippingFeeFromForm === "string") {
+    if (isString(flatShippingFeeFromForm)) {
       flatShippingFee = flatShippingFeeFromForm.trim();
     }
   } catch (error) {

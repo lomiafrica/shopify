@@ -14,27 +14,27 @@ interface ShopifyLineItem {
   price: string;
 }
 
-function getPaymentAmount(data: Record<string, unknown>): number | null {
-  if (typeof data.amount === "number") {
+function getPaymentAmount(data: JsonObject): number | null {
+  if (isNumber(data.amount)) {
     return data.amount;
   }
-  if (typeof data.gross_amount === "number") {
+  if (isNumber(data.gross_amount)) {
     return data.gross_amount;
   }
-  if (typeof data.amount === "string") {
+  if (isString(data.amount)) {
     const parsed = parseFloat(data.amount);
     return Number.isFinite(parsed) ? parsed : null;
   }
-  if (typeof data.gross_amount === "string") {
+  if (isString(data.gross_amount)) {
     const parsed = parseFloat(data.gross_amount);
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;
 }
 
-function getTransactionId(data: Record<string, unknown>): string | null {
+function getTransactionId(data: JsonObject): string | null {
   const id = data.transaction_id ?? data.id;
-  return typeof id === "string" ? id : null;
+  return isString(id) ? id : null;
 }
 
 async function loadOfflineSession(shop: string): Promise<Session | null> {
@@ -65,19 +65,20 @@ async function createLegacyDraftOrder(
       amount?: unknown;
       gross_amount?: unknown;
       customer?: { email?: string; name?: string };
-      metadata?: Record<string, unknown>;
+      metadata?: JsonObject;
     };
   },
 ) {
   const client = new GraphqlClient({ session });
-  const amount = getPaymentAmount(payload.data as Record<string, unknown>);
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
+  const amount = getPaymentAmount(payload.data as JsonObject);
   const customerEmail = payload.data.customer?.email;
   const customerName = payload.data.customer?.name;
 
   let lineItems: ShopifyLineItem[] = [];
   try {
     const rawLineItems = payload?.data?.metadata?.shopify_line_items;
-    if (typeof rawLineItems === "string") {
+    if (isString(rawLineItems)) {
       lineItems = JSON.parse(rawLineItems);
     }
   } catch {
@@ -109,7 +110,7 @@ async function createLegacyDraftOrder(
     ];
   }
 
-  const draftOrderInput: Record<string, unknown> = {
+  const draftOrderInput: JsonObject = {
     lineItems: draftOrderLineItems,
     tags: ["lomi-payment", "paid"],
     note: "Payment processed via lomi. (legacy flow)",
@@ -174,7 +175,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const payload = JSON.parse(rawBody);
 
     const shop = payload?.data?.metadata?.shopify_shop;
-    if (!shop || typeof shop !== "string") {
+    if (!shop || !isString(shop)) {
       console.error("[webhook] Missing shopify_shop in metadata");
       return json({ error: "Missing metadata" }, { status: 400 });
     }
@@ -214,7 +215,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     const metadata = payload?.data?.metadata ?? {};
     const draftOrderId =
-      typeof metadata.shopify_draft_order_id === "string"
+      isString(metadata.shopify_draft_order_id)
         ? metadata.shopify_draft_order_id
         : null;
     const transactionId = getTransactionId(payload.data ?? {});

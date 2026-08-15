@@ -2,11 +2,12 @@ import {
   formatMerchantFacingApiError,
   resolveLomiApiBaseUrl,
 } from "./merchant-errors";
+import type { JsonObject, JsonValue } from "@lomi./shared";
 
 class LomiApiError extends Error {
   status: number;
-  details?: unknown;
-  constructor(message: string, status: number, details?: unknown) {
+  details?: JsonValue;
+  constructor(message: string, status: number, details?: JsonValue) {
     super(message);
     this.name = "LomiApiError";
     this.status = status;
@@ -19,8 +20,8 @@ interface RequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE";
   path: string;
   apiKey: string;
-  body?: Record<string, unknown>;
-  params?: Record<string, string>;
+  body?: JsonObject;
+  params?: { [key: string]: string };
 }
 
 async function lomiApiRequest<T_Data>({
@@ -75,17 +76,20 @@ async function lomiApiRequest<T_Data>({
     }
 
     if (response.status === 204) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       return undefined as T_Data;
     }
 
     if (
       responseBody &&
-      typeof responseBody === "object" &&
+      isJsonObject(responseBody) &&
       "data" in responseBody
     ) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       return responseBody.data as T_Data;
     }
 
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     return responseBody as T_Data;
   } catch (error) {
     console.error("Error during Lomi API request execution:", error);
@@ -96,6 +100,7 @@ async function lomiApiRequest<T_Data>({
       error instanceof Error
         ? error.message
         : "An unexpected error occurred during the Lomi API request",
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       (error as { status?: number }).status || 500,
       error,
     );
@@ -182,7 +187,8 @@ export async function createLomiCheckoutSession(
     method: "POST",
     path,
     apiKey,
-    body: data as unknown as Record<string, unknown>,
+    // SAFETY: CreateCheckoutSessionRequest is JSON-serializable for the checkout-sessions body.
+    body: data as JsonObject,
   });
 }
 

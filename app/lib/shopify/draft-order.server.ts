@@ -44,7 +44,7 @@ export async function createDraftOrderFromCart({
 
   const client = new GraphqlClient({ session });
 
-  const draftOrderInput: Record<string, unknown> = {
+  const draftOrderInput: JsonObject = {
     lineItems,
     tags: ["lomi-payment", "lomi-cart-bypass"],
     note: transactionNote || "Payment via lomi. (cart bypass)",
@@ -115,7 +115,9 @@ export async function createDraftOrderFromCart({
     draftOrder.totalPriceSet?.shopMoney?.currencyCode ?? "XOF";
 
   return {
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     draftOrderId: draftOrder.id as string,
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     draftOrderName: draftOrder.name as string,
     totalAmount: amount,
     currencyCode,
