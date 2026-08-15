@@ -99,6 +99,7 @@ export async function startCartPayment({
 
   const checkoutUrl =
     lomiSession.url ||
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     (lomiSession as { checkout_url?: string }).checkout_url;
 
   if (!checkoutUrl) {

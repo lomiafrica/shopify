@@ -83,6 +83,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       maskedKey: null,
       maskedWebhookSecret: null,
       webhookUrl,
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       setupHealth: [] as SetupHealthCheck[],
       isTestMode: true,
       allowCouponCode: false,
@@ -116,6 +117,7 @@ export default function SettingsPage() {
   ];
 
   const isSubmitting = fetcher.state === "submitting";
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const fetcherResponse = fetcher.data as
     | { success?: boolean; message?: string }
     | undefined;

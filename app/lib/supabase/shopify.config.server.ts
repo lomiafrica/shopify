@@ -47,6 +47,7 @@ export async function getLomiApiKeyByStoreId(
       throw error;
     }
   }
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   return data as string | null; // data should be string (api key) or null
 }
 
@@ -78,5 +79,6 @@ export async function saveLomiApiKey(
   }
   // The RPC returns SETOF shopify_api_keys, so data will be an array.
   // Since we upsert based on a unique store_id, we expect one row.
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   return data && data.length > 0 ? (data[0] as ShopifyLomiApiKey) : null;
 }

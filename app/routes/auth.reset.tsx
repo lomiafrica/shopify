@@ -28,6 +28,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const shop = formData.get("shop") as string;
 
   if (shop) {

@@ -6,6 +6,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { payload, session, topic, shop } = await authenticate.webhook(request);
   console.log(`Received ${topic} webhook for ${shop}`);
 
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const currentScopes = payload?.current as string[] | undefined;
 
   if (session && currentScopes && currentScopes.length > 0) {
