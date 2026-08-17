@@ -1,5 +1,7 @@
-# Build
+# Dependencies
 node_modules
+
+# Build
 /build
 /app/build
 /public/build/
@@ -7,7 +9,6 @@ node_modules
 /app/public/build
 /library
 /extensions/*/dist
-.cursor
 
 # Environment
 .env
@@ -16,6 +17,6 @@ node_modules
 # Cache
 /.cache
 
-# Ignore shopify files created during app dev
+# Shopify
 .shopify/*
 .shopify.lock
