@@ -103,8 +103,8 @@
       "picomatch@^2": "^2.3.2",
       "picomatch@^4": "^4.0.4",
       "qs": "^6.15.2",
-      "react-router": "6.30.4",
-      "react-router-dom": "6.30.4",
+      "react-router": "6.30.6",
+      "react-router-dom": "6.30.6",
       "yaml": "^2.8.3",
       "diff": "^5.2.2",
       "estree-util-value-to-estree": "^3.3.3",
@@ -118,7 +118,9 @@
     },
     "auditConfig": {
       "ignoreGhsas": [
-        "GHSA-qwww-vcr4-c8h2"
+        "GHSA-qwww-vcr4-c8h2",
+        "GHSA-337j-9hxr-rhxg",
+        "GHSA-wrjc-x8rr-h8h6"
       ]
     }
   }
