@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import crypto from "crypto";
+import { isNumber, isString, type JsonObject } from "@lomi./shared";
 import type { Session } from "@shopify/shopify-api";
 import { GraphqlClient } from "@shopify/shopify-api";
 import shopify from "../shopify.server";
@@ -110,11 +111,11 @@ async function createLegacyDraftOrder(
     ];
   }
 
-  const draftOrderInput: JsonObject = {
+  const draftOrderInput = {
     lineItems: draftOrderLineItems,
     tags: ["lomi-payment", "paid"],
     note: "Payment processed via lomi. (legacy flow)",
-  };
+  } as unknown as JsonObject;
 
   if (customerEmail) {
     draftOrderInput.email = customerEmail;

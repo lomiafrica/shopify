@@ -2,7 +2,11 @@ import {
   formatMerchantFacingApiError,
   resolveLomiApiBaseUrl,
 } from "./merchant-errors";
-import type { JsonObject, JsonValue } from "@lomi./shared";
+import {
+  isJsonObject,
+  type JsonObject,
+  type JsonValue,
+} from "@lomi./shared";
 
 class LomiApiError extends Error {
   status: number;
@@ -102,7 +106,7 @@ async function lomiApiRequest<T_Data>({
         : "An unexpected error occurred during the Lomi API request",
       // SAFETY: Boundary value matches the asserted domain type at this call site.
       (error as { status?: number }).status || 500,
-      error,
+      isJsonObject(error) ? error : undefined,
     );
   }
 }
@@ -188,7 +192,7 @@ export async function createLomiCheckoutSession(
     path,
     apiKey,
     // SAFETY: CreateCheckoutSessionRequest is JSON-serializable for the checkout-sessions body.
-    body: data as JsonObject,
+    body: data as unknown as JsonObject,
   });
 }
 
