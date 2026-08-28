@@ -53,8 +53,8 @@ importers:
   .:
     dependencies:
       '@lomi./shared':
-        specifier: file:../../../../packages/shared
-        version: file:../../../../packages/shared
+        specifier: file:../../../packages/shared
+        version: file:../../../packages/shared
       '@radix-ui/react-label':
         specifier: ^2.1.8
         version: 2.1.8(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -906,8 +906,8 @@ packages:
   '@jspm/core@2.1.0':
     resolution: {integrity: sha512-3sRl+pkyFY/kLmHl0cgHiFp2xEqErA8N3ECjMs7serSUBmoJ70lBa0PG5t0IM6WJgdZNyyI0R8YFfi5wM8+mzg==}
 
-  '@lomi./shared@file:../../../../packages/shared':
-    resolution: {directory: ../../../../packages/shared, type: directory}
+  '@lomi./shared@file:../../../packages/shared':
+    resolution: {directory: ../../../packages/shared, type: directory}
 
   '@mdx-js/mdx@2.3.0':
     resolution: {integrity: sha512-jLuwRlz8DQfQNiUCJR50Y09CGPq3fLtmtUQfVrj79E0JWu3dvsVcxVIcfhR5h0iXu+/z++zDrYeiJqifRynJkA==}
@@ -6104,7 +6104,7 @@ snapshots:
 
   '@jspm/core@2.1.0': {}
 
-  '@lomi./shared@file:../../../../packages/shared':
+  '@lomi./shared@file:../../../packages/shared':
     dependencies:
       libphonenumber-js: 1.13.12
 
