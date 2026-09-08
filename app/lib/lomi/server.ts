@@ -4,6 +4,7 @@ import {
 } from "./merchant-errors";
 import {
   isJsonObject,
+  validateJsonValue,
   type JsonObject,
   type JsonValue,
 } from "@lomi./shared";
@@ -187,12 +188,33 @@ export async function createLomiCheckoutSession(
     );
   }
   const path = "/checkout-sessions";
+  const body = validateJsonValue({
+    success_url: data.success_url,
+    cancel_url: data.cancel_url,
+    amount: data.amount,
+    currency_code: data.currency_code,
+    integration_source: data.integration_source,
+    title: data.title,
+    description: data.description,
+    customer_email: data.customer_email,
+    customer_name: data.customer_name,
+    customer_phone: data.customer_phone,
+    product_id: data.product_id,
+    subscription_id: data.subscription_id,
+    plan_id: data.plan_id,
+    metadata: data.metadata,
+    expiration_minutes: data.expiration_minutes,
+    allow_coupon_code: data.allow_coupon_code,
+    require_billing_address: data.require_billing_address,
+  });
+  if (!isJsonObject(body)) {
+    throw new TypeError("Checkout session body must be a JSON object");
+  }
   return lomiApiRequest<CheckoutSession>({
     method: "POST",
     path,
     apiKey,
-    // SAFETY: CreateCheckoutSessionRequest is JSON-serializable for the checkout-sessions body.
-    body: data as unknown as JsonObject,
+    body,
   });
 }
 

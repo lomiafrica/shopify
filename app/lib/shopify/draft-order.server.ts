@@ -1,6 +1,6 @@
 import { GraphqlClient } from "@shopify/shopify-api";
 import type { Session } from "@shopify/shopify-api";
-import type { JsonObject } from "@lomi./shared";
+import { isJsonObject, validateJsonValue } from "@lomi./shared";
 import type {
   CartJsItem,
   DraftOrderResult,
@@ -45,11 +45,14 @@ export async function createDraftOrderFromCart({
 
   const client = new GraphqlClient({ session });
 
-  const draftOrderInput = {
+  const draftOrderInput = validateJsonValue({
     lineItems,
     tags: ["lomi-payment", "lomi-cart-bypass"],
     note: transactionNote || "Payment via lomi. (cart bypass)",
-  } as JsonObject;
+  });
+  if (!isJsonObject(draftOrderInput)) {
+    throw new TypeError("Draft order input must be a JSON object");
+  }
 
   if (customerEmail) {
     draftOrderInput.email = customerEmail;
