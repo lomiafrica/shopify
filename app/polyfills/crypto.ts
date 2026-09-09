@@ -13,7 +13,7 @@ function readGlobalRequire(): MaybeRequire {
 
 function asWebCrypto(value: Crypto | undefined): Crypto | undefined {
   if (value === undefined) return undefined;
-  if (!('getRandomValues' in value) || !('subtle' in value)) return undefined;
+  if (!("getRandomValues" in value) || !("subtle" in value)) return undefined;
   return value;
 }
 

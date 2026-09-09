@@ -103,13 +103,22 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false);
 
   // Checkout settings
-  const [allowCouponCode, setAllowCouponCode] = useState(loaderData.allowCouponCode);
-  const [requireBillingAddress, setRequireBillingAddress] = useState(loaderData.requireBillingAddress);
+  const [allowCouponCode, setAllowCouponCode] = useState(
+    loaderData.allowCouponCode,
+  );
+  const [requireBillingAddress, setRequireBillingAddress] = useState(
+    loaderData.requireBillingAddress,
+  );
   const [shippingMode, setShippingMode] = useState(loaderData.shippingMode);
-  const [flatShippingFee, setFlatShippingFee] = useState(loaderData.flatShippingFee);
+  const [flatShippingFee, setFlatShippingFee] = useState(
+    loaderData.flatShippingFee,
+  );
 
   const shippingModeOptions = [
-    { label: "Subtotal only (no shipping on cart pay)", value: "subtotal_only" },
+    {
+      label: "Subtotal only (no shipping on cart pay)",
+      value: "subtotal_only",
+    },
     {
       label: "Subtotal + flat shipping fee",
       value: "subtotal_plus_flat_fee",
@@ -119,8 +128,7 @@ export default function SettingsPage() {
   const isSubmitting = fetcher.state === "submitting";
   // SAFETY: Boundary value matches the asserted domain type at this call site.
   const fetcherResponse = fetcher.data as
-    | { success?: boolean; message?: string }
-    | undefined;
+    { success?: boolean; message?: string } | undefined;
   const showSuccess = fetcherResponse?.success === true;
   const error =
     fetcherResponse?.success === false ? fetcherResponse.message : null;
@@ -229,9 +237,9 @@ export default function SettingsPage() {
                       ))}
                     </BlockStack>
                     <Text as="p" tone="subdued">
-                      Test and live keys use different webhook secrets. Paste the
-                      matching pair from Dashboard → Developers when switching
-                      modes.
+                      Test and live keys use different webhook secrets. Paste
+                      the matching pair from Dashboard → Developers when
+                      switching modes.
                     </Text>
                   </BlockStack>
                 </Box>
@@ -333,7 +341,8 @@ export default function SettingsPage() {
                           Checkout options
                         </Text>
                         <Text as="p" tone="subdued">
-                          Customize the lomi. checkout experience for your customers.
+                          Customize the lomi. checkout experience for your
+                          customers.
                         </Text>
                       </Box>
 

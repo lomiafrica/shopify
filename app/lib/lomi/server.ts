@@ -85,11 +85,7 @@ async function lomiApiRequest<T_Data>({
       return undefined as T_Data;
     }
 
-    if (
-      responseBody &&
-      isJsonObject(responseBody) &&
-      "data" in responseBody
-    ) {
+    if (responseBody && isJsonObject(responseBody) && "data" in responseBody) {
       // SAFETY: Boundary value matches the asserted domain type at this call site.
       return responseBody.data as T_Data;
     }

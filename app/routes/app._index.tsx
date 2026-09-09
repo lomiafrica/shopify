@@ -137,8 +137,8 @@ export default function Index() {
   const successRate =
     stats.totalTransactions > 0
       ? Math.round(
-        (stats.successfulTransactions / stats.totalTransactions) * 100,
-      )
+          (stats.successfulTransactions / stats.totalTransactions) * 100,
+        )
       : 0;
 
   if (isLoading) {

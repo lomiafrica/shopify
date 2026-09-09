@@ -112,9 +112,7 @@ export async function createDraftOrderFromCart({
     throw new Error("Draft order creation returned no order");
   }
 
-  const amount = parseFloat(
-    draftOrder.totalPriceSet?.shopMoney?.amount ?? "0",
-  );
+  const amount = parseFloat(draftOrder.totalPriceSet?.shopMoney?.amount ?? "0");
   const currencyCode =
     draftOrder.totalPriceSet?.shopMoney?.currencyCode ?? "XOF";
 
@@ -181,7 +179,11 @@ export async function completeDraftOrder(
 export async function getDraftOrderStatus(
   session: Session,
   draftOrderId: string,
-): Promise<{ name: string | null; completed: boolean; orderName: string | null }> {
+): Promise<{
+  name: string | null;
+  completed: boolean;
+  orderName: string | null;
+}> {
   const client = new GraphqlClient({ session });
 
   const query = `

@@ -54,7 +54,10 @@ async function completeExistingDraftOrder(
   draftOrderId: string,
   transactionId: string | null,
 ): Promise<{ orderId: string | null; orderName: string | null }> {
-  const { orderId, orderName } = await completeDraftOrder(session, draftOrderId);
+  const { orderId, orderName } = await completeDraftOrder(
+    session,
+    draftOrderId,
+  );
 
   await supabaseAdmin.rpc("complete_shopify_pending_payment", {
     p_draft_order_id: draftOrderId,
@@ -154,7 +157,9 @@ async function createLegacyDraftOrder(
   const createResult = createResponse.body?.data?.draftOrderCreate;
   if (createResult?.userErrors?.length > 0) {
     throw new Error(
-      createResult.userErrors.map((e: { message: string }) => e.message).join("; "),
+      createResult.userErrors
+        .map((e: { message: string }) => e.message)
+        .join("; "),
     );
   }
 
@@ -201,7 +206,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
     const webhookSecret = settings[0].webhook_secret;
     if (!webhookSecret) {
-      return json({ message: "Webhook secret not configured" }, { status: 200 });
+      return json(
+        { message: "Webhook secret not configured" },
+        { status: 200 },
+      );
     }
 
     const expectedSignature = crypto
@@ -224,10 +232,9 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const metadata = payload?.data?.metadata ?? {};
-    const draftOrderId =
-      isString(metadata.shopify_draft_order_id)
-        ? metadata.shopify_draft_order_id
-        : null;
+    const draftOrderId = isString(metadata.shopify_draft_order_id)
+      ? metadata.shopify_draft_order_id
+      : null;
     const transactionId = getTransactionId(payload.data ?? {});
 
     if (draftOrderId) {
