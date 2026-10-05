@@ -276,7 +276,7 @@ export default function SettingsPage() {
                             <span>
                               You can create a new API key in the{" "}
                               <a
-                                href="https://dashboard.lomi.africa/settings/access-tokens"
+                                href="https://dashboard.lomi.africa/#/settings/developers?tab=access-tokens"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{ textDecoration: "underline" }}
