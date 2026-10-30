@@ -74,7 +74,7 @@
   "pnpm": {
     "overrides": {
       "vite": "^6.4.3",
-      "vitest": "4.1.11",
+      "vitest": "4.1.12",
       "@remix-run/react": "^2.17.5",
       "@remix-run/router": "^1.23.3",
       "@remix-run/server-runtime": "^2.17.5",
@@ -86,9 +86,9 @@
       "minimatch@^9": "^9.0.7",
       "lodash": "^4.18.0",
       "tar": "^7.5.21",
-      "toml": "^4.2.0",
+      "toml": "^5.0.1",
       "undici@>=7.0.0": "^7.29.1",
-      "undici@<7.0.0": "^6.28.0",
+      "undici@<7.0.0": "^6.29.1",
       "ws": "^8.21.0",
       "path-to-regexp": "^0.1.13",
       "postcss": "^8.5.28",
@@ -101,7 +101,7 @@
       "brace-expansion@^1": "^1.1.18",
       "brace-expansion@^2": "^2.1.7",
       "source-map-js": "1.2.2",
-      "@graphql-tools/utils": "12.0.1",
+      "@graphql-tools/utils": "12.0.2",
       "@isaacs/brace-expansion": "^5.0.1",
       "picomatch@^2": "^2.3.2",
       "picomatch@^4": "^4.0.4",
@@ -117,7 +117,8 @@
       "morgan": "^1.11.0",
       "brace-expansion@^5": "^5.0.9",
       "body-parser": "^1.20.6",
-      "nanoid": "^3.3.18"
+      "nanoid": "^3.3.18",
+      "@vitest/mocker": "4.1.12"
     },
     "auditConfig": {
       "ignoreGhsas": [
