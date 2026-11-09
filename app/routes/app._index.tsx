@@ -192,7 +192,7 @@ export default function Index() {
             </Text>
             <Text as="p" tone="subdued">
               Monitor your payments, manage settings, and grow your business
-              with a payment solution adapted to West Africa.
+              with a payment solution adapted to Africa.
             </Text>
           </BlockStack>
         </Card>

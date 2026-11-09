@@ -41,7 +41,7 @@ export default function App() {
             <img src="/lomi_d.webp" alt="lomi." className={styles.logoImage} />
           </h1>
           <p className={styles.text}>
-            Helping West African entrepreneurs sell online
+            Helping African entrepreneurs sell online
           </p>
           {showForm && (
             <Card>
@@ -73,7 +73,7 @@ export default function App() {
             <li>
               <strong>Reach more customers</strong>Enable your customers to pay
               using popular local payment methods. Expand your market across
-              West Africa by offering familiar and trusted payment options.
+              Africa by offering familiar and trusted payment options.
             </li>
             <li>
               <strong>Secure and reliable</strong>Process transactions with
