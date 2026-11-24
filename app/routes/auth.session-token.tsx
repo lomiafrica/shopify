@@ -3,7 +3,6 @@ import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {
-    // Get the session token from Shopify
     const { session } = await authenticate.admin(request);
 
     if (!session) {

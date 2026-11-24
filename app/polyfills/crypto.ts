@@ -17,7 +17,6 @@ function asWebCrypto(value: Crypto | undefined): Crypto | undefined {
   return value;
 }
 
-// Check if crypto is already available
 if (!globalThis.crypto) {
   try {
     const nodeRequire = readGlobalRequire();
